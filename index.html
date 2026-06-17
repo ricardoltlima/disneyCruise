@@ -333,6 +333,9 @@
             <a href="#rest-api">REST API Design</a>
             <a href="#reliability">Reliability Roadmap</a>
             <a href="#idempotency">Idempotency</a>
+            <a href="#timeouts-retries">Timeouts and Retries</a>
+            <a href="#circuit-breakers">Circuit Breakers</a>
+            <a href="#error-observability">Errors and Observability</a>
             <a href="#interview-answers">Polished Answers</a>
             <a href="#aws">AWS Focus</a>
             <a href="#security">Security, Gateway, Load Balancing</a>
@@ -810,190 +813,383 @@ ON payments (reservation_id, payment_type);</code></pre>
                 </section>
 
                 <section id="interview-answers">
-                    <h2>Polished Answers</h2>
-                    <div class="qa">
-                        <article class="card">
-                            <h3>What happens when a request reaches a Spring Boot service?</h3>
-                            <p class="answer">When a request reaches a Spring Boot service, the embedded server receives it and passes it to Spring MVC. The <code>DispatcherServlet</code> routes it to the matching controller method based on the HTTP method and path. The controller handles HTTP-specific concerns and delegates to a service. The service contains the business workflow and may call repositories, external services, or publish events. The repository handles persistence. The result comes back up the stack, and Spring uses Jackson to serialize the response DTO to JSON.</p>
-                        </article>
+                    <section id="timeouts-retries">
+                        <h2>Timeouts and Retries</h2>
+                        <p class="lead">Core interview question: how do you prevent a slow or unhealthy dependency from taking down your service?</p>
 
-                        <article class="card">
-                            <h3>What is a Spring bean?</h3>
-                            <p class="answer">A Spring bean is an object managed by the Spring container. Spring creates it, injects its dependencies, manages its lifecycle, and can apply framework features around it. Beans can be discovered through annotations like <code>@Service</code>, <code>@Repository</code>, and <code>@Component</code>, or declared manually with <code>@Bean</code>.</p>
-                        </article>
+                        <h3>Timeouts</h3>
+                        <p>A timeout is a limit on how long your service is willing to wait for a dependency. It prevents unbounded waiting and protects threads, memory, connection pools, and request latency.</p>
+                        <div class="warning callout">
+                            <p><strong>Cascading failure:</strong> if Payment Service becomes slow and Reservation Service waits forever, Reservation Service threads can become stuck, queues grow, latency rises, and callers of Reservation Service may also start failing.</p>
+                        </div>
 
-                        <article class="card">
-                            <h3>Why is constructor injection preferred?</h3>
-                            <p class="answer">Constructor injection is preferred because dependencies are explicit, fields can be final, the object cannot be partially initialized, and the class is easy to test without Spring. It supports loose coupling and makes required collaborators visible in the class API.</p>
-                        </article>
+                        <h3>Connection Timeout vs Read Timeout</h3>
+                        <ul>
+                            <li><strong>Connection timeout:</strong> how long the client waits to establish a connection to the dependency.</li>
+                            <li><strong>Read timeout:</strong> how long the client waits for the dependency to send a response after the connection is established.</li>
+                        </ul>
+                        <pre><code>Connection timeout: 500ms
+Read timeout:       2s</code></pre>
 
-                        <article class="card">
-                            <h3>What problem does Qualifier solve?</h3>
-                            <p class="answer"><code>@Qualifier</code> solves ambiguity when multiple beans match the same dependency type. If two classes implement <code>PaymentClient</code>, and a constructor asks for <code>PaymentClient</code>, Spring needs to know which implementation to inject.</p>
-                        </article>
+                        <h3>Request Deadline</h3>
+                        <p>Timeouts should fit inside the overall request budget. If the client or gateway will give up after three seconds, a downstream timeout of ten seconds is not useful. Downstream timeouts should align with the caller's deadline and leave room for error handling.</p>
 
-                        <article class="card">
-                            <h3>Why avoid mutable request fields in services?</h3>
-                            <p class="answer">Most Spring beans are singleton by default, so the same service instance may handle many requests concurrently. Request-specific data should stay in method parameters or local variables. Mutable service fields can be overwritten by concurrent requests and create race conditions.</p>
-                        </article>
+                        <h3>Retries</h3>
+                        <p>A retry means trying an operation again after a failure. Retries help with temporary failures, but they can make outages worse if they add traffic to a service that is already unhealthy.</p>
+                        <ul>
+                            <li>Good retry candidates: temporary timeouts, connection resets, <code>503</code>, <code>504</code>, and sometimes <code>429</code> while respecting <code>Retry-After</code>.</li>
+                            <li>Bad retry candidates: <code>400</code>, <code>401</code>, <code>403</code>, <code>404</code>, validation errors, and business-rule failures.</li>
+                        </ul>
 
-                        <article class="card">
-                            <h3>How do you design a reliable REST API?</h3>
-                            <p class="answer">I design REST APIs around resources, so URLs are nouns and HTTP methods express actions. I use DTOs for request and response contracts instead of exposing entities, because the API contract should be separate from the database model. I validate input at the boundary using annotations and <code>@Valid</code>, so invalid requests fail before business logic runs. I centralize exception handling with <code>@RestControllerAdvice</code> to keep controllers clean and return consistent error responses. For reliability, I think about idempotency, pagination, timeouts, retries, error codes, trace IDs, authentication, authorization, and observability. When calling another service, I make sure the call has a timeout and that retries are safe, especially for operations like payments or reservations.</p>
-                        </article>
+                        <h3>Retry Safety</h3>
+                        <p>Before retrying, check whether the operation is safe. Reads are usually safe. Operations with side effects, such as payments, reservations, refunds, or inventory holds, need idempotency protection such as an idempotency key, unique constraint, or conditional write.</p>
 
-                        <article class="card">
-                            <h3>What is idempotency and why does it matter?</h3>
-                            <p class="answer">Idempotency means that performing the same operation once or multiple times has the same final effect. It matters in distributed systems because clients, gateways, or services may retry after timeouts or network failures. If the original request succeeded but the response was lost, a retry can create duplicate side effects like duplicate payments or bookings. For risky operations, I use idempotency keys, request hashes, unique database constraints, or conditional writes. For event consumers, I assume at-least-once delivery and make handlers idempotent using event IDs or business keys.</p>
-                        </article>
-                    </div>
-                </section>
+                        <h3>Retry Storms</h3>
+                        <p>A retry storm happens when many callers retry at the same time against a dependency that is already overloaded. The retry traffic increases pressure and can delay recovery.</p>
 
-                <section id="aws">
-                    <h2>AWS Focus</h2>
-                    <p class="lead">Kinesis, DynamoDB, and Lambda are high-value topics for real-time, high-volume, cloud-native backend systems.</p>
-                    <div class="grid">
-                        <article class="card">
-                            <h3>Kinesis</h3>
-                            <p>Study real-time streaming, records, streams, shards, partition keys, ordering guarantees, consumers, enhanced fan-out, retention, replay, throughput, and failure handling.</p>
-                            <p><strong>Goal:</strong> explain how to process high-volume real-time events safely.</p>
-                        </article>
-                        <article class="card">
-                            <h3>DynamoDB</h3>
-                            <p>Study key-value and document modeling, partition keys, sort keys, access-pattern-first design, GSIs, LSIs, capacity modes, hot partitions, TTL, conditional writes, transactions, optimistic locking, and single-table design basics.</p>
-                            <p><strong>Goal:</strong> design a DynamoDB table from access patterns instead of relational habits.</p>
-                        </article>
-                        <article class="card">
-                            <h3>Lambda</h3>
-                            <p>Study serverless execution, event sources, API Gateway integration, Kinesis triggers, DynamoDB Streams, cold starts, retries, timeouts, concurrency, idempotency, and observability.</p>
-                            <p><strong>Goal:</strong> explain when Lambda is appropriate and how to make it reliable.</p>
-                        </article>
-                        <article class="card">
-                            <h3>Event-Driven Architecture</h3>
-                            <p>Study synchronous vs asynchronous communication, event contracts, schema evolution, duplicate events, dead-letter queues, replay, eventual consistency, and saga basics.</p>
-                            <p><strong>Goal:</strong> design a backend that handles real-time data without losing correctness.</p>
-                        </article>
-                    </div>
-                </section>
+                        <h3>Exponential Backoff and Jitter</h3>
+                        <p>Exponential backoff waits longer between each retry, such as <code>100ms</code>, <code>200ms</code>, and <code>400ms</code>. Jitter adds randomness to those waits so many clients do not retry at exactly the same time.</p>
+                        <pre><code>Without jitter:
+1000 clients retry at 100ms, then 200ms, then 400ms
 
-                <section id="security">
-                    <h2>Security, Gateway, Load Balancing</h2>
-                    <div class="grid">
-                        <article class="card">
-                            <h3>Spring Security and OAuth2</h3>
-                            <ul>
-                                <li>Authentication vs authorization.</li>
-                                <li>OAuth2 concepts.</li>
-                                <li>JWT access tokens.</li>
-                                <li>Authorization server vs resource server.</li>
-                                <li>Scopes, roles, and claims.</li>
-                                <li>Spring Security filter chain.</li>
-                                <li>401 vs 403 troubleshooting.</li>
-                            </ul>
-                            <p><strong>Goal:</strong> explain how a request with an OAuth2/JWT token is authenticated and authorized by a Spring Boot API.</p>
-                        </article>
-                        <article class="card">
-                            <h3>Gateway and Load Balancing</h3>
-                            <ul>
-                                <li>API gateway routing.</li>
-                                <li>Cross-cutting concerns.</li>
-                                <li>Rate limiting.</li>
-                                <li>TLS termination.</li>
-                                <li>Authentication at the edge vs service level.</li>
-                                <li>Server-side and client-side load balancing.</li>
-                                <li>Health checks and horizontal scaling.</li>
-                            </ul>
-                            <p><strong>Goal:</strong> explain traffic flow from client to gateway or load balancer into backend microservices.</p>
-                        </article>
-                    </div>
-                </section>
+With jitter:
+some retry at 85ms, some at 117ms, some at 263ms</code></pre>
 
-                <section id="testing">
-                    <h2>JUnit and Mockito</h2>
-                    <p class="lead">Testing is part of senior backend ownership, especially when modernizing enterprise systems.</p>
-                    <div class="grid">
-                        <article class="card">
-                            <h3>Topics To Study</h3>
-                            <ul>
-                                <li>Unit tests vs integration tests.</li>
-                                <li>JUnit 5 assertions and lifecycle.</li>
-                                <li>Mockito mocks and stubs.</li>
-                                <li><code>@Mock</code>, <code>@InjectMocks</code>, <code>when</code>, <code>thenReturn</code>, and <code>verify</code>.</li>
-                                <li>Testing Spring service classes.</li>
-                                <li>Testing controllers with MockMvc.</li>
-                                <li>Testing error cases and failure paths.</li>
-                                <li>Avoiding brittle tests and over-mocking.</li>
-                            </ul>
-                        </article>
-                        <article class="card">
-                            <h3>Interview Framing</h3>
-                            <p>Unit tests protect business logic and make refactoring safer. Mockito is useful when a service depends on repositories or external clients. The goal is to test the service's behavior without requiring a database, network call, or full Spring context.</p>
-                            <pre><code>ReservationRepository repository = mock(ReservationRepository.class);
+                        <h3>Practical Policy</h3>
+                        <p>A practical retry policy should limit attempts, use exponential backoff with jitter, respect the request deadline, retry only transient failures, and only retry operations that are safe to repeat.</p>
+                    </section>
+
+                    <section id="circuit-breakers">
+                        <h2>Circuit Breakers</h2>
+                        <p class="lead">Core interview question: how do you stop repeated calls to a failing dependency, and how do you decide whether degraded behavior is safe?</p>
+
+                        <h3>Problem</h3>
+                        <p>When a dependency is slow or unavailable, repeated calls and retries can consume threads, connections, CPU, memory, and network capacity. A circuit breaker protects the caller and gives the dependency time to recover.</p>
+
+                        <h3>States</h3>
+                        <ul>
+                            <li><strong>Closed:</strong> normal state. Calls are allowed, and the breaker records successes, failures, and slow calls.</li>
+                            <li><strong>Open:</strong> failure state. Calls are blocked immediately, so the service fails fast or uses a safe fallback.</li>
+                            <li><strong>Half-open:</strong> recovery test state. A small number of trial calls are allowed. If they succeed, the breaker closes. If they fail, it opens again.</li>
+                        </ul>
+                        <pre><code>CLOSED -> OPEN -> HALF_OPEN -> CLOSED
+                   or
+                   HALF_OPEN -> OPEN</code></pre>
+
+                        <h3>Fail Fast</h3>
+                        <p>Fail fast means the service does not wait for a call that is likely to fail. When the circuit is open, the call is blocked immediately and returns a controlled failure or safe fallback. This keeps latency bounded and releases resources quickly.</p>
+
+                        <h3>Circuit Breaker vs Retry</h3>
+                        <p>Retries try again because a failure may be temporary. Circuit breakers stop trying temporarily because the dependency appears unhealthy. A common reliability pattern is timeout, limited retry, circuit breaker, then controlled failure or safe fallback.</p>
+
+                        <h3>Fallback Behavior</h3>
+                        <p>A fallback is an alternative response when the normal dependency call fails. Fallbacks are useful only when they are truthful and safe.</p>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Safer Fallbacks</h3>
+                                <ul>
+                                    <li>Return popular cruise activities when recommendations are unavailable.</li>
+                                    <li>Return cached non-critical content if freshness is acceptable.</li>
+                                    <li>Queue a confirmation email for retry later.</li>
+                                    <li>Accept a request as pending with <code>202 Accepted</code> when asynchronous processing is appropriate.</li>
+                                </ul>
+                            </article>
+                            <article class="card">
+                                <h3>Dangerous Fallbacks</h3>
+                                <ul>
+                                    <li>Assume payment succeeded when Payment Service is unavailable.</li>
+                                    <li>Assume inventory is available when Inventory Service is unavailable.</li>
+                                    <li>Allow a request when authorization cannot be verified.</li>
+                                    <li>Return stale pricing as if it were guaranteed current pricing.</li>
+                                </ul>
+                            </article>
+                        </div>
+
+                        <h3>Configuration Concepts</h3>
+                        <p>Circuit breakers are usually configured with a failure threshold, slow-call threshold, sliding window, minimum number of calls, wait duration in open state, and permitted test calls in half-open state.</p>
+                        <pre><code>slidingWindowSize: 20
+minimumNumberOfCalls: 10
+failureRateThreshold: 50%
+waitDurationInOpenState: 30s
+permittedNumberOfCallsInHalfOpenState: 3</code></pre>
+
+                        <h3>Observability</h3>
+                        <p>Circuit breaker state should be visible in metrics and logs. Useful signals include circuit state, failure rate, slow call rate, blocked calls, fallback count, dependency latency, trace ID, dependency name, and failure reason.</p>
+                    </section>
+
+                    <section id="error-observability">
+                        <h2>Error Handling and Observability</h2>
+                        <p class="lead">Core interview question: how do you return useful errors to clients while giving engineers enough data to debug production issues?</p>
+
+                        <h3>Good API Errors</h3>
+                        <p>A good API error response should be clear for the client, safe for security, stable for integrations, useful for debugging, and consistent across endpoints.</p>
+                        <pre><code>{
+  "code": "PAYMENT_SERVICE_UNAVAILABLE",
+  "message": "Payment service is temporarily unavailable",
+  "traceId": "7f4a91c3"
+}</code></pre>
+
+                        <h3>Business Errors vs Technical Errors</h3>
+                        <ul>
+                            <li><strong>Business errors:</strong> expected domain outcomes, such as payment declined, reservation not found, cabin unavailable, duplicate request, or reservation cannot be cancelled.</li>
+                            <li><strong>Technical errors:</strong> bugs, infrastructure failures, or dependency failures, such as timeouts, connection failures, database outages, null pointer exceptions, or Kafka publish failures.</li>
+                        </ul>
+                        <p>Business and client errors usually map to <code>4xx</code>. Unexpected server and dependency failures usually map to <code>5xx</code>.</p>
+
+                        <h3>Stable Error Codes</h3>
+                        <p>Clients should not parse human-readable messages. They should rely on stable error codes like <code>RESERVATION_NOT_FOUND</code>, <code>VALIDATION_ERROR</code>, or <code>PAYMENT_SERVICE_UNAVAILABLE</code>. Messages can change; codes should remain stable.</p>
+
+                        <h3>Do Not Leak Internals</h3>
+                        <p>API responses should not expose stack traces, SQL queries, table names, internal hostnames, internal service URLs, raw library exceptions, secrets, or tokens. Keep internal details in logs and traces, linked by trace ID.</p>
+
+                        <h3>Spring Exception Handling</h3>
+                        <p><code>@RestControllerAdvice</code> centralizes exception handling, keeps controllers clean, maps exceptions to appropriate status codes, and returns consistent error bodies.</p>
+                        <pre><code>@RestControllerAdvice
+public class ApiExceptionHandler {
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity&lt;ApiError&gt; handleNotFound(ReservationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(
+                        "RESERVATION_NOT_FOUND",
+                        "Reservation was not found",
+                        getTraceId()
+                ));
+    }
+}</code></pre>
+
+                        <h3>Logs, Metrics, Traces</h3>
+                        <ul>
+                            <li><strong>Logs:</strong> tell what happened in a specific execution path.</li>
+                            <li><strong>Metrics:</strong> show health and trends over time, such as latency, error rate, throughput, memory, consumer lag, or dependency failures.</li>
+                            <li><strong>Traces:</strong> show where time was spent across services in a distributed request.</li>
+                        </ul>
+
+                        <h3>Useful Log Fields</h3>
+                        <p>Structured logs should include fields such as timestamp, level, service, operation, trace ID, span ID, safe business identifiers, dependency name, status code, duration, error code, and exception class.</p>
+                        <pre><code>{
+  "level": "ERROR",
+  "service": "reservation-service",
+  "operation": "createReservation",
+  "traceId": "abc-123",
+  "reservationId": "R123",
+  "dependency": "payment-service",
+  "durationMs": 2050,
+  "errorCode": "PAYMENT_SERVICE_TIMEOUT",
+  "exception": "ReadTimeoutException"
+}</code></pre>
+
+                        <h3>Latency Investigation</h3>
+                        <ol>
+                            <li>Check dashboards for p95/p99 latency, error rate, throughput, and affected endpoints.</li>
+                            <li>Check dependency metrics for payment, inventory, database, queues, streams, and external APIs.</li>
+                            <li>Inspect traces for slow requests and identify the slow span.</li>
+                            <li>Search logs by trace ID.</li>
+                            <li>Check recent deploys or configuration changes.</li>
+                            <li>Check resource saturation: CPU, memory, thread pools, database pools, and connection pools.</li>
+                            <li>Choose mitigation: rollback, scale, open circuit, disable feature, queue work, or increase capacity.</li>
+                        </ol>
+                    </section>
+
+                    <section id="interview-answers">
+                        <h2>Polished Answers</h2>
+                        <div class="qa">
+                            <article class="card">
+                                <h3>What happens when a request reaches a Spring Boot service?</h3>
+                                <p class="answer">When a request reaches a Spring Boot service, the embedded server receives it and passes it to Spring MVC. The <code>DispatcherServlet</code> routes it to the matching controller method based on the HTTP method and path. The controller handles HTTP-specific concerns and delegates to a service. The service contains the business workflow and may call repositories, external services, or publish events. The repository handles persistence. The result comes back up the stack, and Spring uses Jackson to serialize the response DTO to JSON.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>What is a Spring bean?</h3>
+                                <p class="answer">A Spring bean is an object managed by the Spring container. Spring creates it, injects its dependencies, manages its lifecycle, and can apply framework features around it. Beans can be discovered through annotations like <code>@Service</code>, <code>@Repository</code>, and <code>@Component</code>, or declared manually with <code>@Bean</code>.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>Why is constructor injection preferred?</h3>
+                                <p class="answer">Constructor injection is preferred because dependencies are explicit, fields can be final, the object cannot be partially initialized, and the class is easy to test without Spring. It supports loose coupling and makes required collaborators visible in the class API.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>What problem does Qualifier solve?</h3>
+                                <p class="answer"><code>@Qualifier</code> solves ambiguity when multiple beans match the same dependency type. If two classes implement <code>PaymentClient</code>, and a constructor asks for <code>PaymentClient</code>, Spring needs to know which implementation to inject.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>Why avoid mutable request fields in services?</h3>
+                                <p class="answer">Most Spring beans are singleton by default, so the same service instance may handle many requests concurrently. Request-specific data should stay in method parameters or local variables. Mutable service fields can be overwritten by concurrent requests and create race conditions.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>How do you design a reliable REST API?</h3>
+                                <p class="answer">I design REST APIs around resources, so URLs are nouns and HTTP methods express actions. I use DTOs for request and response contracts instead of exposing entities, because the API contract should be separate from the database model. I validate input at the boundary using annotations and <code>@Valid</code>, so invalid requests fail before business logic runs. I centralize exception handling with <code>@RestControllerAdvice</code> to keep controllers clean and return consistent error responses. For reliability, I think about idempotency, pagination, timeouts, retries, error codes, trace IDs, authentication, authorization, and observability. When calling another service, I make sure the call has a timeout and that retries are safe, especially for operations like payments or reservations.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>What is idempotency and why does it matter?</h3>
+                                <p class="answer">Idempotency means that performing the same operation once or multiple times has the same final effect. It matters in distributed systems because clients, gateways, or services may retry after timeouts or network failures. If the original request succeeded but the response was lost, a retry can create duplicate side effects like duplicate payments or bookings. For risky operations, I use idempotency keys, request hashes, unique database constraints, or conditional writes. For event consumers, I assume at-least-once delivery and make handlers idempotent using event IDs or business keys.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>How do you handle timeouts and retries between services?</h3>
+                                <p class="answer">I configure explicit timeouts for every outbound dependency call so my service does not wait indefinitely and exhaust threads, memory, or connection pools. I distinguish connection timeouts from read timeouts and align them with the overall request deadline. For retries, I only retry failures that are likely transient, such as timeouts, <code>503</code>, <code>504</code>, or sometimes <code>429</code> while respecting <code>Retry-After</code>. I avoid retrying validation, authentication, authorization, and business-rule errors. I also make sure the operation is safe to retry, either naturally idempotent or protected by an idempotency key, unique constraint, or conditional write. To avoid retry storms, I use limited attempts, exponential backoff, jitter, and eventually circuit breakers or asynchronous recovery.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>How do circuit breakers and fallbacks improve reliability?</h3>
+                                <p class="answer">A circuit breaker prevents repeated calls to a dependency that appears unhealthy. In the closed state, calls flow normally and the breaker records successes, failures, and slow calls. If failures exceed a threshold, it opens and fails fast instead of continuing to consume resources. After a wait period, it moves to half-open and allows a small number of test calls. If they succeed, it closes; if they fail, it opens again. For fallback behavior, I only use alternatives that are truthful and safe, such as cached non-critical data, default recommendations, or queuing work for later. I would not use fallback to pretend that a payment, authorization, or inventory operation succeeded.</p>
+                            </article>
+
+                            <article class="card">
+                                <h3>How do you handle errors and observability in a Spring Boot microservice?</h3>
+                                <p class="answer">I centralize error handling with <code>@RestControllerAdvice</code> so controllers stay clean and API errors are consistent. I separate expected business or client errors from unexpected server and dependency failures, map them to appropriate <code>4xx</code> or <code>5xx</code> status codes, and return stable error codes with safe messages and trace IDs. I avoid leaking stack traces, SQL details, tokens, or internal hostnames in API responses. For observability, I use structured logs, metrics, and distributed tracing. Logs tell me what happened, metrics show health and trends, and traces show where time was spent across services. I make sure trace or correlation IDs are propagated across service boundaries and included in logs and error responses, so production issues can be debugged quickly.</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section id="aws">
+                        <h2>AWS Focus</h2>
+                        <p class="lead">Kinesis, DynamoDB, and Lambda are high-value topics for real-time, high-volume, cloud-native backend systems.</p>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Kinesis</h3>
+                                <p>Study real-time streaming, records, streams, shards, partition keys, ordering guarantees, consumers, enhanced fan-out, retention, replay, throughput, and failure handling.</p>
+                                <p><strong>Goal:</strong> explain how to process high-volume real-time events safely.</p>
+                            </article>
+                            <article class="card">
+                                <h3>DynamoDB</h3>
+                                <p>Study key-value and document modeling, partition keys, sort keys, access-pattern-first design, GSIs, LSIs, capacity modes, hot partitions, TTL, conditional writes, transactions, optimistic locking, and single-table design basics.</p>
+                                <p><strong>Goal:</strong> design a DynamoDB table from access patterns instead of relational habits.</p>
+                            </article>
+                            <article class="card">
+                                <h3>Lambda</h3>
+                                <p>Study serverless execution, event sources, API Gateway integration, Kinesis triggers, DynamoDB Streams, cold starts, retries, timeouts, concurrency, idempotency, and observability.</p>
+                                <p><strong>Goal:</strong> explain when Lambda is appropriate and how to make it reliable.</p>
+                            </article>
+                            <article class="card">
+                                <h3>Event-Driven Architecture</h3>
+                                <p>Study synchronous vs asynchronous communication, event contracts, schema evolution, duplicate events, dead-letter queues, replay, eventual consistency, and saga basics.</p>
+                                <p><strong>Goal:</strong> design a backend that handles real-time data without losing correctness.</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section id="security">
+                        <h2>Security, Gateway, Load Balancing</h2>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Spring Security and OAuth2</h3>
+                                <ul>
+                                    <li>Authentication vs authorization.</li>
+                                    <li>OAuth2 concepts.</li>
+                                    <li>JWT access tokens.</li>
+                                    <li>Authorization server vs resource server.</li>
+                                    <li>Scopes, roles, and claims.</li>
+                                    <li>Spring Security filter chain.</li>
+                                    <li>401 vs 403 troubleshooting.</li>
+                                </ul>
+                                <p><strong>Goal:</strong> explain how a request with an OAuth2/JWT token is authenticated and authorized by a Spring Boot API.</p>
+                            </article>
+                            <article class="card">
+                                <h3>Gateway and Load Balancing</h3>
+                                <ul>
+                                    <li>API gateway routing.</li>
+                                    <li>Cross-cutting concerns.</li>
+                                    <li>Rate limiting.</li>
+                                    <li>TLS termination.</li>
+                                    <li>Authentication at the edge vs service level.</li>
+                                    <li>Server-side and client-side load balancing.</li>
+                                    <li>Health checks and horizontal scaling.</li>
+                                </ul>
+                                <p><strong>Goal:</strong> explain traffic flow from client to gateway or load balancer into backend microservices.</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section id="testing">
+                        <h2>JUnit and Mockito</h2>
+                        <p class="lead">Testing is part of senior backend ownership, especially when modernizing enterprise systems.</p>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Topics To Study</h3>
+                                <ul>
+                                    <li>Unit tests vs integration tests.</li>
+                                    <li>JUnit 5 assertions and lifecycle.</li>
+                                    <li>Mockito mocks and stubs.</li>
+                                    <li><code>@Mock</code>, <code>@InjectMocks</code>, <code>when</code>, <code>thenReturn</code>, and <code>verify</code>.</li>
+                                    <li>Testing Spring service classes.</li>
+                                    <li>Testing controllers with MockMvc.</li>
+                                    <li>Testing error cases and failure paths.</li>
+                                    <li>Avoiding brittle tests and over-mocking.</li>
+                                </ul>
+                            </article>
+                            <article class="card">
+                                <h3>Interview Framing</h3>
+                                <p>Unit tests protect business logic and make refactoring safer. Mockito is useful when a service depends on repositories or external clients. The goal is to test the service's behavior without requiring a database, network call, or full Spring context.</p>
+                                <pre><code>ReservationRepository repository = mock(ReservationRepository.class);
 ReservationService service = new ReservationService(repository);</code></pre>
-                        </article>
-                    </div>
-                </section>
+                            </article>
+                        </div>
+                    </section>
 
-                <section id="ai">
-                    <h2>AI at Work</h2>
-                    <p class="lead">For an interview, AI usage should sound like senior engineering judgment, not blind tool adoption.</p>
-                    <div class="callout">
-                        <p><strong>Strong framing:</strong> I use AI to accelerate understanding, boilerplate, tests, refactoring ideas, and documentation, but I keep ownership of correctness, security, architecture, and production behavior.</p>
-                    </div>
-                    <div class="grid">
-                        <article class="card">
-                            <h3>Good Uses</h3>
-                            <ul>
-                                <li>Understanding unfamiliar code.</li>
-                                <li>Generating first drafts of unit tests.</li>
-                                <li>Explaining stack traces.</li>
-                                <li>Summarizing pull requests.</li>
-                                <li>Suggesting refactoring approaches.</li>
-                                <li>Creating migration checklists.</li>
-                            </ul>
-                        </article>
-                        <article class="card">
-                            <h3>What To Avoid</h3>
-                            <ul>
-                                <li>Pasting secrets, credentials, tokens, customer data, or unapproved proprietary information into AI tools.</li>
-                                <li>Accepting generated code without review.</li>
-                                <li>Using AI-generated security or authorization code blindly.</li>
-                                <li>Letting AI perform destructive actions without approval.</li>
-                                <li>Relying on AI for production diagnosis without validating logs, metrics, and traces.</li>
-                                <li>Introducing dependencies or licenses without checking policy.</li>
-                            </ul>
-                        </article>
-                    </div>
-                    <div class="note callout">
-                        <p><strong>References to know:</strong> <a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a>, <a href="https://www.nist.gov/itl/ai-risk-management-framework/ai-rmf-generative-ai-profile">NIST Generative AI Profile</a>, <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for LLM Applications</a>, and <a href="https://github.com/features/copilot/trust">GitHub Copilot Trust Center</a>.</p>
-                    </div>
-                </section>
+                    <section id="ai">
+                        <h2>AI at Work</h2>
+                        <p class="lead">For an interview, AI usage should sound like senior engineering judgment, not blind tool adoption.</p>
+                        <div class="callout">
+                            <p><strong>Strong framing:</strong> I use AI to accelerate understanding, boilerplate, tests, refactoring ideas, and documentation, but I keep ownership of correctness, security, architecture, and production behavior.</p>
+                        </div>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Good Uses</h3>
+                                <ul>
+                                    <li>Understanding unfamiliar code.</li>
+                                    <li>Generating first drafts of unit tests.</li>
+                                    <li>Explaining stack traces.</li>
+                                    <li>Summarizing pull requests.</li>
+                                    <li>Suggesting refactoring approaches.</li>
+                                    <li>Creating migration checklists.</li>
+                                </ul>
+                            </article>
+                            <article class="card">
+                                <h3>What To Avoid</h3>
+                                <ul>
+                                    <li>Pasting secrets, credentials, tokens, customer data, or unapproved proprietary information into AI tools.</li>
+                                    <li>Accepting generated code without review.</li>
+                                    <li>Using AI-generated security or authorization code blindly.</li>
+                                    <li>Letting AI perform destructive actions without approval.</li>
+                                    <li>Relying on AI for production diagnosis without validating logs, metrics, and traces.</li>
+                                    <li>Introducing dependencies or licenses without checking policy.</li>
+                                </ul>
+                            </article>
+                        </div>
+                        <div class="note callout">
+                            <p><strong>References to know:</strong> <a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a>, <a href="https://www.nist.gov/itl/ai-risk-management-framework/ai-rmf-generative-ai-profile">NIST Generative AI Profile</a>, <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for LLM Applications</a>, and <a href="https://github.com/features/copilot/trust">GitHub Copilot Trust Center</a>.</p>
+                        </div>
+                    </section>
 
-                <section id="next">
-                    <h2>Next Topics</h2>
-                    <p class="lead">The next study session should continue with timeouts and retries.</p>
-                    <div class="grid">
-                        <article class="card">
-                            <h3>Next Core Question</h3>
-                            <p>How do you prevent a slow or unhealthy dependency from taking down your service?</p>
-                        </article>
-                        <article class="card">
-                            <h3>Next Concepts</h3>
-                            <ul>
-                                <li>Connection timeout vs read timeout.</li>
-                                <li>Cascading failures.</li>
-                                <li>Retry safety.</li>
-                                <li>Exponential backoff.</li>
-                                <li>Jitter.</li>
-                                <li>Retry storms.</li>
-                            </ul>
-                        </article>
-                    </div>
-                </section>
+                    <section id="next">
+                        <h2>Next Topics</h2>
+                        <p class="lead">The next study session should continue with synchronous vs asynchronous communication.</p>
+                        <div class="grid">
+                            <article class="card">
+                                <h3>Next Core Question</h3>
+                                <p>How do you decide whether one service should call another directly or publish an event for later processing?</p>
+                            </article>
+                            <article class="card">
+                                <h3>Next Concepts</h3>
+                                <ul>
+                                    <li>Synchronous REST calls.</li>
+                                    <li>Asynchronous messaging.</li>
+                                    <li>Eventual consistency.</li>
+                                    <li>When users need an immediate answer.</li>
+                                    <li>When background processing is better.</li>
+                                    <li>How this connects to Kafka, Kinesis, RabbitMQ, and Lambda.</li>
+                                </ul>
+                            </article>
+                        </div>
+                    </section>
 
-                <footer>
-                    <p>Generated as a local study artifact for the Disney Senior Java Backend interview preparation.</p>
-                </footer>
+                    <footer>
+                        <p>Generated as a local study artifact for the Disney Senior Java Backend interview preparation.</p>
+                    </footer>
     </main>
 </div>
 </body>
