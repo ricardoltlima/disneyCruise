@@ -336,6 +336,8 @@
         <a href="#timeouts-retries">Timeouts and Retries</a>
         <a href="#circuit-breakers">Circuit Breakers</a>
         <a href="#error-observability">Errors and Observability</a>
+        <a href="#sync-async">Sync vs Async</a>
+        <a href="#spring-security">Spring Security OAuth2</a>
         <a href="#interview-answers">Polished Answers</a>
         <a href="#aws">AWS Focus</a>
         <a href="#security">Security, Gateway, Load Balancing</a>
@@ -990,6 +992,160 @@ public class ApiExceptionHandler {
         </ol>
       </section>
 
+      <section id="sync-async">
+        <h2>Synchronous vs Asynchronous Communication</h2>
+        <p class="lead">Core interview question: how do you decide whether one service should call another directly or publish an event for later processing?</p>
+
+        <h3>Synchronous Communication</h3>
+        <p>Synchronous communication means the caller waits for the callee to respond before continuing. REST and gRPC calls are common examples.</p>
+        <pre><code>Client
+  -> Reservation Service
+  -> Payment Service
+  -> Reservation Service
+  -> Client response</code></pre>
+        <p>Synchronous calls are useful when the caller needs an immediate answer, such as whether payment was authorized, whether a reservation exists, or whether a user is allowed to access a resource.</p>
+
+        <h3>Synchronous Tradeoffs</h3>
+        <ul>
+          <li><strong>Benefits:</strong> simple request/response model, easier to reason about, immediate result, natural fit for user-facing reads and validations.</li>
+          <li><strong>Risks:</strong> tighter coupling, dependency latency affects caller latency, failures can cascade, and every dependency needs timeouts, retries, circuit breakers, and observability.</li>
+        </ul>
+
+        <h3>Asynchronous Communication</h3>
+        <p>Asynchronous communication means the caller publishes a message or event and does not wait for the downstream work to complete inside the same request. Kafka, RabbitMQ, Kinesis, SQS, SNS, and Lambda triggers are common examples.</p>
+        <pre><code>Reservation Service
+  -> publishes ReservationCreated event
+  -> returns response
+
+Other consumers later:
+  -> Email Service sends confirmation
+  -> Loyalty Service awards points
+  -> Analytics Service records activity</code></pre>
+
+        <h3>Asynchronous Tradeoffs</h3>
+        <ul>
+          <li><strong>Benefits:</strong> decouples services, absorbs traffic spikes, improves resilience, supports replay, and lets non-critical work happen in the background.</li>
+          <li><strong>Risks:</strong> eventual consistency, duplicate messages, ordering issues, harder debugging, schema evolution, and more complex failure handling.</li>
+        </ul>
+
+        <h3>When To Use Synchronous</h3>
+        <ul>
+          <li>The user or caller needs an immediate answer.</li>
+          <li>The next step depends on the result.</li>
+          <li>The operation is a read or direct validation.</li>
+          <li>The workflow cannot honestly continue without the dependency response.</li>
+        </ul>
+        <p>Example: a reservation service may need a synchronous payment authorization before confirming a booking.</p>
+
+        <h3>When To Use Asynchronous</h3>
+        <ul>
+          <li>The work can happen later.</li>
+          <li>The caller does not need the final result immediately.</li>
+          <li>The system needs to absorb high-volume events.</li>
+          <li>Multiple consumers need to react to the same event.</li>
+          <li>The system benefits from replay, buffering, or decoupling.</li>
+        </ul>
+        <p>Example: after a reservation is confirmed, sending emails, updating analytics, awarding loyalty points, or syncing downstream reporting can happen asynchronously.</p>
+
+        <h3>Eventual Consistency</h3>
+        <p>Asynchronous systems are often eventually consistent. One service may update immediately while another service catches up later. This is acceptable when the business can tolerate short delays, but it must be visible in product behavior and support workflows.</p>
+
+        <h3>Senior Design Rule</h3>
+        <p>Use synchronous communication when correctness or user experience requires an immediate answer. Use asynchronous communication when work can be decoupled, retried, replayed, or processed in the background. Do not make everything synchronous by default, and do not make everything event-driven if the user needs a clear immediate result.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>Choose synchronous communication when the caller needs the result immediately or the next step cannot proceed without it.</li>
+          <li>Choose asynchronous communication when the work can happen later, the user does not need the final result immediately, or multiple consumers need to react to the same event.</li>
+          <li>Eventual consistency means different parts of the system may temporarily show different states, but they should converge after background processing completes.</li>
+          <li>Async consumers need idempotency because messages may be retried or delivered more than once.</li>
+          <li>A Disney-style synchronous example is buying or confirming cruise tickets after checking payment and availability. A Disney-style asynchronous example is sending notifications or park news updates after an event is published.</li>
+        </ul>
+      </section>
+
+      <section id="spring-security">
+        <h2>Spring Security, OAuth2, and JWT</h2>
+        <p class="lead">Core interview question: how does a Spring Boot API authenticate and authorize a request using OAuth2 and JWT?</p>
+
+        <h3>Authentication vs Authorization</h3>
+        <ul>
+          <li><strong>Authentication:</strong> verifies who the caller is.</li>
+          <li><strong>Authorization:</strong> verifies what the authenticated caller is allowed to do.</li>
+        </ul>
+        <p>A simple way to remember it: authentication is identity; authorization is permission.</p>
+
+        <h3>OAuth2 Roles</h3>
+        <ul>
+          <li><strong>Resource owner:</strong> usually the user.</li>
+          <li><strong>Client:</strong> the application requesting access, such as a mobile app, web app, or backend service.</li>
+          <li><strong>Authorization server:</strong> authenticates users or clients and issues tokens, such as Okta, Auth0, Cognito, Azure AD, or Ping Identity.</li>
+          <li><strong>Resource server:</strong> the protected API. A Spring Boot API commonly plays this role.</li>
+        </ul>
+
+        <h3>JWT Structure</h3>
+        <p>A JWT is commonly used as an access token and has three parts: header, payload, and signature.</p>
+        <pre><code>header.payload.signature</code></pre>
+        <ul>
+          <li><strong>Header:</strong> token type and signing algorithm.</li>
+          <li><strong>Payload:</strong> claims such as subject, issuer, audience, expiration, scopes, and roles.</li>
+          <li><strong>Signature:</strong> proves the token was signed by a trusted issuer and was not modified.</li>
+        </ul>
+        <div class="warning callout">
+          <p><strong>Important:</strong> a normal JWT payload is encoded, not encrypted. Do not put secrets, credentials, or sensitive data in JWT claims unless there is a specific encrypted-token design.</p>
+        </div>
+
+        <h3>Resource Server Flow</h3>
+        <ol>
+          <li>Request enters the Spring Security filter chain.</li>
+          <li>Bearer token filter extracts the token from the <code>Authorization</code> header.</li>
+          <li>JWT decoder validates signature and claims such as issuer, expiration, and audience.</li>
+          <li>Spring creates an authenticated principal.</li>
+          <li>Scopes or roles are mapped to authorities.</li>
+          <li>Authorization rules are checked.</li>
+          <li>The controller is called only if access is allowed.</li>
+        </ol>
+
+        <h3>401 vs 403</h3>
+        <ul>
+          <li><strong>401 Unauthorized:</strong> the caller is not authenticated. Common causes include missing token, expired token, invalid signature, wrong issuer, or malformed <code>Authorization</code> header.</li>
+          <li><strong>403 Forbidden:</strong> the caller is authenticated but not allowed. Common causes include missing scope, wrong role, or failing a business authorization rule.</li>
+        </ul>
+
+        <h3>Scopes, Roles, and Business Authorization</h3>
+        <p>Scopes usually describe permissions, such as <code>reservation:read</code> or <code>payment:authorize</code>. Roles usually describe who the caller is, such as <code>GUEST</code>, <code>ADMIN</code>, or <code>SERVICE_ACCOUNT</code>.</p>
+        <p>Endpoint-level authorization checks whether the caller can access an operation. Business authorization checks whether the caller can access this specific resource.</p>
+        <pre><code>Endpoint permission:
+Can this caller use GET /api/reservations/{id}?
+
+Business permission:
+Does reservation 123 belong to this authenticated guest?</code></pre>
+
+        <h3>Spring Security Configuration Concept</h3>
+        <pre><code>@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.GET, "/api/reservations/**")
+                    .hasAuthority("SCOPE_reservation:read")
+                    .requestMatchers(HttpMethod.POST, "/api/reservations")
+                    .hasAuthority("SCOPE_reservation:write")
+                    .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt())
+            .build();
+}</code></pre>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>Authentication verifies identity; authorization verifies permission.</li>
+          <li>A Spring Boot API usually acts as an OAuth2 resource server.</li>
+          <li>A JWT has a header, payload, and signature.</li>
+          <li>Do not put secrets in a normal JWT payload because it is encoded, not encrypted.</li>
+          <li><code>401</code> means missing or invalid authentication; <code>403</code> means authenticated but not permitted.</li>
+          <li>Endpoint-level authorization is not enough when access depends on the specific resource, such as whether a reservation belongs to the authenticated guest.</li>
+        </ul>
+      </section>
+
       <section id="interview-answers">
         <h2>Polished Answers</h2>
         <div class="qa">
@@ -1041,6 +1197,16 @@ public class ApiExceptionHandler {
           <article class="card">
             <h3>How do you handle errors and observability in a Spring Boot microservice?</h3>
             <p class="answer">I centralize error handling with <code>@RestControllerAdvice</code> so controllers stay clean and API errors are consistent. I separate expected business or client errors from unexpected server and dependency failures, map them to appropriate <code>4xx</code> or <code>5xx</code> status codes, and return stable error codes with safe messages and trace IDs. I avoid leaking stack traces, SQL details, tokens, or internal hostnames in API responses. For observability, I use structured logs, metrics, and distributed tracing. Logs tell me what happened, metrics show health and trends, and traces show where time was spent across services. I make sure trace or correlation IDs are propagated across service boundaries and included in logs and error responses, so production issues can be debugged quickly.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you choose between synchronous and asynchronous communication?</h3>
+            <p class="answer">I use synchronous communication when the caller needs an immediate answer or the next step cannot proceed without the result, such as authorization, reads, validation, or payment authorization before confirming a booking. I use asynchronous communication when work can happen later, multiple consumers need to react to the same event, or the system needs buffering, replay, and decoupling. Synchronous calls are simpler but can create tight coupling and cascading failures, so they need timeouts, retries, circuit breakers, and observability. Asynchronous systems improve resilience and scalability, but require idempotent consumers, schema management, duplicate handling, ordering decisions, and acceptance of eventual consistency.</p>
+          </article>
+
+          <article class="card">
+            <h3>How does OAuth2/JWT work in a Spring Boot API?</h3>
+            <p class="answer">In this setup, the Spring Boot API acts as an OAuth2 resource server. A client obtains an access token from an authorization server such as Okta, Cognito, or Azure AD, then sends it to the API in the <code>Authorization: Bearer</code> header. Spring Security's filter chain extracts the bearer token, validates the JWT signature and claims such as issuer, expiration, and audience, then creates an authenticated principal. Scopes or roles from the token are mapped to authorities and checked against endpoint rules. For finer-grained authorization, the service still needs business checks, such as whether the authenticated guest owns the reservation. If the token is missing or invalid, the API returns <code>401</code>. If the token is valid but lacks permission, it returns <code>403</code>.</p>
           </article>
         </div>
       </section>
@@ -1167,21 +1333,21 @@ ReservationService service = new ReservationService(repository);</code></pre>
 
       <section id="next">
         <h2>Next Topics</h2>
-        <p class="lead">The next study session should continue with synchronous vs asynchronous communication.</p>
+        <p class="lead">The next study session should continue with gateway and load balancing.</p>
         <div class="grid">
           <article class="card">
             <h3>Next Core Question</h3>
-            <p>How do you decide whether one service should call another directly or publish an event for later processing?</p>
+            <p>How does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
           </article>
           <article class="card">
             <h3>Next Concepts</h3>
             <ul>
-              <li>Synchronous REST calls.</li>
-              <li>Asynchronous messaging.</li>
-              <li>Eventual consistency.</li>
-              <li>When users need an immediate answer.</li>
-              <li>When background processing is better.</li>
-              <li>How this connects to Kafka, Kinesis, RabbitMQ, and Lambda.</li>
+              <li>API gateway responsibilities.</li>
+              <li>Load balancer responsibilities.</li>
+              <li>Routing and TLS termination.</li>
+              <li>Health checks.</li>
+              <li>Horizontal scaling.</li>
+              <li>Authentication at the edge vs service level.</li>
             </ul>
           </article>
         </div>
