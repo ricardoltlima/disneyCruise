@@ -338,6 +338,8 @@
         <a href="#error-observability">Errors and Observability</a>
         <a href="#sync-async">Sync vs Async</a>
         <a href="#spring-security">Spring Security OAuth2</a>
+        <a href="#gateway-load-balancing">Gateway and Load Balancing</a>
+        <a href="#junit-mockito">JUnit and Mockito Deep Dive</a>
         <a href="#interview-answers">Polished Answers</a>
         <a href="#aws">AWS Focus</a>
         <a href="#security">Security, Gateway, Load Balancing</a>
@@ -1146,6 +1148,158 @@ SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         </ul>
       </section>
 
+      <section id="gateway-load-balancing">
+        <h2>Gateway and Load Balancing</h2>
+        <p class="lead">Core interview question: how does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
+
+        <h3>Common Traffic Flow</h3>
+        <pre><code>Client
+  -> DNS
+  -> CDN / WAF
+  -> API Gateway
+  -> Load Balancer
+  -> Backend Service Instance
+  -> Database / Cache / Event System</code></pre>
+
+        <h3>API Gateway</h3>
+        <p>An API gateway is the front door for API traffic. It routes requests to the right backend service and often handles cross-cutting concerns such as authentication, TLS termination, rate limiting, request limits, CORS, logging, metrics, API versioning, and request or response transformation.</p>
+
+        <h3>Load Balancer</h3>
+        <p>A load balancer distributes requests across healthy instances of a service. It supports scalability, availability, fault tolerance, rolling deployments, and traffic distribution.</p>
+
+        <h3>Gateway vs Load Balancer</h3>
+        <p>Conceptually, the gateway decides which service should handle a request, while the load balancer decides which healthy instance of that service should receive it.</p>
+        <pre><code>/api/reservations/** -> reservation-service
+reservation-service -> instance 1, 2, or 3</code></pre>
+
+        <h3>TLS Termination</h3>
+        <p>TLS termination means the HTTPS connection ends at a layer such as the gateway, load balancer, or ingress controller. Internal traffic may then continue as HTTP or be re-encrypted with TLS or mTLS depending on the security model.</p>
+
+        <h3>Rate Limiting</h3>
+        <p>Rate limiting protects services from excessive traffic, abuse, and traffic spikes. If a caller exceeds the configured limit, the API commonly returns <code>429 Too Many Requests</code>.</p>
+
+        <h3>Health Checks</h3>
+        <p>A load balancer should only send traffic to healthy instances. Spring Boot Actuator commonly exposes endpoints such as <code>/actuator/health</code>, but health checks need careful design so non-critical dependency failures do not remove every instance from service.</p>
+        <ul>
+          <li><strong>Liveness:</strong> asks whether the process is alive or should be restarted.</li>
+          <li><strong>Readiness:</strong> asks whether the instance is ready to receive traffic.</li>
+        </ul>
+
+        <h3>Horizontal Scaling</h3>
+        <p>Horizontal scaling means adding more service instances. Backend services should usually be stateless or externalize state to a database, cache, token, or external store so any healthy instance can handle any request.</p>
+
+        <h3>Gateway Security vs Service Security</h3>
+        <p>The gateway can enforce coarse-grained security such as token validation and scopes, but services still own fine-grained business authorization. For example, the gateway may know a caller has <code>reservation:read</code>, while the reservation service must check whether the reservation belongs to that authenticated guest.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>The gateway routes traffic to the correct service and handles API-level policies.</li>
+          <li>The load balancer chooses a healthy instance of that service.</li>
+          <li>Gateway routing chooses the service; load balancing chooses the instance.</li>
+          <li>Horizontally scaled services should be stateless because requests may go to different instances, and in-memory session state is not shared reliably.</li>
+          <li>Liveness checks whether the process should be restarted. Readiness checks whether the instance should receive traffic.</li>
+          <li>Gateway-level authorization is not enough for resource-specific business rules.</li>
+        </ul>
+      </section>
+
+      <section id="junit-mockito">
+        <h2>JUnit 5 and Mockito</h2>
+        <p class="lead">Core interview question: how do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
+
+        <h3>Unit Test vs Integration Test</h3>
+        <ul>
+          <li><strong>Unit test:</strong> tests one class or small unit in isolation. It is fast and usually mocks repositories, external clients, publishers, or other boundaries.</li>
+          <li><strong>Integration test:</strong> tests multiple components working together, such as controller, service, repository, Spring configuration, database mappings, or HTTP behavior.</li>
+        </ul>
+
+        <h3>JUnit 5</h3>
+        <p>JUnit provides the test structure and assertions. Common annotations include <code>@Test</code>, <code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@DisplayName</code>, and <code>@ParameterizedTest</code>.</p>
+        <pre><code>@Test
+void calculatesTotalPrice() {
+    BigDecimal total = priceCalculator.calculate(2, new BigDecimal("50.00"));
+
+    assertEquals(new BigDecimal("100.00"), total);
+}</code></pre>
+
+        <h3>Mockito</h3>
+        <p>Mockito creates fake versions of dependencies called mocks. Mocks let a service be tested without a real database, real API call, real network, or real message broker.</p>
+        <pre><code>ReservationRepository repository = mock(ReservationRepository.class);
+PaymentClient paymentClient = mock(PaymentClient.class);
+ReservationService service = new ReservationService(repository, paymentClient);</code></pre>
+
+        <h3>Stubbing</h3>
+        <p>Stubbing defines what a mock should return or throw when called in a test scenario.</p>
+        <pre><code>when(repository.findById(123L))
+        .thenReturn(Optional.of(reservation));
+
+when(paymentClient.authorize(any()))
+        .thenThrow(new PaymentServiceUnavailableException());</code></pre>
+
+        <h3>Verification</h3>
+        <p>Verification checks whether a dependency was called as expected. It can also prove that something was not called when a business rule fails.</p>
+        <pre><code>verify(repository).findById(123L);
+verify(paymentClient).authorize(any(PaymentRequest.class));
+verify(reservationRepository, never()).save(any());</code></pre>
+
+        <h3>Mockito Annotations</h3>
+        <pre><code>@ExtendWith(MockitoExtension.class)
+class ReservationServiceTest {
+
+    @Mock
+    private ReservationRepository reservationRepository;
+
+    @Mock
+    private PaymentClient paymentClient;
+
+    @InjectMocks
+    private ReservationService reservationService;
+}</code></pre>
+        <ul>
+          <li><code>@Mock</code> creates mock dependencies.</li>
+          <li><code>@InjectMocks</code> creates the class under test and injects the mocks.</li>
+          <li><code>@ExtendWith(MockitoExtension.class)</code> enables Mockito in JUnit 5.</li>
+        </ul>
+
+        <h3>Failure Paths</h3>
+        <p>Good tests cover more than the happy path. For service methods, test not found, validation or business-rule failures, declined payments, dependency failures, duplicate/idempotency cases, and cases where a downstream call must not happen.</p>
+        <pre><code>@Test
+void doesNotCancelDepartedReservation() {
+    Reservation reservation = new Reservation(123L, "DEPARTED");
+
+    when(reservationRepository.findById(123L))
+            .thenReturn(Optional.of(reservation));
+
+    assertThrows(
+            ReservationCannotBeCancelledException.class,
+            () -> reservationService.cancelReservation(123L)
+    );
+
+    verify(reservationRepository, never()).save(any());
+}</code></pre>
+
+        <h3>ArgumentCaptor</h3>
+        <p><code>ArgumentCaptor</code> lets a test inspect the object passed to a mock, such as the entity built by a service before saving.</p>
+        <pre><code>ArgumentCaptor&lt;Reservation&gt; captor = ArgumentCaptor.forClass(Reservation.class);
+
+verify(reservationRepository).save(captor.capture());
+
+Reservation saved = captor.getValue();
+assertEquals("CONFIRMED", saved.getStatus());</code></pre>
+
+        <h3>Constructor Injection and Testing</h3>
+        <p>Constructor injection makes unit testing easier because dependencies are explicit. A test can create the service directly with mocks and does not need to start the Spring context or rely on field injection.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>A unit test checks a small unit in isolation; an integration test checks multiple components working together.</li>
+          <li>Mockito mocks simulate boundaries such as repositories, external APIs, publishers, and other dependencies.</li>
+          <li>Stubbing defines what a mock returns or throws for a scenario.</li>
+          <li>Verification checks whether a mock method was called, how many times, or not called at all.</li>
+          <li>Failure paths matter because production failures often happen in edge cases, dependency failures, and invalid state transitions.</li>
+          <li>Constructor injection makes tests easier because mocks can be passed directly into the class under test.</li>
+        </ul>
+      </section>
+
       <section id="interview-answers">
         <h2>Polished Answers</h2>
         <div class="qa">
@@ -1207,6 +1361,16 @@ SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
           <article class="card">
             <h3>How does OAuth2/JWT work in a Spring Boot API?</h3>
             <p class="answer">In this setup, the Spring Boot API acts as an OAuth2 resource server. A client obtains an access token from an authorization server such as Okta, Cognito, or Azure AD, then sends it to the API in the <code>Authorization: Bearer</code> header. Spring Security's filter chain extracts the bearer token, validates the JWT signature and claims such as issuer, expiration, and audience, then creates an authenticated principal. Scopes or roles from the token are mapped to authorities and checked against endpoint rules. For finer-grained authorization, the service still needs business checks, such as whether the authenticated guest owns the reservation. If the token is missing or invalid, the API returns <code>401</code>. If the token is valid but lacks permission, it returns <code>403</code>.</p>
+          </article>
+
+          <article class="card">
+            <h3>What are the roles of a gateway and load balancer?</h3>
+            <p class="answer">An API gateway is the front door for API traffic. It routes requests to the right backend service and often handles cross-cutting concerns like authentication, rate limiting, TLS termination, CORS, request limits, logging, and metrics. A load balancer distributes traffic across healthy instances of a service so the system can scale horizontally and tolerate instance failures. Conceptually, the gateway decides which service should handle the request, and the load balancer decides which instance should receive it. The gateway may enforce coarse-grained checks like token validation and scopes, but each backend service still owns fine-grained business authorization.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you test Spring Boot services with JUnit and Mockito?</h3>
+            <p class="answer">I use JUnit 5 for test structure and assertions, and Mockito to isolate the class under test from dependencies like repositories, external clients, and publishers. For service unit tests, I usually do not start the Spring context. I instantiate the service with mocked dependencies, stub expected dependency responses, execute the method, assert the result or exception, and verify important interactions. I cover both happy paths and failure paths, such as not found, validation or business rule failures, declined payments, and dependency errors. I avoid over-mocking domain objects and prefer constructor injection because it makes unit tests simple and explicit.</p>
           </article>
         </div>
       </section>
@@ -1333,21 +1497,21 @@ ReservationService service = new ReservationService(repository);</code></pre>
 
       <section id="next">
         <h2>Next Topics</h2>
-        <p class="lead">The next study session should continue with gateway and load balancing.</p>
+        <p class="lead">The next study session should continue with JUnit 5 and Mockito.</p>
         <div class="grid">
           <article class="card">
             <h3>Next Core Question</h3>
-            <p>How does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
+            <p>How do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
           </article>
           <article class="card">
             <h3>Next Concepts</h3>
             <ul>
-              <li>API gateway responsibilities.</li>
-              <li>Load balancer responsibilities.</li>
-              <li>Routing and TLS termination.</li>
-              <li>Health checks.</li>
-              <li>Horizontal scaling.</li>
-              <li>Authentication at the edge vs service level.</li>
+              <li>Unit tests vs integration tests.</li>
+              <li>JUnit 5 annotations and assertions.</li>
+              <li>Mockito mocks and stubs.</li>
+              <li><code>@Mock</code> and <code>@InjectMocks</code>.</li>
+              <li>Testing success and failure paths.</li>
+              <li>Verifying dependency interactions.</li>
             </ul>
           </article>
         </div>
