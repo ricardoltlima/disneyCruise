@@ -345,6 +345,14 @@
         <a href="#security">Security, Gateway, Load Balancing</a>
         <a href="#testing">JUnit and Mockito</a>
         <a href="#ai">AI at Work</a>
+        <a href="#production-support">Production Support</a>
+        <a href="#modernization">Modernization</a>
+        <a href="#kinesis-deep">Kinesis Deep Dive</a>
+        <a href="#dynamodb-deep">DynamoDB Deep Dive</a>
+        <a href="#lambda-deep">Lambda Deep Dive</a>
+        <a href="#event-architecture-deep">Event Architecture</a>
+        <a href="#behavioral">Behavioral Prep</a>
+        <a href="#mock-pack">Mock Interview Pack</a>
         <a href="#next">Next Topics</a>
       </nav>
     </aside>
@@ -1495,23 +1503,320 @@ ReservationService service = new ReservationService(repository);</code></pre>
         </div>
       </section>
 
-      <section id="next">
-        <h2>Next Topics</h2>
-        <p class="lead">The next study session should continue with JUnit 5 and Mockito.</p>
+      <section id="production-support">
+        <h2>Production Support</h2>
+        <p class="lead">Core interview question: how do you investigate and stabilize a production issue without guessing?</p>
+        <div class="callout">
+          <p><strong>Senior mindset:</strong> assess impact, stabilize customer/business impact first, then continue root cause analysis and prevention work.</p>
+        </div>
+        <h3>Incident Flow</h3>
+        <ol>
+          <li>Detect the issue through alerts, dashboards, logs, or user reports.</li>
+          <li>Triage scope: affected endpoints, users, regions, versions, workflows, and time window.</li>
+          <li>Mitigate if impact is high: rollback, feature flag off, scale, rate limit, open circuit, route traffic, or degrade non-critical functionality.</li>
+          <li>Investigate using logs, metrics, traces, dependency dashboards, and recent change history.</li>
+          <li>Resolve the root issue and verify recovery.</li>
+          <li>Prevent recurrence with tests, alerts, dashboards, runbooks, guardrails, or code changes.</li>
+        </ol>
+        <h3>Golden Signals</h3>
+        <div class="grid">
+          <article class="card"><h3>Latency</h3><p>How long requests or dependency calls take. Watch p50, p95, p99, database query time, and dependency latency.</p></article>
+          <article class="card"><h3>Traffic</h3><p>How much load the system receives: requests per second, transactions per minute, events per second, and consumer throughput.</p></article>
+          <article class="card"><h3>Errors</h3><p>Failure counts and rates: 4xx, 5xx, exceptions, timeouts, dependency failures, and publish failures.</p></article>
+          <article class="card"><h3>Saturation</h3><p>Resource pressure: CPU, memory, GC, thread pools, connection pools, queue depth, consumer lag, and database connections.</p></article>
+        </div>
+        <h3>Latency Spike Checklist</h3>
+        <ul>
+          <li>Check whether one endpoint, all endpoints, one region, one version, or one customer group is affected.</li>
+          <li>Check traffic volume and retry behavior. Retry storms can double or triple load.</li>
+          <li>Check error rates and timeout counts.</li>
+          <li>Use traces to find the slow span: controller, service logic, downstream API, database, cache, or event publishing.</li>
+          <li>Check dependency dashboards: payment, inventory, database, Redis, Kafka/Kinesis, and third-party APIs.</li>
+          <li>Check saturation: CPU, memory, GC pauses, thread pool usage, HTTP/database connection pools.</li>
+          <li>Check recent deploys, configuration changes, feature flags, schema changes, and dependency releases.</li>
+        </ul>
+        <h3>Database Bottleneck Signs</h3>
+        <p>Common symptoms include slow query logs, high database CPU, table scans, missing indexes, N+1 queries, lock waits, deadlocks, exhausted connection pools, long-running transactions, and query timeouts.</p>
+        <div class="warning callout">
+          <p><strong>Important:</strong> increasing a database connection pool can make things worse if the database is already saturated. More concurrent queries can add pressure instead of improving throughput.</p>
+        </div>
+        <h3>JVM and Thread Issues</h3>
+        <p>For memory or GC issues, check heap usage, non-heap usage, allocation rate, GC pause duration, object retention, container restarts, and recent code changes. For thread pool exhaustion, check active thread count, queue size, blocked calls, missing timeouts, deadlocks, and slow downstream dependencies.</p>
+        <h3>Root Cause Analysis</h3>
+        <ul>
+          <li>Timeline: when it started, when detected, actions taken, and when mitigated.</li>
+          <li>Impact: users, endpoints, regions, error rate, latency, and business workflows affected.</li>
+          <li>Root cause: what failed, why it failed, and why safeguards did not catch it.</li>
+          <li>Corrective actions: tests, monitoring, alerts, runbooks, retry/circuit policies, capacity changes, and deployment guardrails.</li>
+        </ul>
+      </section>
+
+      <section id="modernization">
+        <h2>Modernization</h2>
+        <p class="lead">Core interview question: how do you modernize a legacy Java backend without destabilizing production?</p>
+        <h3>Safe Modernization Strategy</h3>
+        <ol>
+          <li>Understand current behavior, dependencies, deployment process, owners, and production pain points.</li>
+          <li>Add characterization tests around important existing behavior before refactoring.</li>
+          <li>Upgrade incrementally: Java, Spring Boot, dependencies, build plugins, CI/CD, container images, then architecture.</li>
+          <li>Keep changes small and reversible. Use feature flags, canary releases, blue/green deployments, and rollback plans.</li>
+          <li>Improve observability before and during migration so regressions are visible.</li>
+          <li>Document risks, compatibility changes, and operational runbooks.</li>
+        </ol>
+        <h3>Java 8/11 to 17/21 Risks</h3>
+        <ul>
+          <li>Removed or strongly encapsulated JDK internals and reflection behavior.</li>
+          <li>Dependency incompatibilities with older libraries, app servers, and build plugins.</li>
+          <li>Changes in GC defaults, container memory behavior, TLS/cipher support, and timezone/certificate handling.</li>
+          <li>Build pipeline changes: Maven compiler plugin, surefire/failsafe, Docker base images, and CI Java version.</li>
+        </ul>
+        <h3>Spring Boot Upgrade Risks</h3>
+        <ul>
+          <li>Spring Boot 2 to 3 includes migration from <code>javax.*</code> to <code>jakarta.*</code>.</li>
+          <li>Security configuration style changes, dependency version changes, and actuator endpoint changes.</li>
+          <li>Serialization, validation, persistence, and test configuration changes.</li>
+        </ul>
+        <h3>Strangler Pattern</h3>
+        <p>The strangler pattern incrementally replaces legacy functionality with new services or modules. Route one capability at a time to the new implementation while the old system continues running. This reduces big-bang migration risk.</p>
+        <h3>Interview Answer</h3>
+        <p class="answer">I modernize legacy systems incrementally. First I understand behavior and production risk, then add tests and observability around critical flows. I upgrade Java, Spring Boot, dependencies, and build pipelines in small reversible steps, using feature flags, canaries, and rollback plans. For large architecture changes, I prefer a strangler approach so we can move one capability at a time instead of doing a risky big-bang rewrite.</p>
+      </section>
+
+      <section id="kinesis-deep">
+        <h2>Kinesis Deep Dive</h2>
+        <p class="lead">Core interview question: how do you process high-volume real-time events with ordering, replay, and reliability?</p>
+        <h3>Mental Model</h3>
+        <p>Amazon Kinesis Data Streams is a managed streaming service. Producers put records into a stream. The stream is divided into shards. Consumers read records from shards and process them in near real time.</p>
+        <pre><code>Producer -> Kinesis Stream -> Shards -> Consumers/Lambda -> Downstream systems</code></pre>
+        <h3>Key Concepts</h3>
+        <ul>
+          <li><strong>Record:</strong> one event, such as <code>ReservationCreated</code> or <code>GuestCheckedIn</code>.</li>
+          <li><strong>Partition key:</strong> decides which shard receives the record.</li>
+          <li><strong>Shard:</strong> unit of ordering and throughput.</li>
+          <li><strong>Sequence number:</strong> position of a record inside a shard.</li>
+          <li><strong>Retention:</strong> how long records remain available for replay.</li>
+          <li><strong>Consumer:</strong> application, Lambda, or service that reads records.</li>
+        </ul>
+        <h3>Ordering</h3>
+        <p>Kinesis preserves ordering within a shard, not globally across all shards. Records with the same partition key go to the same shard, so choose partition keys based on the ordering you need.</p>
+        <h3>Partition Key Design</h3>
+        <p>A good partition key spreads traffic evenly while preserving required ordering. For reservation events, <code>reservationId</code> may preserve ordering per reservation. A bad key like <code>eventType</code> can create hot shards if most events share the same type.</p>
+        <h3>Scaling and Hot Shards</h3>
+        <p>If one shard receives too much traffic, it becomes hot and throttles writes or reads. Fixes include better partition key distribution, increasing shard count, on-demand mode where appropriate, batching, and reducing per-record size.</p>
+        <h3>Consumers and Failure Handling</h3>
+        <ul>
+          <li>Consumers checkpoint progress after successful processing.</li>
+          <li>If processing fails before checkpointing, records may be read again.</li>
+          <li>Consumers must be idempotent because delivery is effectively at least once.</li>
+          <li>Poison records need a strategy: retries, skip with alert, DLQ pattern, or quarantine storage.</li>
+        </ul>
+        <h3>Kinesis vs Kafka</h3>
+        <p>Kinesis is AWS-managed and shard-based, with AWS-native integrations like Lambda and CloudWatch. Kafka is broker/partition-based and often gives more ecosystem control, but requires operating a cluster unless using a managed service. Both need partition-key design, consumer lag monitoring, replay strategy, and idempotent consumers.</p>
+        <h3>Interview Answer</h3>
+        <p class="answer">I would use Kinesis for high-volume real-time events when AWS-native streaming, retention, replay, and Lambda integration are useful. I design partition keys around ordering and even distribution, monitor shard throughput and iterator age, and make consumers idempotent because records can be processed more than once. If lag grows, I check consumer speed, downstream dependencies, shard count, hot shards, throttling, poison messages, and batch configuration.</p>
+      </section>
+
+      <section id="dynamodb-deep">
+        <h2>DynamoDB Deep Dive</h2>
+        <p class="lead">Core interview question: how do you design DynamoDB tables from access patterns instead of relational habits?</p>
+        <h3>Mental Model</h3>
+        <p>DynamoDB is a managed NoSQL key-value/document database. It is designed for predictable low-latency access at scale, but it requires modeling around queries you need to support.</p>
+        <h3>Primary Key</h3>
+        <ul>
+          <li><strong>Partition key:</strong> determines where data is stored and is required for efficient lookups.</li>
+          <li><strong>Sort key:</strong> orders related items within the same partition and supports range queries.</li>
+        </ul>
+        <pre><code>PK = GUEST#123
+SK = RESERVATION#2026-06-20#R789</code></pre>
+        <h3>Access-Pattern-First Design</h3>
+        <p>Start by listing queries: get reservation by id, list reservations by guest, list reservations by cruise/date, find active payment by reservation, or load itinerary events by reservation. Then design keys and indexes for those queries.</p>
+        <h3>GSIs and LSIs</h3>
+        <ul>
+          <li><strong>GSI:</strong> alternate partition/sort key for different query patterns. It is eventually consistent.</li>
+          <li><strong>LSI:</strong> alternate sort key under the same partition key, created with the table.</li>
+        </ul>
+        <h3>Capacity and Hot Partitions</h3>
+        <p>Hot partitions happen when too many reads/writes hit the same partition key. Avoid low-cardinality keys like <code>status=ACTIVE</code> for high-volume writes. Use high-cardinality keys and distribute load.</p>
+        <h3>Conditional Writes and Idempotency</h3>
+        <p>Conditional writes are critical for correctness. They can enforce <code>put only if item does not exist</code>, implement optimistic locking, and prevent duplicate processing with idempotency keys.</p>
+        <pre><code>Put payment record only if paymentId does not already exist.
+Put processed event only if eventId does not already exist.</code></pre>
+        <h3>TTL and Streams</h3>
+        <p>TTL automatically expires items such as idempotency records or temporary sessions. DynamoDB Streams emit item-level changes, commonly consumed by Lambda for downstream processing.</p>
+        <h3>Interview Answer</h3>
+        <p class="answer">With DynamoDB, I start from access patterns rather than normalized relational design. I choose partition and sort keys that support the main queries and distribute load, then add GSIs for alternate lookups. I watch for hot partitions, large items, and inefficient scans. For correctness, I use conditional writes for idempotency, uniqueness, and optimistic locking. I also consider TTL for temporary data and DynamoDB Streams when downstream systems need to react to changes.</p>
+      </section>
+
+      <section id="lambda-deep">
+        <h2>Lambda Deep Dive</h2>
+        <p class="lead">Core interview question: when is Lambda appropriate, and how do you make serverless processing reliable?</p>
+        <h3>Mental Model</h3>
+        <p>AWS Lambda runs code in response to events without managing servers. It is a good fit for event processing, glue logic, scheduled tasks, lightweight APIs, stream processing, and background jobs.</p>
+        <h3>Common Event Sources</h3>
+        <ul>
+          <li>API Gateway for HTTP APIs.</li>
+          <li>Kinesis for streaming records.</li>
+          <li>DynamoDB Streams for table change events.</li>
+          <li>SQS for queued work and buffering.</li>
+          <li>S3 for object-created events.</li>
+          <li>EventBridge for scheduled or business events.</li>
+        </ul>
+        <h3>Cold Starts</h3>
+        <p>A cold start happens when AWS initializes a new execution environment before invoking the function. It can add latency, especially with large packages, VPC networking, heavy frameworks, or low traffic. Mitigations include smaller packages, lighter initialization, provisioned concurrency for critical paths, and avoiding unnecessary startup work.</p>
+        <h3>Concurrency</h3>
+        <p>Lambda scales by running concurrent executions. Reserved concurrency can protect downstream systems and isolate critical functions. Too much concurrency can overwhelm databases, APIs, or streams.</p>
+        <h3>Retries and DLQs</h3>
+        <p>Retry behavior depends on the event source. Async invokes may retry automatically. Streams retry batches until success or until records expire unless configured with partial batch handling and failure destinations. SQS can use visibility timeout and dead-letter queues.</p>
+        <h3>Idempotency</h3>
+        <p>Lambda handlers must be idempotent because events can be retried. Use event IDs, idempotency tables, conditional writes, and safe state transitions to avoid duplicate side effects.</p>
+        <h3>When Not To Use Lambda</h3>
+        <ul>
+          <li>Long-running workloads beyond Lambda limits.</li>
+          <li>Very latency-sensitive APIs where cold starts are unacceptable without mitigation.</li>
+          <li>Complex stateful workflows better handled by services or Step Functions.</li>
+          <li>Heavy continuous compute where containers may be more cost-effective.</li>
+        </ul>
+        <h3>Interview Answer</h3>
+        <p class="answer">I use Lambda when event-driven, bursty, or background processing fits the problem, such as Kinesis consumers, DynamoDB Stream handlers, scheduled jobs, and lightweight APIs. I design handlers to be idempotent, monitor errors and duration, control concurrency to protect downstream systems, and understand retry behavior for each event source. For critical latency paths, I consider cold starts, package size, initialization work, and provisioned concurrency.</p>
+      </section>
+
+      <section id="event-architecture-deep">
+        <h2>Event-Driven Architecture</h2>
+        <p class="lead">Core interview question: how do you design an event-driven backend that handles real-time data safely?</p>
+        <h3>Core Ideas</h3>
+        <ul>
+          <li><strong>Event:</strong> a fact that happened, such as <code>ReservationCreated</code>.</li>
+          <li><strong>Command:</strong> a request to do something, such as <code>CreateReservation</code>.</li>
+          <li><strong>Producer:</strong> publishes events.</li>
+          <li><strong>Consumer:</strong> reacts to events.</li>
+          <li><strong>Broker/stream:</strong> Kafka, RabbitMQ, Kinesis, SNS/SQS, or EventBridge.</li>
+        </ul>
+        <h3>Reliability Rules</h3>
+        <ul>
+          <li>Assume at-least-once delivery and make consumers idempotent.</li>
+          <li>Use stable event IDs and business keys.</li>
+          <li>Design schemas carefully and evolve them backward-compatibly.</li>
+          <li>Have a retry and poison-message strategy.</li>
+          <li>Monitor lag, error rate, processing time, DLQ count, and downstream dependency health.</li>
+        </ul>
+        <h3>Outbox Pattern</h3>
+        <p>The outbox pattern avoids losing events when database updates and event publishing must happen together. Save the business entity and an outbox event in the same database transaction. A separate worker publishes the event and marks it as published.</p>
+        <pre><code>1. Save reservation and outbox row in one transaction.
+2. Worker reads unpublished outbox rows.
+3. Worker publishes ReservationCreated.
+4. Worker marks outbox row as published.</code></pre>
+        <h3>Saga Pattern</h3>
+        <p>A saga coordinates a multi-step distributed workflow without a single database transaction. Each step has a compensating action if later steps fail. Example: reserve cabin, authorize payment, confirm booking. If payment fails, release the cabin hold.</p>
+        <h3>Kafka vs RabbitMQ vs Kinesis</h3>
+        <ul>
+          <li><strong>Kafka:</strong> durable log, partitions, replay, high-throughput event streaming.</li>
+          <li><strong>RabbitMQ:</strong> queue/message routing, work queues, flexible routing patterns.</li>
+          <li><strong>Kinesis:</strong> AWS-managed stream, shards, retention, replay, Lambda integration.</li>
+        </ul>
+        <h3>Interview Answer</h3>
+        <p class="answer">For event-driven systems, I treat events as facts and design consumers for at-least-once delivery. That means stable event IDs, idempotent handlers, duplicate detection, retry limits, poison-message handling, and observability around lag and errors. I use the outbox pattern when a database change and event publish must stay consistent. I also design event schemas to evolve safely and choose Kafka, RabbitMQ, or Kinesis based on throughput, replay, routing, cloud integration, and operational needs.</p>
+      </section>
+
+      <section id="behavioral">
+        <h2>Behavioral Prep</h2>
+        <p class="lead">Core goal: tell senior-level stories that show ownership, judgment, delivery, and production responsibility.</p>
+        <h3>STAR Structure</h3>
+        <ul>
+          <li><strong>Situation:</strong> what was happening and why it mattered.</li>
+          <li><strong>Task:</strong> your responsibility.</li>
+          <li><strong>Action:</strong> what you personally did.</li>
+          <li><strong>Result:</strong> measurable outcome and what changed afterward.</li>
+        </ul>
+        <h3>Stories To Prepare</h3>
+        <ul>
+          <li>Production incident: how you triaged, mitigated, communicated, and prevented recurrence.</li>
+          <li>Modernization: how you upgraded or refactored a system safely.</li>
+          <li>Ownership: a time you took responsibility for an ambiguous or messy codebase.</li>
+          <li>Conflict: a technical disagreement and how you resolved it with data and collaboration.</li>
+          <li>Cross-team delivery: coordinating with product, QA, DevOps, security, or another service team.</li>
+          <li>Quality improvement: adding tests, observability, CI/CD, or reliability safeguards.</li>
+        </ul>
+        <h3>Disney-Framed Intro</h3>
+        <p class="answer">I am a backend Java engineer focused on building reliable enterprise services. My experience fits this role because I have worked with Spring Boot APIs, service-layer business logic, production troubleshooting, testing, and modern backend patterns. I am comfortable stepping into existing systems, understanding how requests and data flow, improving reliability, and collaborating across teams. For Disney Connected Products, I would bring a strong backend ownership mindset: clean APIs, safe changes, observability, and practical reliability for high-volume guest-facing experiences.</p>
+      </section>
+
+      <section id="mock-pack">
+        <h2>Mock Interview Pack</h2>
+        <p class="lead">Use these questions for self-study while traveling. Answer out loud, then compare against the polished answers in this guide.</p>
         <div class="grid">
           <article class="card">
-            <h3>Next Core Question</h3>
-            <p>How do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
+            <h3>Java and Spring</h3>
+            <ul>
+              <li>Explain the Spring Boot request lifecycle.</li>
+              <li>What is a Spring bean?</li>
+              <li>Why use constructor injection?</li>
+              <li>How do controllers, services, repositories, DTOs, and entities differ?</li>
+              <li>Why avoid mutable request state in singleton services?</li>
+            </ul>
           </article>
           <article class="card">
-            <h3>Next Concepts</h3>
+            <h3>APIs and Security</h3>
             <ul>
-              <li>Unit tests vs integration tests.</li>
-              <li>JUnit 5 annotations and assertions.</li>
-              <li>Mockito mocks and stubs.</li>
-              <li><code>@Mock</code> and <code>@InjectMocks</code>.</li>
-              <li>Testing success and failure paths.</li>
-              <li>Verifying dependency interactions.</li>
+              <li>How do you design a reliable REST API?</li>
+              <li>Explain idempotency and idempotency keys.</li>
+              <li>How does OAuth2/JWT work in Spring Boot?</li>
+              <li>What is the difference between 401 and 403?</li>
+              <li>Why is endpoint-level authorization not always enough?</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Reliability</h3>
+            <ul>
+              <li>How do you configure timeouts and retries?</li>
+              <li>What is a retry storm?</li>
+              <li>How does a circuit breaker work?</li>
+              <li>When is fallback safe or dangerous?</li>
+              <li>How do logs, metrics, and traces differ?</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>AWS and Events</h3>
+            <ul>
+              <li>Explain Kinesis shards and partition keys.</li>
+              <li>How do you model DynamoDB tables from access patterns?</li>
+              <li>How do Lambda retries and idempotency work?</li>
+              <li>What is the outbox pattern?</li>
+              <li>Compare Kafka, RabbitMQ, and Kinesis.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>System Design Prompt</h3>
+        <p>Design a Disney Cruise reservation event platform. Guests create reservations through an API. The system must authorize payment, store reservation state, publish real-time events, send notifications, update loyalty points, support analytics, prevent duplicates, and remain observable in production.</p>
+        <h3>Expected Design Themes</h3>
+        <ul>
+          <li>REST API with DTO validation, idempotency key, OAuth2/JWT, and consistent error responses.</li>
+          <li>Synchronous payment authorization if confirmation depends on payment.</li>
+          <li>Database transaction plus outbox event for <code>ReservationCreated</code>.</li>
+          <li>Kinesis/Kafka stream for downstream consumers.</li>
+          <li>Idempotent consumers for email, loyalty, analytics, and notifications.</li>
+          <li>DynamoDB for high-scale access patterns where appropriate.</li>
+          <li>Lambda for event-driven background processing where appropriate.</li>
+          <li>Timeouts, retries, circuit breakers, DLQs, logs, metrics, traces, dashboards, and alerts.</li>
+        </ul>
+      </section>
+
+      <section id="next">
+        <h2>Next Topics</h2>
+        <p class="lead">Offline travel study plan: review one major section per day and answer the mock questions out loud.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Daily Review</h3>
+            <p>Day 1: REST, idempotency, timeouts, retries. Day 2: OAuth2, gateway, load balancing. Day 3: production support and modernization. Day 4: Kinesis. Day 5: DynamoDB. Day 6: Lambda and event-driven architecture. Day 7: behavioral stories and full mock.</p>
+          </article>
+          <article class="card">
+            <h3>Final Checklist</h3>
+            <ul>
+              <li>Practice the 60-second intro.</li>
+              <li>Prepare five STAR stories.</li>
+              <li>Explain one Spring Boot request flow.</li>
+              <li>Explain one reliability incident investigation.</li>
+              <li>Design one AWS event-driven workflow.</li>
+              <li>Prepare questions for the interviewer.</li>
             </ul>
           </article>
         </div>
