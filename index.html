@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Disney Senior Backend Interview Study Guide</title>
+  <title>Backend Engineering Reference Guide</title>
   <style>
     :root {
       --ink: #172033;
@@ -322,12 +322,12 @@
 <body>
   <div class="shell">
     <aside>
-      <h1>Disney Backend Interview Guide</h1>
+      <h1>Backend Engineering Guide</h1>
       <p>Prepared from the study sessions through June 15, 2026.</p>
       <nav aria-label="Table of contents">
-        <a href="#role">Role Target</a>
+        <a href="#role">Engineering Focus</a>
         <a href="#strategy">Study Strategy</a>
-        <a href="#schedule">Two-Week Schedule</a>
+        <a href="#schedule">Learning Roadmap</a>
         <a href="#spring-request">Spring Request Lifecycle</a>
         <a href="#beans">Beans and Dependency Injection</a>
         <a href="#rest-api">REST API Design</a>
@@ -339,8 +339,8 @@
         <a href="#sync-async">Sync vs Async</a>
         <a href="#spring-security">Spring Security OAuth2</a>
         <a href="#gateway-load-balancing">Gateway and Load Balancing</a>
-        <a href="#junit-mockito">JUnit and Mockito Deep Dive</a>
-        <a href="#interview-answers">Polished Answers</a>
+        <a href="#junit-Mockito">JUnit and Mockito Deep Dive</a>
+        <a href="#reference-answers">Reference Answers</a>
         <a href="#aws">AWS Focus</a>
         <a href="#security">Security, Gateway, Load Balancing</a>
         <a href="#testing">JUnit and Mockito</a>
@@ -351,24 +351,24 @@
         <a href="#dynamodb-deep">DynamoDB Deep Dive</a>
         <a href="#lambda-deep">Lambda Deep Dive</a>
         <a href="#event-architecture-deep">Event Architecture</a>
-        <a href="#behavioral">Behavioral Prep</a>
-        <a href="#mock-pack">Mock Interview Pack</a>
-        <a href="#next">Next Topics</a>
+        <a href="#collaboration">Collaboration Scenarios</a>
+        <a href="#practice-pack">Practice Question Pack</a>
+        <a href="#next">Review Plan</a>
       </nav>
     </aside>
 
     <main>
       <header class="hero">
-        <h2>Senior Java Backend Interview Study Guide</h2>
-        <p>Deep, steady preparation for a Disney Connected Products backend role across Java, Spring Boot, REST APIs, security, microservices, AWS event systems, production support, testing, and responsible AI usage.</p>
+        <h2>Senior Java Backend Reference Guide</h2>
+        <p>Deep, steady review of Java, Spring Boot, REST APIs, security, microservices, AWS event systems, production support, testing, and responsible AI usage.</p>
       </header>
 
       <section id="role">
-        <h2>Role Target</h2>
-        <p class="lead">The target role is a hands-on Senior Software Engineer position on Disney's Connected Products team, supporting backend systems for Disney Cruise Line, Parks, and other business units.</p>
+        <h2>Engineering Focus</h2>
+        <p class="lead">This guide focuses on hands-on senior backend engineering skills for enterprise connected-product systems, including high-volume APIs, real-time events, production support, and modernization work.</p>
         <div class="grid">
           <article class="card">
-            <h3>Core Responsibilities</h3>
+            <h3>Core Engineering Areas</h3>
             <ul>
               <li>Design, build, and maintain Java backend services and microservices.</li>
               <li>Develop REST APIs and event-driven systems.</li>
@@ -379,7 +379,7 @@
             </ul>
           </article>
           <article class="card">
-            <h3>Skills To Demonstrate</h3>
+            <h3>Technical Topics</h3>
             <div class="tag-row">
               <span class="tag">Java 17+</span>
               <span class="tag">Spring Boot</span>
@@ -416,13 +416,13 @@
           <li>Real backend example.</li>
           <li>Code-level understanding.</li>
           <li>Production mindset: failures, logs, metrics, traces, performance.</li>
-          <li>Interview practice and refined answer.</li>
+          <li>Practice explanation and refined answer.</li>
         </ol>
       </section>
 
       <section id="schedule">
-        <h2>Two-Week Schedule</h2>
-        <p class="lead">The expected behavioral interview may happen the week of June 15, 2026. The technical interview is tentatively expected around Friday, June 26, 2026.</p>
+        <h2>Learning Roadmap</h2>
+        <p class="lead">Use this roadmap to review the topics progressively, from core Spring Boot foundations through reliability, AWS, production support, and system design.</p>
         <div class="timeline">
           <div class="day">
             <strong>Sunday, Jun 14</strong>
@@ -430,7 +430,7 @@
           </div>
           <div class="day">
             <strong>Monday, Jun 15</strong>
-            <div>REST APIs and behavioral setup: HTTP, status codes, validation, error handling, pagination, API versioning, STAR stories.</div>
+            <div>REST APIs and scenario setup: HTTP, status codes, validation, error handling, pagination, API versioning, incident and collaboration stories.</div>
           </div>
           <div class="day">
             <strong>Tuesday, Jun 16</strong>
@@ -446,7 +446,7 @@
           </div>
           <div class="day">
             <strong>Friday, Jun 19</strong>
-            <div>Behavioral mock interview: ownership, production support, conflict, modernization, cross-team delivery.</div>
+            <div>Collaboration scenario practice: ownership, production support, conflict, modernization, cross-team delivery.</div>
           </div>
           <div class="day">
             <strong>Saturday, Jun 20</strong>
@@ -470,18 +470,18 @@
           </div>
           <div class="day">
             <strong>Thursday, Jun 25</strong>
-            <div>Responsible AI at work, modernization strategy, Java/Spring upgrades, CI/CD, Docker, Kubernetes, AWS basics, full technical mock.</div>
+            <div>Responsible AI at work, modernization strategy, Java/Spring upgrades, CI/CD, Docker, Kubernetes, AWS basics, full technical review.</div>
           </div>
           <div class="day">
             <strong>Friday, Jun 26</strong>
-            <div>Light review and final technical interview simulation if needed.</div>
+            <div>Light review and final technical review if needed.</div>
           </div>
         </div>
       </section>
 
       <section id="spring-request">
         <h2>Spring Boot Request Lifecycle</h2>
-        <p class="lead">Core interview question: what happens when an HTTP request reaches a Spring Boot backend application?</p>
+        <p class="lead">Core question: what happens when an HTTP request reaches a Spring Boot backend application?</p>
         <div class="flow" aria-label="Request flow">
           <span>Client sends GET /api/reservations/123</span>
           <span>Load balancer or gateway forwards traffic to the service</span>
@@ -561,7 +561,7 @@ public interface ReservationRepository extends JpaRepository&lt;Reservation, Lon
 
       <section id="beans">
         <h2>Beans and Dependency Injection</h2>
-        <p class="lead">Core interview question: how does Spring create objects and connect them together?</p>
+        <p class="lead">Core question: how does Spring create objects and connect them together?</p>
 
         <h3>Spring Bean</h3>
         <p>A Spring bean is an object managed by the Spring container. Spring creates it, injects its dependencies, manages its lifecycle, and can apply framework behavior around it.</p>
@@ -625,10 +625,10 @@ public class AwsConfig {
         </ol>
       </section>
 
-      <section id="interview-answers">
+      <section id="reference-answers">
       <section id="rest-api">
         <h2>REST API Design</h2>
-        <p class="lead">Core interview question: how do you design a clean, reliable REST API in Spring Boot?</p>
+        <p class="lead">Core question: how do you design a clean, reliable REST API in Spring Boot?</p>
 
         <h3>Resource-Oriented URLs</h3>
         <p>REST APIs usually model URLs around resources, not actions. The URL identifies the thing, and the HTTP method expresses the action.</p>
@@ -769,10 +769,10 @@ GET /api/reservations?limit=50&amp;cursor=eyJpZCI6MTIzfQ</code></pre>
         </div>
       </section>
 
-      <section id="interview-answers">
+      <section id="reference-answers">
       <section id="idempotency">
         <h2>Idempotency</h2>
-        <p class="lead">Core interview question: how do you prevent duplicate side effects when a request or event is retried?</p>
+        <p class="lead">Core question: how do you prevent duplicate side effects when a request or event is retried?</p>
 
         <h3>Definition</h3>
         <p>Idempotency means making the same operation once or multiple times has the same final effect. The first call may change state, but repeated calls should not create additional side effects.</p>
@@ -824,10 +824,10 @@ ON payments (reservation_id, payment_type);</code></pre>
 }</code></pre>
       </section>
 
-      <section id="interview-answers">
+      <section id="reference-answers">
       <section id="timeouts-retries">
         <h2>Timeouts and Retries</h2>
-        <p class="lead">Core interview question: how do you prevent a slow or unhealthy dependency from taking down your service?</p>
+        <p class="lead">Core question: how do you prevent a slow or unhealthy dependency from taking down your service?</p>
 
         <h3>Timeouts</h3>
         <p>A timeout is a limit on how long your service is willing to wait for a dependency. It prevents unbounded waiting and protects threads, memory, connection pools, and request latency.</p>
@@ -873,7 +873,7 @@ some retry at 85ms, some at 117ms, some at 263ms</code></pre>
 
       <section id="circuit-breakers">
         <h2>Circuit Breakers</h2>
-        <p class="lead">Core interview question: how do you stop repeated calls to a failing dependency, and how do you decide whether degraded behavior is safe?</p>
+        <p class="lead">Core question: how do you stop repeated calls to a failing dependency, and how do you decide whether degraded behavior is safe?</p>
 
         <h3>Problem</h3>
         <p>When a dependency is slow or unavailable, repeated calls and retries can consume threads, connections, CPU, memory, and network capacity. A circuit breaker protects the caller and gives the dependency time to recover.</p>
@@ -931,7 +931,7 @@ permittedNumberOfCallsInHalfOpenState: 3</code></pre>
 
       <section id="error-observability">
         <h2>Error Handling and Observability</h2>
-        <p class="lead">Core interview question: how do you return useful errors to clients while giving engineers enough data to debug production issues?</p>
+        <p class="lead">Core question: how do you return useful errors to clients while giving engineers enough data to debug production issues?</p>
 
         <h3>Good API Errors</h3>
         <p>A good API error response should be clear for the client, safe for security, stable for integrations, useful for debugging, and consistent across endpoints.</p>
@@ -1004,7 +1004,7 @@ public class ApiExceptionHandler {
 
       <section id="sync-async">
         <h2>Synchronous vs Asynchronous Communication</h2>
-        <p class="lead">Core interview question: how do you decide whether one service should call another directly or publish an event for later processing?</p>
+        <p class="lead">Core question: how do you decide whether one service should call another directly or publish an event for later processing?</p>
 
         <h3>Synchronous Communication</h3>
         <p>Synchronous communication means the caller waits for the callee to respond before continuing. REST and gRPC calls are common examples.</p>
@@ -1069,13 +1069,13 @@ Other consumers later:
           <li>Choose asynchronous communication when the work can happen later, the user does not need the final result immediately, or multiple consumers need to react to the same event.</li>
           <li>Eventual consistency means different parts of the system may temporarily show different states, but they should converge after background processing completes.</li>
           <li>Async consumers need idempotency because messages may be retried or delivered more than once.</li>
-          <li>A Disney-style synchronous example is buying or confirming cruise tickets after checking payment and availability. A Disney-style asynchronous example is sending notifications or park news updates after an event is published.</li>
+          <li>A Travel-platform synchronous example is buying or confirming cruise tickets after checking payment and availability. A Travel-platform asynchronous example is sending notifications or park news updates after an event is published.</li>
         </ul>
       </section>
 
       <section id="spring-security">
         <h2>Spring Security, OAuth2, and JWT</h2>
-        <p class="lead">Core interview question: how does a Spring Boot API authenticate and authorize a request using OAuth2 and JWT?</p>
+        <p class="lead">Core question: how does a Spring Boot API authenticate and authorize a request using OAuth2 and JWT?</p>
 
         <h3>Authentication vs Authorization</h3>
         <ul>
@@ -1158,7 +1158,7 @@ SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
       <section id="gateway-load-balancing">
         <h2>Gateway and Load Balancing</h2>
-        <p class="lead">Core interview question: how does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
+        <p class="lead">Core question: how does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
 
         <h3>Common Traffic Flow</h3>
         <pre><code>Client
@@ -1210,13 +1210,13 @@ reservation-service -> instance 1, 2, or 3</code></pre>
         </ul>
       </section>
 
-      <section id="junit-mockito">
+      <section id="junit-Mockito">
         <h2>JUnit 5 and Mockito</h2>
-        <p class="lead">Core interview question: how do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
+        <p class="lead">Core question: how do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
 
         <h3>Unit Test vs Integration Test</h3>
         <ul>
-          <li><strong>Unit test:</strong> tests one class or small unit in isolation. It is fast and usually mocks repositories, external clients, publishers, or other boundaries.</li>
+          <li><strong>Unit test:</strong> tests one class or small unit in isolation. It is fast and usually practices repositories, external clients, publishers, or other boundaries.</li>
           <li><strong>Integration test:</strong> tests multiple components working together, such as controller, service, repository, Spring configuration, database mappings, or HTTP behavior.</li>
         </ul>
 
@@ -1230,13 +1230,13 @@ void calculatesTotalPrice() {
 }</code></pre>
 
         <h3>Mockito</h3>
-        <p>Mockito creates fake versions of dependencies called mocks. Mocks let a service be tested without a real database, real API call, real network, or real message broker.</p>
-        <pre><code>ReservationRepository repository = mock(ReservationRepository.class);
-PaymentClient paymentClient = mock(PaymentClient.class);
+        <p>Mockito creates fake versions of dependencies called mocks. mocks let a service be tested without a real database, real API call, real network, or real message broker.</p>
+        <pre><code>ReservationRepository repository = practice(ReservationRepository.class);
+PaymentClient paymentClient = practice(PaymentClient.class);
 ReservationService service = new ReservationService(repository, paymentClient);</code></pre>
 
         <h3>Stubbing</h3>
-        <p>Stubbing defines what a mock should return or throw when called in a test scenario.</p>
+        <p>Stubbing defines what a practice should return or throw when called in a test scenario.</p>
         <pre><code>when(repository.findById(123L))
         .thenReturn(Optional.of(reservation));
 
@@ -1253,18 +1253,18 @@ verify(reservationRepository, never()).save(any());</code></pre>
         <pre><code>@ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
-    @Mock
+    @practice
     private ReservationRepository reservationRepository;
 
-    @Mock
+    @practice
     private PaymentClient paymentClient;
 
-    @InjectMocks
+    @Injectpractices
     private ReservationService reservationService;
 }</code></pre>
         <ul>
-          <li><code>@Mock</code> creates mock dependencies.</li>
-          <li><code>@InjectMocks</code> creates the class under test and injects the mocks.</li>
+          <li><code>@practice</code> creates mock dependencies.</li>
+          <li><code>@Injectpractices</code> creates the class under test and injects the practices.</li>
           <li><code>@ExtendWith(MockitoExtension.class)</code> enables Mockito in JUnit 5.</li>
         </ul>
 
@@ -1286,7 +1286,7 @@ void doesNotCancelDepartedReservation() {
 }</code></pre>
 
         <h3>ArgumentCaptor</h3>
-        <p><code>ArgumentCaptor</code> lets a test inspect the object passed to a mock, such as the entity built by a service before saving.</p>
+        <p><code>ArgumentCaptor</code> lets a test inspect the object passed to a practice, such as the entity built by a service before saving.</p>
         <pre><code>ArgumentCaptor&lt;Reservation&gt; captor = ArgumentCaptor.forClass(Reservation.class);
 
 verify(reservationRepository).save(captor.capture());
@@ -1301,15 +1301,15 @@ assertEquals("CONFIRMED", saved.getStatus());</code></pre>
         <ul>
           <li>A unit test checks a small unit in isolation; an integration test checks multiple components working together.</li>
           <li>Mockito mocks simulate boundaries such as repositories, external APIs, publishers, and other dependencies.</li>
-          <li>Stubbing defines what a mock returns or throws for a scenario.</li>
-          <li>Verification checks whether a mock method was called, how many times, or not called at all.</li>
+          <li>Stubbing defines what a practice returns or throws for a scenario.</li>
+          <li>Verification checks whether a practice method was called, how many times, or not called at all.</li>
           <li>Failure paths matter because production failures often happen in edge cases, dependency failures, and invalid state transitions.</li>
-          <li>Constructor injection makes tests easier because mocks can be passed directly into the class under test.</li>
+          <li>Constructor injection makes tests easier because practices can be passed directly into the class under test.</li>
         </ul>
       </section>
 
-      <section id="interview-answers">
-        <h2>Polished Answers</h2>
+      <section id="reference-answers">
+        <h2>Reference Answers</h2>
         <div class="qa">
           <article class="card">
             <h3>What happens when a request reaches a Spring Boot service?</h3>
@@ -1452,17 +1452,17 @@ assertEquals("CONFIRMED", saved.getStatus());</code></pre>
               <li>Unit tests vs integration tests.</li>
               <li>JUnit 5 assertions and lifecycle.</li>
               <li>Mockito mocks and stubs.</li>
-              <li><code>@Mock</code>, <code>@InjectMocks</code>, <code>when</code>, <code>thenReturn</code>, and <code>verify</code>.</li>
+              <li><code>@practice</code>, <code>@Injectpractices</code>, <code>when</code>, <code>thenReturn</code>, and <code>verify</code>.</li>
               <li>Testing Spring service classes.</li>
-              <li>Testing controllers with MockMvc.</li>
+              <li>Testing controllers with practiceMvc.</li>
               <li>Testing error cases and failure paths.</li>
               <li>Avoiding brittle tests and over-mocking.</li>
             </ul>
           </article>
           <article class="card">
-            <h3>Interview Framing</h3>
+            <h3>Practical Framing</h3>
             <p>Unit tests protect business logic and make refactoring safer. Mockito is useful when a service depends on repositories or external clients. The goal is to test the service's behavior without requiring a database, network call, or full Spring context.</p>
-            <pre><code>ReservationRepository repository = mock(ReservationRepository.class);
+            <pre><code>ReservationRepository repository = practice(ReservationRepository.class);
 ReservationService service = new ReservationService(repository);</code></pre>
           </article>
         </div>
@@ -1470,7 +1470,7 @@ ReservationService service = new ReservationService(repository);</code></pre>
 
       <section id="ai">
         <h2>AI at Work</h2>
-        <p class="lead">For an interview, AI usage should sound like senior engineering judgment, not blind tool adoption.</p>
+        <p class="lead">For workplace discussion, AI usage should sound like senior engineering judgment, not blind tool adoption.</p>
         <div class="callout">
           <p><strong>Strong framing:</strong> I use AI to accelerate understanding, boilerplate, tests, refactoring ideas, and documentation, but I keep ownership of correctness, security, architecture, and production behavior.</p>
         </div>
@@ -1505,7 +1505,7 @@ ReservationService service = new ReservationService(repository);</code></pre>
 
       <section id="production-support">
         <h2>Production Support</h2>
-        <p class="lead">Core interview question: how do you investigate and stabilize a production issue without guessing?</p>
+        <p class="lead">Core question: how do you investigate and stabilize a production issue without guessing?</p>
         <div class="callout">
           <p><strong>Senior mindset:</strong> assess impact, stabilize customer/business impact first, then continue root cause analysis and prevention work.</p>
         </div>
@@ -1553,7 +1553,7 @@ ReservationService service = new ReservationService(repository);</code></pre>
 
       <section id="modernization">
         <h2>Modernization</h2>
-        <p class="lead">Core interview question: how do you modernize a legacy Java backend without destabilizing production?</p>
+        <p class="lead">Core question: how do you modernize a legacy Java backend without destabilizing production?</p>
         <h3>Safe Modernization Strategy</h3>
         <ol>
           <li>Understand current behavior, dependencies, deployment process, owners, and production pain points.</li>
@@ -1578,13 +1578,13 @@ ReservationService service = new ReservationService(repository);</code></pre>
         </ul>
         <h3>Strangler Pattern</h3>
         <p>The strangler pattern incrementally replaces legacy functionality with new services or modules. Route one capability at a time to the new implementation while the old system continues running. This reduces big-bang migration risk.</p>
-        <h3>Interview Answer</h3>
+        <h3>Reference Answer</h3>
         <p class="answer">I modernize legacy systems incrementally. First I understand behavior and production risk, then add tests and observability around critical flows. I upgrade Java, Spring Boot, dependencies, and build pipelines in small reversible steps, using feature flags, canaries, and rollback plans. For large architecture changes, I prefer a strangler approach so we can move one capability at a time instead of doing a risky big-bang rewrite.</p>
       </section>
 
       <section id="kinesis-deep">
         <h2>Kinesis Deep Dive</h2>
-        <p class="lead">Core interview question: how do you process high-volume real-time events with ordering, replay, and reliability?</p>
+        <p class="lead">Core question: how do you process high-volume real-time events with ordering, replay, and reliability?</p>
         <h3>Mental Model</h3>
         <p>Amazon Kinesis Data Streams is a managed streaming service. Producers put records into a stream. The stream is divided into shards. Consumers read records from shards and process them in near real time.</p>
         <pre><code>Producer -> Kinesis Stream -> Shards -> Consumers/Lambda -> Downstream systems</code></pre>
@@ -1612,13 +1612,13 @@ ReservationService service = new ReservationService(repository);</code></pre>
         </ul>
         <h3>Kinesis vs Kafka</h3>
         <p>Kinesis is AWS-managed and shard-based, with AWS-native integrations like Lambda and CloudWatch. Kafka is broker/partition-based and often gives more ecosystem control, but requires operating a cluster unless using a managed service. Both need partition-key design, consumer lag monitoring, replay strategy, and idempotent consumers.</p>
-        <h3>Interview Answer</h3>
+        <h3>Reference Answer</h3>
         <p class="answer">I would use Kinesis for high-volume real-time events when AWS-native streaming, retention, replay, and Lambda integration are useful. I design partition keys around ordering and even distribution, monitor shard throughput and iterator age, and make consumers idempotent because records can be processed more than once. If lag grows, I check consumer speed, downstream dependencies, shard count, hot shards, throttling, poison messages, and batch configuration.</p>
       </section>
 
       <section id="dynamodb-deep">
         <h2>DynamoDB Deep Dive</h2>
-        <p class="lead">Core interview question: how do you design DynamoDB tables from access patterns instead of relational habits?</p>
+        <p class="lead">Core question: how do you design DynamoDB tables from access patterns instead of relational habits?</p>
         <h3>Mental Model</h3>
         <p>DynamoDB is a managed NoSQL key-value/document database. It is designed for predictable low-latency access at scale, but it requires modeling around queries you need to support.</p>
         <h3>Primary Key</h3>
@@ -1643,13 +1643,13 @@ SK = RESERVATION#2026-06-20#R789</code></pre>
 Put processed event only if eventId does not already exist.</code></pre>
         <h3>TTL and Streams</h3>
         <p>TTL automatically expires items such as idempotency records or temporary sessions. DynamoDB Streams emit item-level changes, commonly consumed by Lambda for downstream processing.</p>
-        <h3>Interview Answer</h3>
+        <h3>Reference Answer</h3>
         <p class="answer">With DynamoDB, I start from access patterns rather than normalized relational design. I choose partition and sort keys that support the main queries and distribute load, then add GSIs for alternate lookups. I watch for hot partitions, large items, and inefficient scans. For correctness, I use conditional writes for idempotency, uniqueness, and optimistic locking. I also consider TTL for temporary data and DynamoDB Streams when downstream systems need to react to changes.</p>
       </section>
 
       <section id="lambda-deep">
         <h2>Lambda Deep Dive</h2>
-        <p class="lead">Core interview question: when is Lambda appropriate, and how do you make serverless processing reliable?</p>
+        <p class="lead">Core question: when is Lambda appropriate, and how do you make serverless processing reliable?</p>
         <h3>Mental Model</h3>
         <p>AWS Lambda runs code in response to events without managing servers. It is a good fit for event processing, glue logic, scheduled tasks, lightweight APIs, stream processing, and background jobs.</p>
         <h3>Common Event Sources</h3>
@@ -1676,13 +1676,13 @@ Put processed event only if eventId does not already exist.</code></pre>
           <li>Complex stateful workflows better handled by services or Step Functions.</li>
           <li>Heavy continuous compute where containers may be more cost-effective.</li>
         </ul>
-        <h3>Interview Answer</h3>
+        <h3>Reference Answer</h3>
         <p class="answer">I use Lambda when event-driven, bursty, or background processing fits the problem, such as Kinesis consumers, DynamoDB Stream handlers, scheduled jobs, and lightweight APIs. I design handlers to be idempotent, monitor errors and duration, control concurrency to protect downstream systems, and understand retry behavior for each event source. For critical latency paths, I consider cold starts, package size, initialization work, and provisioned concurrency.</p>
       </section>
 
       <section id="event-architecture-deep">
         <h2>Event-Driven Architecture</h2>
-        <p class="lead">Core interview question: how do you design an event-driven backend that handles real-time data safely?</p>
+        <p class="lead">Core question: how do you design an event-driven backend that handles real-time data safely?</p>
         <h3>Core Ideas</h3>
         <ul>
           <li><strong>Event:</strong> a fact that happened, such as <code>ReservationCreated</code>.</li>
@@ -1713,14 +1713,14 @@ Put processed event only if eventId does not already exist.</code></pre>
           <li><strong>RabbitMQ:</strong> queue/message routing, work queues, flexible routing patterns.</li>
           <li><strong>Kinesis:</strong> AWS-managed stream, shards, retention, replay, Lambda integration.</li>
         </ul>
-        <h3>Interview Answer</h3>
+        <h3>Reference Answer</h3>
         <p class="answer">For event-driven systems, I treat events as facts and design consumers for at-least-once delivery. That means stable event IDs, idempotent handlers, duplicate detection, retry limits, poison-message handling, and observability around lag and errors. I use the outbox pattern when a database change and event publish must stay consistent. I also design event schemas to evolve safely and choose Kafka, RabbitMQ, or Kinesis based on throughput, replay, routing, cloud integration, and operational needs.</p>
       </section>
 
-      <section id="behavioral">
-        <h2>Behavioral Prep</h2>
+      <section id="collaboration">
+        <h2>Collaboration Scenarios</h2>
         <p class="lead">Core goal: tell senior-level stories that show ownership, judgment, delivery, and production responsibility.</p>
-        <h3>STAR Structure</h3>
+        <h3>Scenario Structure</h3>
         <ul>
           <li><strong>Situation:</strong> what was happening and why it mattered.</li>
           <li><strong>Task:</strong> your responsibility.</li>
@@ -1736,13 +1736,13 @@ Put processed event only if eventId does not already exist.</code></pre>
           <li>Cross-team delivery: coordinating with product, QA, DevOps, security, or another service team.</li>
           <li>Quality improvement: adding tests, observability, CI/CD, or reliability safeguards.</li>
         </ul>
-        <h3>Disney-Framed Intro</h3>
-        <p class="answer">I am a backend Java engineer focused on building reliable enterprise services. My experience fits this role because I have worked with Spring Boot APIs, service-layer business logic, production troubleshooting, testing, and modern backend patterns. I am comfortable stepping into existing systems, understanding how requests and data flow, improving reliability, and collaborating across teams. For Disney Connected Products, I would bring a strong backend ownership mindset: clean APIs, safe changes, observability, and practical reliability for high-volume guest-facing experiences.</p>
+        <h3>Backend Ownership Summary</h3>
+        <p class="answer">I am a backend Java engineer focused on building reliable enterprise services. This material emphasizes experience with Spring Boot APIs, service-layer business logic, production troubleshooting, testing, and modern backend patterns. I am comfortable stepping into existing systems, understanding how requests and data flow, improving reliability, and collaborating across teams. The focus is a strong backend ownership mindset: clean APIs, safe changes, observability, and practical reliability for high-volume guest-facing experiences.</p>
       </section>
 
-      <section id="mock-pack">
-        <h2>Mock Interview Pack</h2>
-        <p class="lead">Use these questions for self-study while traveling. Answer out loud, then compare against the polished answers in this guide.</p>
+      <section id="practice-pack">
+        <h2>Practice Question Pack</h2>
+        <p class="lead">Use these questions for self-study while traveling. Answer out loud, then compare against the Reference Answers in this guide.</p>
         <div class="grid">
           <article class="card">
             <h3>Java and Spring</h3>
@@ -1786,7 +1786,7 @@ Put processed event only if eventId does not already exist.</code></pre>
           </article>
         </div>
         <h3>System Design Prompt</h3>
-        <p>Design a Disney Cruise reservation event platform. Guests create reservations through an API. The system must authorize payment, store reservation state, publish real-time events, send notifications, update loyalty points, support analytics, prevent duplicates, and remain observable in production.</p>
+        <p>Design a cruise reservation event platform. Guests create reservations through an API. The system must authorize payment, store reservation state, publish real-time events, send notifications, update loyalty points, support analytics, prevent duplicates, and remain observable in production.</p>
         <h3>Expected Design Themes</h3>
         <ul>
           <li>REST API with DTO validation, idempotency key, OAuth2/JWT, and consistent error responses.</li>
@@ -1801,31 +1801,34 @@ Put processed event only if eventId does not already exist.</code></pre>
       </section>
 
       <section id="next">
-        <h2>Next Topics</h2>
-        <p class="lead">Offline travel study plan: review one major section per day and answer the mock questions out loud.</p>
+        <h2>Review Plan</h2>
+        <p class="lead">Offline travel study plan: review one major section per day and answer the practice questions out loud.</p>
         <div class="grid">
           <article class="card">
             <h3>Daily Review</h3>
-            <p>Day 1: REST, idempotency, timeouts, retries. Day 2: OAuth2, gateway, load balancing. Day 3: production support and modernization. Day 4: Kinesis. Day 5: DynamoDB. Day 6: Lambda and event-driven architecture. Day 7: behavioral stories and full mock.</p>
+            <p>Day 1: REST, idempotency, timeouts, retries. Day 2: OAuth2, gateway, load balancing. Day 3: production support and modernization. Day 4: Kinesis. Day 5: DynamoDB. Day 6: Lambda and event-driven architecture. Day 7: collaboration stories and full practice.</p>
           </article>
           <article class="card">
             <h3>Final Checklist</h3>
             <ul>
               <li>Practice the 60-second intro.</li>
-              <li>Prepare five STAR stories.</li>
+              <li>Prepare five incident and collaboration stories.</li>
               <li>Explain one Spring Boot request flow.</li>
               <li>Explain one reliability incident investigation.</li>
               <li>Design one AWS event-driven workflow.</li>
-              <li>Prepare questions for the interviewer.</li>
+              <li>Prepare architecture and operations discussion questions.</li>
             </ul>
           </article>
         </div>
       </section>
 
       <footer>
-        <p>Generated as a local study artifact for the Disney Senior Java Backend interview preparation.</p>
+        <p>Generated as a local backend engineering reference artifact.</p>
       </footer>
     </main>
   </div>
 </body>
 </html>
+
+
+
