@@ -1,0 +1,1237 @@
+SOFTWARE ENGINEERING INTERVIEW STUDY — CHAT TRANSCRIPT / STUDY RECORD
+
+Topics covered:
+Java 17, functional programming, records, sealed types, Streams, Project Reactor,
+Mono/Flux, laziness, map/flatMap, hot/cold publishers, schedulers, fromCallable,
+defer, subscribeOn/publishOn, error handling, backpressure, Spring WebFlux,
+REST controllers, DTO/entity/repository/service architecture, MapStruct, and AWS Kafka alternatives.
+
+======================================================================
+DAY 1 — JAVA 17 / FUNCTIONAL FOUNDATIONS
+======================================================================
+
+USER:
+Ok, as you know I'm studying for a job interview as a software engineer. Java 17, Project reactor, Spring Boot and functional programming patterns in software design. Let's plan it.
+
+USER:
+Let's make today Day 1. Prepare all these suggestions and let's start it.
+
+USER:
+I want to try to solve all questions and I want you to review my answers, tell me what I did wrong, how to improve it and an explanation about the subject.
+
+USER — Question 1:
+public List<User> pipeline() {
+    User user1 = new User("1", "Ricardo", 40);
+    User user2 = new User("2", "Luke", 15);
+
+    return Stream.of(user1, user2)
+            .filter(user -> user.age() > 21)
+            .map(user ->  new User(user.id(), user.name().toUpperCase(), user.age()))
+            .sorted((a,b) -> Long.compare(a.age(), b.age()))
+            .toList();
+}
+
+USER — Question 2:
+public record Product(String sku, double price) {}
+
+USER — Question 3:
+public sealed interface Event permits UserRegistered, UserLoggedIn, UserLoggedOut {
+}
+
+final class UserRegistered implements Event {
+}
+
+final class UserLoggedIn implements Event {
+}
+
+final class UserLoggedOut implements Event {
+}
+
+USER:
+So how records implement sealed classes?
+
+USER — Question 4:
+private String testSwitch(String role) {
+    return switch (role) {
+        case "ADMIN" -> "Full Access";
+        case "USER" -> "Limited Access";
+        default -> "Unknown Role";
+    };
+}
+
+USER — Quiz answers:
+Why are records immutable, and how does that help functional programming?
+records are immutable because all their attributes and methods are final.
+
+What’s the difference between map and flatMap in streams?
+a map will apply a function over the objects passed, while a flatmap will flatten all the attributes, like instead of returning a list<list> objects it returns a list only
+
+When should you prefer a sealed class hierarchy?
+because all the permitted classes from a sealed are defined and predicted
+
+What makes switch expressions safer than classic switch statements?
+because there are no need to add break in the cases and it's easier to read
+
+USER:
+Sure. Please ask me again the mini mock interview questions
+
+USER — Q1:
+the benefits of records is that they have theirs fields immutable. They don't need all the boilerplate to be created - constructors, getters and setters, they are thread-safe and work perfectly with events because they are already serialized
+
+USER — Q2:
+the new instanceof makes it safer to verify the instance of a class
+
+USER — Q3:
+public long startVowel(List<String> names) {
+    return names.stream()
+            .filter(name -> name.toUpperCase().startsWith("A") ||
+                    name.toUpperCase().startsWith("E") ||
+                    name.toUpperCase().startsWith("I") ||
+                    name.toUpperCase().startsWith("O") ||
+                    name.toUpperCase().startsWith("U"))
+            .count();
+}
+
+USER:
+I want to verify that this method works. How to make it using Asserts or Asserting?
+
+======================================================================
+DAY 2 — FUNCTIONAL PROGRAMMING
+======================================================================
+
+USER:
+Let's move to day 2
+
+USER:
+Before we start, tell me why is this mutable?
+List<String> list = new ArrayList<>();
+list.add("A");
+
+USER — Exercise 1:
+public List<Integer> getEvenDoubledFunctional(List<Integer> numbers) {
+    return numbers.stream()
+            .filter(number -> number % 2 == 0)
+            .map(number -> number * 2)
+            .toList();
+}
+
+USER — Exercise 2:
+static Function<Integer, Integer> multiplyByThree = x -> x*3;
+static Function<Integer, Integer> addsOne = x -> x+1;
+static Function<Integer, Integer> multiplyAdd = multiplyByThree.andThen(addsOne);
+
+public static void main(String[] args) {
+    Assertions.assertEquals(multiplyAdd.apply(5), 16);
+}
+
+USER — Exercise 3:
+static Predicate<String> numberOfStrings = name -> name.length() > 5;
+Assertions.assertTrue(numberOfStrings.test("Ricardo"));
+
+USER:
+Make Exercise 4 for me and explain
+
+USER:
+What's next for day 2?
+
+USER — Q1 Function Composition:
+Function composition is a function that can be passed as an attribute in a method and is divided in Function, Predicate, Bifunction, Consumer and Supplier and are usually called by streams methods. They are important in reactive programming because they are immutable and pure, what makes the data passed by them safe and predictable.
+
+USER:
+Functional Interfaces are interfaces with only one method. Some examples of functional interfaces are Predicate with method test, Function with method apply, Bifunction with method apply, Supplier and Consumer.
+
+USER — Question 3:
+products.stream().filter(product -> product.price > 100).map(product -> product.getPrice()).reduce(0, (a,b) -> a+b);
+
+USER:
+Let's continue day 2 quiz
+
+USER:
+pure functions are functions that are immutable and predictable
+
+USER:
+Can a pure function receive a String and return an Integer?
+
+USER:
+I don't know what a higher-order function means
+
+USER:
+High order functions are functions that either receives a function as parameter or returns a function. This is the backbone of Stream functions and Reactive functions, as filter receives a Predicate, map receives a function
+
+USER:
+Imperative code is how we tell java to run the code. It was present in Java until Java 8 when Stream were introduced. Declarative code is what we want the compiler to do, like filter and map.
+
+USER:
+Immutability is important in reactive because reactive depends on asynchonous, safe and predictable behaviour.
+
+USER — Q1:
+Function composition is essentially one function called by another function. This is the backbone of reactive programming because in reactive we have methods that receives attributes from other methods and return values for other methods. This is an example .filter().map().flatMap()
+
+USER:
+What else is missing to finish day 2?
+
+USER:
+Functional Interfaces are interfaces with only one abstract method and zero or more default or private methods. It's important to have only one abstract method so it can be called from Stream and Reactive operators. The common FI are predicate with test object, function and bifunction with apply method, supplier and consumer with get method. They are important to stream and reactive because they are pure functions
+
+USER — Q3:
+Stream.of(products).filter(product -> product.price > 100).mapToInt(Product::price).sum();
+
+USER:
+It's late today and I'm tired. Let's leave it to tomorrow, ok?
+
+USER:
+Have a good night, and thank you for your help.
+
+======================================================================
+DAY 3 — PROJECT REACTOR BASICS
+======================================================================
+
+USER:
+Hi good morning
+
+USER:
+Thank you. Start day 3
+
+USER — Exercise 1:
+public Mono<String> printHello() {
+    return Mono.just("Hello")
+            .map(String::toUpperCase)
+            .doOnNext(System.out::println);
+}
+
+USER — Exercise 2:
+public static Flux<Integer> oneToFive() {
+    return Flux.range(1, 5)
+            .filter(number -> number%2 == 0)
+            .map(number -> number * 10)
+            .doOnNext(System.out::println);
+}
+To execute it: oneToFive().subscribe();
+
+USER — Exercise 3:
+return getUserId().flatMap(id -> findUserById(id);
+
+USER:
+what does composable mean?
+
+USER:
+In reactor there is a Publisher and a Subscriber. To start the conversation between both, the subscriber must at the first moment call the publisher method and subscribe to it, or else it won't get the response.
+
+USER:
+Move to day 3 quiz
+
+USER:
+1 - Mono represents the flow of zero or one elements in the pipe. Flux represents zero or more elements in the pipeline. Mono is used when we want to get a user by Id from the database for example. Flux is used to get all users or we use it when emitting elements through Kafka topics.
+
+USER:
+Project reactor has a Publisher and a Subscriber. To start the flow of data in the pipeline, the Subscriber must first subscribe to the Publisher, this will start the flow of data in the pipeline. Rector is considered lazy because this will give the subscriber the power to control the flow through backpressure.
+
+USER:
+a flatMap is used to compose an asynchronous operation, when A Stream<Stream> or Mono<Mono> must be flatten, or else it will break the pipe
+
+ASSISTANT REVIEW:
+flatMap is used when composing asynchronous operations. If the mapping function returns another reactive type like Mono or Flux, using map would result in a nested publisher such as Mono<Mono<T>>. flatMap flattens this structure and keeps the pipeline as a single reactive stream.
+
+Short rule:
+Use map for synchronous transformations and flatMap for asynchronous ones.
+
+USER:
+I don't know [what a hot publisher is]
+
+ASSISTANT TEACHING:
+A hot publisher produces data independently of subscribers. It emits whether or not anyone is listening, and late subscribers can miss previous values.
+
+Analogy: live radio. If you tune in late, you don't hear what was already broadcast.
+
+Cold publisher:
+- starts emitting when subscribed
+- each subscriber gets the sequence
+- example: Flux.range(1, 3)
+
+Hot publisher examples:
+- shared live streams
+- WebSocket messages
+- UI events
+- Flux.interval(...).share()
+
+Example:
+Flux<Long> hot = Flux.interval(Duration.ofSeconds(1)).share();
+
+hot.subscribe(v -> System.out.println("Subscriber 1: " + v));
+
+Thread.sleep(3000);
+
+hot.subscribe(v -> System.out.println("Subscriber 2: " + v));
+
+Interview answer:
+“A hot publisher emits data independently of subscribers. It produces values continuously, and subscribers only receive items emitted after they subscribe.”
+
+======================================================================
+DAY 4 — REACTOR DEEP DIVE
+======================================================================
+
+USER:
+Start day 4
+
+Initial topics:
+Schedulers, threading, error handling, Reactor Context, backpressure.
+
+USER:
+Actually, I don't master any of these subjects from day 4 and I need you to teach me
+
+ASSISTANT TEACHING:
+Day 4 switched to teaching mode.
+
+Core Reactor threading rule:
+Reactor does not automatically create a new thread for every pipeline. In ordinary synchronous sources/operators, execution remains on the subscribing/calling thread unless an asynchronous boundary or scheduler changes it.
+
+Schedulers:
+- Schedulers.parallel(): CPU-bound work
+- Schedulers.boundedElastic(): blocking I/O / legacy blocking APIs
+- Schedulers.single(): one shared worker for ordered work
+- Schedulers.immediate(): current thread
+
+Blocking work should be isolated from non-blocking event-loop threads.
+
+USER:
+I'm strting to understand, but I want to go slowly. Things that confused me the most are subscribeOn vs publishOn and what does fromCallable mean.
+
+----------------------------------------------------------------------
+fromCallable
+----------------------------------------------------------------------
+
+ASSISTANT:
+Mono.fromCallable(...) means:
+“Create a Mono that will invoke this Callable later, at subscription time, and emit its result; if it throws, emit an error signal.”
+
+A Callable<T> is similar to Supplier<T>, but it may throw checked exceptions.
+
+Example:
+Mono<String> mono = Mono.fromCallable(() -> blockingCallThatReturnsString());
+
+Use cases:
+- blocking JDBC
+- file I/O
+- legacy libraries
+- imperative methods that return a value and may throw
+
+Important: it is lazy. Nothing runs until subscription.
+
+If the callable throws:
+Mono.fromCallable(() -> { throw new RuntimeException("boom"); })
+    .onErrorReturn("fallback");
+
+----------------------------------------------------------------------
+subscribeOn vs publishOn
+----------------------------------------------------------------------
+
+Mental model:
+subscribeOn(scheduler):
+- controls where subscription/source-side work is scheduled
+- commonly used to move a blocking source to boundedElastic
+
+publishOn(scheduler):
+- creates a scheduling boundary
+- downstream onNext/onComplete/onError processing after that point runs on the chosen scheduler until another boundary changes it
+
+Example:
+Mono.fromCallable(this::blockingCall)
+    .subscribeOn(Schedulers.boundedElastic())
+    .publishOn(Schedulers.parallel())
+    .map(this::cpuTask)
+    .subscribe();
+
+blockingCall -> boundedElastic
+cpuTask -> parallel
+
+USER:
+please explain why Only the operators after publishOn move.
+
+ASSISTANT:
+Example:
+Mono.just("x")
+    .map(a -> a)
+    .publishOn(Schedulers.parallel())
+    .map(b -> b);
+
+Visual model:
+SOURCE -> map1 -> [publishOn scheduling boundary] -> map2
+
+publishOn changes downstream signal execution. Upstream operators are not retroactively moved.
+
+At runtime:
+Thread A:
+1. source emits x
+2. map1 processes x
+3. publishOn schedules/hands the signal downstream
+
+Parallel scheduler thread:
+4. map2 processes x
+5. downstream subscriber receives it
+
+Important mental distinction:
+An operator invocation does not pause halfway and migrate between threads. A signal is handed across an asynchronous boundary, and downstream processing continues on another worker.
+
+USER:
+so the source X just run in a parallel thread? It started in one thread and then moved to another?
+
+ASSISTANT:
+No. With publishOn only, the upstream source and operators before publishOn run on the original subscription thread. The signal is then handed off to the scheduler for downstream processing.
+
+Example:
+Mono.just("x")
+    .map(v -> {
+        System.out.println("map1: " + Thread.currentThread().getName());
+        return v;
+    })
+    .publishOn(Schedulers.parallel())
+    .map(v -> {
+        System.out.println("map2: " + Thread.currentThread().getName());
+        return v;
+    })
+    .subscribe();
+
+map1 -> original thread
+map2 -> parallel scheduler thread
+
+USER:
+it's late and I'm tired. Let's continue this tomorrow
+
+USER:
+continue day 4
+
+ASSISTANT RECAP:
+Without an explicit asynchronous boundary, ordinary synchronous Reactor operators execute on the current subscription thread.
+
+Only subscribeOn example:
+Mono.just("x")
+    .map(...)
+    .subscribeOn(Schedulers.parallel())
+    .subscribe();
+
+The subscription/source execution is scheduled on parallel. With no publishOn, downstream synchronous operators generally continue on that same worker.
+
+Both:
+Mono.fromCallable(this::blockingCall)
+    .subscribeOn(Schedulers.boundedElastic())
+    .publishOn(Schedulers.parallel())
+    .map(this::cpuWork)
+
+boundedElastic -> blocking source
+publishOn boundary
+parallel -> CPU work
+
+USER:
+ready
+
+----------------------------------------------------------------------
+just vs fromCallable
+----------------------------------------------------------------------
+
+ASSISTANT:
+Dangerous:
+Mono.just(blockingCall());
+
+blockingCall() executes before Mono.just receives the value, so the call happens immediately during assembly and can block the caller/event-loop thread.
+
+Correct:
+Mono.fromCallable(() -> blockingCall());
+
+The method invocation is deferred until subscription.
+
+Safe blocking pattern:
+Mono.fromCallable(this::blockingDbCall)
+    .subscribeOn(Schedulers.boundedElastic());
+
+fromCallable:
+- defers computation
+- converts thrown exceptions to onError
+subscribeOn(boundedElastic):
+- ensures the blocking source executes on a scheduler intended for blocking work
+
+USER:
+About this code:
+Mono.fromCallable(this::blockingDbCall)
+    .subscribeOn(Schedulers.boundedElastic())
+    .publishOn(Schedulers.parallel())
+    .map(this::cpuTransform)
+    .subscribe();
+
+Do I need to add .publishOn every time I have a subscribeOn(boundedElastic)? What will happen if I don't add the publishOn?
+
+ASSISTANT:
+No.
+
+Without publishOn:
+Mono.fromCallable(this::blockingDbCall)
+    .subscribeOn(Schedulers.boundedElastic())
+    .map(this::cpuTransform);
+
+The blocking call and subsequent synchronous map generally continue on boundedElastic.
+
+This is valid. CPU work can run there, but boundedElastic is not the scheduler optimized for CPU-heavy workloads.
+
+publishOn(parallel) is useful when you intentionally want to move downstream CPU-heavy work to the parallel scheduler.
+
+Rule:
+subscribeOn chooses where subscription/source work begins.
+publishOn is optional and changes downstream execution from that point.
+
+USER:
+If I see CPU work running on boundedElastic this is not a bug, it will run fine. But this is not the optimal Scheduler to run CPU work
+
+ASSISTANT REVIEW:
+Correct. It is not necessarily a correctness bug, but CPU-heavy work on boundedElastic can become a performance/scalability issue under load.
+
+----------------------------------------------------------------------
+defer
+----------------------------------------------------------------------
+
+ASSISTANT:
+Mono.defer(...) means:
+“Create the Publisher fresh for each subscription.”
+
+Example:
+Mono<Long> m = Mono.just(System.currentTimeMillis());
+The timestamp is computed at assembly time and reused.
+
+Mono<Long> m = Mono.defer(() -> Mono.just(System.currentTimeMillis()));
+The lambda executes for every subscription, creating a fresh Mono/value.
+
+fromCallable vs defer:
+Mono.fromCallable(System::currentTimeMillis)
+also evaluates the callable per subscription.
+
+Key distinction:
+fromCallable -> defer one computation and turn its result/error into a Mono signal
+defer -> defer creation of the Publisher/pipeline itself
+
+Quiz:
+A)
+Mono<UUID> m = Mono.just(UUID.randomUUID());
+
+B)
+Mono<UUID> m = Mono.fromCallable(UUID::randomUUID);
+
+C)
+Mono<UUID> m = Mono.defer(() -> Mono.just(UUID.randomUUID()));
+
+USER:
+C will return a different value persubscription because it's lazy and a defer creates a fresh pipeline persubscription
+
+ASSISTANT REVIEW:
+C is correct, but B is also correct.
+
+A computes UUID.randomUUID() immediately.
+B invokes UUID::randomUUID on each subscription.
+C creates a fresh Mono containing a newly generated UUID on each subscription.
+
+Interview answer:
+“fromCallable defers a single computation, while defer defers creation of the entire reactive Publisher per subscription.”
+
+----------------------------------------------------------------------
+ERROR HANDLING
+----------------------------------------------------------------------
+
+USER:
+error handling
+
+ASSISTANT:
+Errors in Reactor are terminal signals:
+- onNext
+- onComplete
+- onError
+
+Core operators:
+
+doOnError:
+side effect such as logging; does not recover.
+
+onErrorReturn:
+static fallback value.
+
+onErrorResume:
+dynamic fallback Publisher; can inspect the exception.
+
+onErrorMap:
+transform one exception/error into another.
+
+retry(n):
+re-subscribe after failure. retry(2) means original attempt + 2 retries = 3 attempts total.
+
+retryWhen:
+retry with strategy/backoff/filtering.
+
+Ordering matters:
+Mono.fromCallable(this::callApi)
+    .retry(2)
+    .onErrorReturn("fallback");
+
+If onErrorReturn comes before retry, the error has already been recovered, so retry sees no failure to retry.
+
+USER ATTEMPT:
+Mono.fromCallable(() -> risky())
+.doOnError(ex -> log.error("Exception occurred {}", ex)
+.onErrorReturn("Risky")
+.retry(2)
+.subscribeOn(Schedulers.boundedElastic);
+
+ASSISTANT REVIEW:
+Issues:
+- retry must come before fallback
+- missing parentheses
+- boundedElastic() is a method
+
+Correct:
+Mono.fromCallable(this::risky)
+    .subscribeOn(Schedulers.boundedElastic())
+    .doOnError(ex -> log.error("Exception occurred", ex))
+    .retry(2)
+    .onErrorReturn("fallback")
+    .subscribe();
+
+USER:
+1. Three attemps
+2. if Risky() is not blocking, I would not need to use boundedElastic()
+
+ASSISTANT:
+Correct.
+
+USER EXERCISE:
+Mono.fromCallable(() -> risky())
+.subscribeOn(Schedulers.boundedElastic())
+.onErrorResume(ex -> {
+if(ex instanceof TimeoutException){
+return Mono.just("timeout-fallback");
+}
+return Mono.just("generic-fallback");
+});
+
+ASSISTANT REVIEW:
+Correct.
+
+More idiomatic typed overload:
+Mono.fromCallable(this::risky)
+    .subscribeOn(Schedulers.boundedElastic())
+    .onErrorResume(
+        TimeoutException.class,
+        ex -> Mono.just("timeout-fallback")
+    )
+    .onErrorResume(ex -> Mono.just("generic-fallback"));
+
+----------------------------------------------------------------------
+BACKPRESSURE
+----------------------------------------------------------------------
+
+USER:
+backpressure
+
+ASSISTANT TEACHING:
+Backpressure is demand control.
+
+Analogy:
+Producer = factory
+Consumer = delivery truck
+
+Without flow control, a fast producer can overwhelm a slow consumer.
+
+Reactive Streams demand:
+Subscriber requests N.
+A compliant Publisher emits no more than the requested demand.
+
+Important:
+Backpressure is not the same as buffering.
+Buffering is one strategy for dealing with sources/operators that can outpace downstream demand.
+
+Common Reactor strategies:
+- onBackpressureBuffer()
+- onBackpressureDrop()
+- onBackpressureLatest()
+- onBackpressureError()
+
+USER:
+Backpressure is a mechanism that ensures the reactive consumer to signal demand to a producer, so it can consume data as fast as it is emmited by the producer. It prevents overwhelming consumers and out of memory problems in systems. It cannot prevent kafka or sockets, but it can signs Flux.range the amount of data to be emmited.
+
+ASSISTANT REVIEW:
+Core idea correct. Better wording:
+“Backpressure allows a reactive consumer to signal demand so a compliant producer emits only as fast as downstream demand allows. This helps prevent overwhelming consumers and uncontrolled buffering.”
+
+Flux.range is demand-aware and can emit according to downstream requests.
+
+For external push systems, flow control depends on the integration/protocol. If the upstream cannot be slowed enough, buffering, dropping, latest-value, pausing/poll control, or errors may be needed.
+
+======================================================================
+DAY 5 — SPRING WEBFLUX
+======================================================================
+
+USER:
+Day 5
+
+USER:
+I want to do the same as day 4. I want you to teach me first and then we can slowly start the interview questions/quizz and testing coding
+
+ASSISTANT TEACHING:
+Spring WebFlux is Spring's reactive web framework built around Reactive Streams and Reactor.
+
+Mental model:
+Spring MVC:
+Request -> worker thread -> blocking service/I/O -> response
+
+WebFlux:
+Request -> event-loop processing -> reactive Publisher -> asynchronous I/O -> response
+
+WebFlux commonly uses Reactor Netty when using the default reactive server setup.
+
+Important:
+Event-loop threads must not be blocked.
+
+Controller:
+@GetMapping("/user/{id}")
+public Mono<User> getUser(String id) {
+    return userService.findById(id);
+}
+
+The controller returns a Publisher describing asynchronous work. Spring subscribes at the HTTP boundary.
+
+Do not manually call subscribe() in a WebFlux controller.
+
+USER:
+because Spring will subscribe to the Publisher.
+
+ASSISTANT REVIEW:
+Correct.
+
+Expanded interview answer:
+“Spring subscribes at the HTTP boundary and controls the request lifecycle, cancellation, error propagation, and response writing. Manually subscribing detaches work from that lifecycle.”
+
+----------------------------------------------------------------------
+WEBFLUX REQUEST LIFECYCLE
+----------------------------------------------------------------------
+
+USER:
+show me the diagram and once I understand we continue with error handling
+
+ASSISTANT:
+Conceptual lifecycle:
+
+Client
+  |
+  v
+Reactor Netty / HTTP server event loop
+  |
+  v
+Spring WebFlux routing/controller
+  |
+  v
+Controller returns Mono/Flux
+  |
+  v
+Spring subscribes
+  |
+  v
+Reactive pipeline executes
+  |
+  +--> asynchronous I/O / scheduler boundaries as configured
+  |
+  v
+onNext / onComplete / onError
+  |
+  v
+Spring encodes HTTP response
+  |
+  v
+Netty writes response to client
+
+If client disconnects, cancellation can propagate through the reactive chain when supported.
+
+USER:
+I have a question before we continue. Is Spring Webflux responsible for the blocking threads? I mean do I still need to subscribeOn(Schedulers.boundedElastic()) and PublishOn() ?
+
+ASSISTANT:
+Spring WebFlux does not automatically detect arbitrary blocking code and move it to boundedElastic for you.
+
+If you must integrate a blocking call:
+@GetMapping("/user/{id}")
+public Mono<User> getUser(String id) {
+    return Mono.fromCallable(this::blockingDbCall)
+               .subscribeOn(Schedulers.boundedElastic());
+}
+
+If your stack is non-blocking end-to-end (for example R2DBC, reactive MongoDB driver, WebClient), you normally do not need boundedElastic merely because you're using WebFlux.
+
+publishOn remains optional and is used when you intentionally want to change the downstream execution context.
+
+USER:
+Webflux must never block
+
+ASSISTANT:
+Correct principle: avoid blocking event-loop/non-blocking threads in WebFlux. If unavoidable legacy blocking work must be integrated, isolate it on an appropriate scheduler such as boundedElastic.
+
+----------------------------------------------------------------------
+WEBFLUX ERROR HANDLING
+----------------------------------------------------------------------
+
+ASSISTANT:
+For a reactive repository:
+Mono<User> findById(...)
+
+No row usually means Mono.empty(), not HTTP 404.
+
+Convert empty to a domain/HTTP error:
+return service.findById(id)
+    .switchIfEmpty(
+        Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND))
+    );
+
+onErrorMap transforms error signals:
+.onErrorMap(ex -> new MyServiceException(...))
+
+Global error mapping:
+@RestControllerAdvice
+class GlobalErrorHandler {
+    @ExceptionHandler(UserNotFoundException.class)
+    ...
+}
+
+USER:
+I have a question. Lets suppose I'm calling findById and the database returns a HTTP 404. In my code I have switchIfEmpty followed by onErrorMap. Does onErrorMap will also handle this error? Do I need these two together? What would be the best code to handle this?
+
+ASSISTANT:
+Clarification:
+A database repository doesn't return HTTP 404. HTTP status codes belong to HTTP.
+
+Reactive repository not found:
+Mono.empty()
+
+Remote HTTP WebClient 404:
+typically an error signal when using retrieve() unless status handling changes it.
+
+Important operator interaction:
+repository.findById(id)
+    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+    .onErrorMap(ex -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+The onErrorMap is downstream of switchIfEmpty, so it can also transform the 404 error you just created unless you filter/map only the errors you intend.
+
+Rule:
+switchIfEmpty -> absence of value
+onErrorMap -> existing error signal
+
+Avoid blanket onErrorMap when you need to preserve specific domain/HTTP errors.
+
+----------------------------------------------------------------------
+REST USERS API DESIGN
+----------------------------------------------------------------------
+
+USER:
+let's continue writing controller code and handle all possible scenarios. I want to write perfect get, post, delete, put and patch users, handle possible errors and work with Mono and Flux.
+
+ASSISTANT:
+Suggested architecture:
+- User domain/response
+- CreateUserRequest
+- UpdateUserRequest
+- PatchUserRequest
+- UserEntity
+- UserRepository
+- UserService
+- UserController
+- @RestControllerAdvice
+
+Suggested endpoints:
+GET /users -> Flux<User>
+GET /users/{id} -> Mono<User>
+POST /users -> Mono<ResponseEntity<User>>, HTTP 201
+PUT /users/{id} -> Mono<User>
+PATCH /users/{id} -> Mono<User>
+DELETE /users/{id} -> Mono<ResponseEntity<Void>>, HTTP 204
+
+Key rules:
+- no block()
+- no manual subscribe()
+- switchIfEmpty for missing reactive repository values
+- custom exceptions for domain errors
+- global HTTP error mapping
+
+USER:
+Awesome. But first let me try to write a code just like you did. Once I'm done I want you to do exactly this, to give me this set of edge cases, adjust the code and review and help improve it
+
+USER:
+Question: why do I need CreateUserRequest and UpdateUserRequest? Actually why do I need 3 other records? Isn't it duplication of code? Why not to use only User?
+
+ASSISTANT:
+Separate DTOs express different API contracts:
+- Create: client supplies creation fields; server-managed fields can be excluded
+- PUT: complete replacement/update contract
+- PATCH: partial fields, usually nullable/optional
+- User/domain: internal/response representation
+
+Benefits:
+- different validation rules
+- prevents over-posting
+- separates API contract from domain/persistence model
+- PATCH semantics can differ cleanly
+
+USER:
+But what about the Repositories? Do I have to create a new Repository interface for each record?
+
+ASSISTANT:
+No. Repositories are for persistence entities/aggregate roots, not request DTOs.
+
+Typical:
+CreateUserRequest/UpdateUserRequest/PatchUserRequest -> API layer
+User -> domain/response
+UserEntity -> persistence
+UserRepository extends ReactiveCrudRepository<UserEntity, String>
+
+----------------------------------------------------------------------
+USER'S IMPLEMENTATION REVIEW
+----------------------------------------------------------------------
+
+USER DTO:
+package com.disney.auth.testing.dto;
+
+public record User(String id, String name, int age, String email) {
+}
+
+CreateUser:
+public record CreateUser(
+        @NotEmpty String id,
+        @NotEmpty String name,
+        @Min(0) int age,
+        @Email @NotEmpty String email
+) {
+}
+
+UpdateUser:
+public record UpdateUser(
+        @NotEmpty String name,
+        @Min(0) int age,
+        @Email @NotEmpty String email
+) {
+}
+
+ASSISTANT REVIEW:
+- records are good for immutable DTOs
+- consider server-generated ID rather than accepting id in CreateUser
+- @NotBlank is often preferable to @NotEmpty for human text because it rejects whitespace-only strings
+- consider naming CreateUserRequest / UpdateUserRequest
+- keep domain and DTO naming clear
+- PatchUser fields need partial-update semantics
+
+USER ENTITY:
+@Table("users")
+public record User(String id, String name, int age, String email) {
+}
+
+ASSISTANT REVIEW:
+Two classes named User (dto.User and entity.User) create confusion.
+Suggested:
+@Table("users")
+public record UserEntity(
+    @Id String id,
+    String name,
+    int age,
+    String email
+) {}
+
+USER REPOSITORY:
+@Repository
+public interface UserRepo extends ReactiveCrudRepository<User, String> {
+}
+
+with import com.disney.auth.testing.dto.User;
+
+ASSISTANT REVIEW:
+Repository is using DTO User instead of persistence entity.
+Suggested:
+ReactiveCrudRepository<UserEntity, String>
+
+Optional:
+Mono<Boolean> existsByEmail(String email);
+Mono<UserEntity> findByEmail(String email);
+
+USER GLOBAL EXCEPTION / SERVICE / CONTROLLER:
+@RestControllerAdvice
+public class GlobalException {
+    @ExceptionHandler(UserNotFoundException.class)
+    public Mono<ResponseEntity<ErrorDetails>> userNotFoundException(...) { ... }
+
+    @ExceptionHandler(DuplicateUserException.class)
+    public Mono<ResponseEntity<ErrorDetails>> duplicateUserException(...) { ... }
+
+    @ExceptionHandler(RuntimeException.class)
+    public Mono<ResponseEntity<ErrorDetails>> internalErrorException(...) { ... }
+}
+
+ErrorDetails:
+public record ErrorDetails(String message, OffsetDateTime timestamp) {}
+
+DatabaseException extends RuntimeException
+DuplicateUserException extends RuntimeException
+UserNotFoundException extends RuntimeException
+
+UserService:
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepo userRepo;
+    private final UserMapper mapper;
+
+    public Mono<User> getUserById(String id) {
+        return userRepo.findById(id);
+    }
+
+    public Flux<User> getAllUsers() {
+        return userRepo.findAll();
+    }
+
+    public Mono<User> createUser(CreateUser user) {
+        return userRepo.existsById(user.id())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new RuntimeException("User already exists"));
+                    }
+                    return userRepo.save(mapper.toEntity(user));
+                })
+                .onErrorMap(throwable -> new RuntimeException("Error occurred"));
+    }
+
+    public Mono<Void> deleteUser(String id) {
+        return userRepo.deleteById(id);
+    }
+
+    public Mono<String> patchUser(PatchUser user) {
+        return userRepo.save(mapper.toEntity(user)).thenReturn(user.name());
+    }
+
+    public Mono<String> updateUser(UpdateUser user) {
+        return userRepo.save(mapper.toEntity(user)).thenReturn(user.name());
+    }
+}
+
+UserController:
+@RestController
+@RequestMapping("/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    final UserService service;
+
+    @GetMapping("/{id}")
+    public Mono<ResponseEntity<User>> getUserById(@PathVariable String id) {
+        return service.getUserById(id)
+                .onErrorMap(throwable ->  new DatabaseException("Error on database"))
+                .switchIfEmpty(Mono.error(new UserNotFoundException("user not found")))
+                .map(user -> ResponseEntity.ok(user));
+    }
+
+    @GetMapping()
+    public Flux<ResponseEntity<User>> getUsers() {
+        return service
+                .getAllUsers()
+                .onErrorMap(throwable -> new DatabaseException("Error on Database"))
+                .map(user -> ResponseEntity.ok(user));
+    }
+
+    @PostMapping()
+    public Mono<ResponseEntity<User>> createUser(@Valid @RequestBody CreateUser user) {
+        return service
+                .createUser(user)
+                .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created));
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> deleteUserById(@PathVariable String id) {
+        return service
+                .deleteUser(id)
+                .map(user -> ResponseEntity.status(HttpStatus.OK).body(user));
+    }
+}
+
+ASSISTANT REVIEW SUMMARY:
+Good:
+- real layered WebFlux application
+- reactive repository
+- service/controller separation
+- custom exception types
+- @RestControllerAdvice
+- validation
+- Mono/Flux use
+
+Improvements:
+1. Repository should persist UserEntity, not DTO User.
+2. Map UserEntity -> API/domain User in service.
+3. Do not blanket-map every error to RuntimeException/DatabaseException; preserve known domain errors.
+4. Duplicate user should use DuplicateUserException.
+5. deleteById may complete successfully even if row doesn't exist; decide strict 404 vs idempotent 204.
+6. PUT should load existing user and replace intended fields.
+7. PATCH should load existing entity, merge provided fields, save.
+8. Returning Mono<String> for update/patch is less useful than returning updated User.
+9. GET all normally returns Flux<User>, not Flux<ResponseEntity<User>>.
+10. DELETE with Mono<Void> should use thenReturn/then(...) rather than map.
+11. DatabaseException should have an explicit handler if used.
+12. Validation errors should have a consistent 400 response.
+
+Edge cases identified:
+- GET missing -> 404
+- DB failure -> 500
+- invalid POST -> 400
+- duplicate ID/email -> 409
+- DELETE missing -> 404 or idempotent 204
+- PUT missing -> 404 or documented upsert
+- PUT invalid -> 400
+- PATCH one field
+- PATCH invalid age -> 400
+- PATCH missing -> 404
+- preserve 404 instead of accidentally converting to 500
+
+USER MAPPER:
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    User toEntity(CreateUser user);
+    User toEntity(UpdateUser user);
+    User toEntity(PatchUser user);
+}
+
+ASSISTANT REVIEW:
+The return type is dto.User, so this is DTO -> DTO, not DTO -> entity.
+
+Recommended conceptual mapper:
+User toDto(UserEntity entity);
+
+UserEntity toEntity(CreateUser dto);
+UserEntity toEntity(UpdateUser dto);
+
+For PATCH, a direct conversion can lose existing values. PATCH is a merge operation.
+
+MapStruct can support partial merge with:
+@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+void mergePatch(PatchUser patch, @MappingTarget UserEntity target);
+
+Note: if UserEntity is a Java record, in-place @MappingTarget mutation is not suitable because records are immutable. For a record entity, create a new merged UserEntity in the service/mapper instead. If using a mutable entity class, @MappingTarget works naturally.
+
+USER:
+I understood all my mistakes, and I'd like to fix them at another time. Right now I'd like to jump to the next subject. Do you remember what was it?
+
+ASSISTANT:
+Next planned subject:
+Day 6 — Testing Reactive Code & WebFlux
+- StepVerifier
+- Mono/Flux tests
+- completion/error assertions
+- retries
+- WebTestClient
+- HTTP status/error/validation testing
+- interview questions
+
+======================================================================
+FULL REACTIVE REVIEW
+======================================================================
+
+USER:
+Yes, our conversation about fromCallable and defer, subscribeOn, publishOn. That's about that chat that I'm talking about. Not only four subjects, but the whole chat (pure functions, mono, flux, etc)
+
+ASSISTANT REVIEW:
+Reactive programming mental model:
+“Describe asynchronous data flows that are lazy, composable, and backpressure-aware.”
+
+Functional programming:
+Pure function:
+- output depends only on inputs
+- no externally observable side effects
+- same inputs -> same result
+
+Immutability:
+- state does not change after creation
+- reduces shared mutable-state problems in concurrent/asynchronous systems
+
+Higher-order functions:
+- receive functions or return functions
+- map/filter/flatMap accept functional interfaces
+
+Mono:
+- 0 or 1 value
+
+Flux:
+- 0..N values
+
+Laziness:
+- Publisher describes work
+- work commonly begins on subscription
+
+just:
+- use when you already have a value
+- method arguments are evaluated before just() is called
+
+fromCallable:
+- evaluate computation at subscription
+- exceptions -> onError
+
+defer:
+- create Publisher fresh at subscription
+
+subscribeOn:
+- schedule subscription/source-side execution
+
+publishOn:
+- downstream scheduling boundary
+
+boundedElastic:
+- blocking I/O integration
+
+parallel:
+- CPU-bound tasks when scheduler isolation is needed
+
+Errors:
+- terminal onError signal
+- doOnError, onErrorReturn, onErrorResume, onErrorMap, retry/retryWhen
+
+Backpressure:
+- downstream demand controls compliant upstream emission
+- buffer/drop/latest/error are possible overflow strategies
+
+WebFlux:
+- reactive HTTP framework
+- Spring subscribes
+- don't manually subscribe in controllers
+- avoid block()
+- isolate unavoidable blocking work
+- reactive DB/client libraries usually do not need boundedElastic
+
+======================================================================
+AWS / KAFKA
+======================================================================
+
+USER:
+whats the aws equivalent to kafka?
+
+ASSISTANT:
+Closest direct answer:
+Amazon MSK (Managed Streaming for Apache Kafka) is managed Apache Kafka on AWS.
+
+AWS-native alternative:
+Amazon Kinesis Data Streams solves a similar streaming problem but is not Kafka-compatible.
+
+Quick mapping:
+- “Kafka on AWS?” -> Amazon MSK
+- “AWS-native streaming?” -> Kinesis Data Streams
+- Existing Spring Kafka/Kafka clients -> MSK is the direct fit
+
+Other related AWS services:
+- MSK Serverless
+- Kinesis Data Firehose (delivery pipeline, not a Kafka replacement)
+- EventBridge (event bus, different model)
+
+======================================================================
+PLANNED NEXT STEP
+======================================================================
+
+Day 6 — Testing Reactive Code and WebFlux:
+1. StepVerifier
+2. Testing Mono and Flux values/completion/errors
+3. Testing retries
+4. WebTestClient
+5. Controller status/error/validation tests
+6. Interview questions and coding exercises
+
+END OF STUDY RECORD
