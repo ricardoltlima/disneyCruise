@@ -326,6 +326,7 @@
       <nav aria-label="Table of contents">
         <a href="#role">Engineering Focus</a>
         <a href="#java-language-features">Java Language Features</a>
+        <a href="#java-streams">Java Streams</a>
         <a href="#spring-request">Spring Request Lifecycle</a>
         <a href="#beans">Beans and Dependency Injection</a>
         <a href="#rest-api">REST API Design</a>
@@ -502,6 +503,408 @@ steps.addLast("publish event");</code></pre>
           <li>Use switch expressions for clear value mapping and avoid mutation-heavy branching.</li>
           <li>Use text blocks in tests and infrastructure code where multiline JSON, SQL, or configuration improves readability.</li>
           <li>Use virtual threads for blocking I/O workloads where the stack supports them, but keep reactive pipelines non-blocking.</li>
+        </ul>
+      </section>
+
+      <section id="java-streams">
+        <h2>Java Streams Deep Dive</h2>
+        <p class="lead">A Stream is a pipeline for processing data from a collection or another source. It lets code describe what should happen to the data: filter these items, transform them, sort them, group them, count them, or reduce them into a final answer.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a Disney cruise check-in line. Guests enter the line, staff remove invalid reservations, sort guests by boarding group, transform each reservation into a boarding pass, and finally collect the passes into a stack. A Java Stream works the same way: data moves through a sequence of steps until a terminal operation produces the result.</p>
+        <pre><code>List&lt;BoardingPass&gt; passes = reservations.stream()
+        .filter(Reservation::isPaid)
+        .filter(reservation -> !reservation.isCancelled())
+        .sorted(Comparator.comparing(Reservation::boardingGroup)
+                .thenComparing(Reservation::guestName))
+        .map(reservation -> new BoardingPass(
+                reservation.id(),
+                reservation.guestName(),
+                reservation.boardingGroup()))
+        .toList();</code></pre>
+        <p>The source is <code>reservations</code>. The intermediate operations are <code>filter</code>, <code>sorted</code>, and <code>map</code>. The terminal operation is <code>toList</code>.</p>
+
+        <h3>Stream Vocabulary</h3>
+        <ul>
+          <li><strong>Source:</strong> where data comes from, such as a <code>List</code>, <code>Set</code>, array, file, or generated sequence.</li>
+          <li><strong>Intermediate operation:</strong> returns another Stream and does not run by itself. Examples: <code>map</code>, <code>filter</code>, <code>sorted</code>, <code>distinct</code>.</li>
+          <li><strong>Terminal operation:</strong> starts the pipeline and produces a result or side effect. Examples: <code>toList</code>, <code>collect</code>, <code>count</code>, <code>sum</code>, <code>forEach</code>.</li>
+          <li><strong>Lazy execution:</strong> intermediate operations wait until a terminal operation is called.</li>
+          <li><strong>One-time use:</strong> a Stream cannot be reused after a terminal operation.</li>
+        </ul>
+
+        <h3>Example Data</h3>
+        <pre><code>public record Payment(
+        String id,
+        String reservationId,
+        String guestName,
+        String method,
+        String status,
+        int amountInCents
+) {}
+
+List&lt;Payment&gt; payments = List.of(
+        new Payment("P1", "R1", "Ana", "CARD", "APPROVED", 125_00),
+        new Payment("P2", "R2", "Luke", "GIFT_CARD", "DECLINED", 80_00),
+        new Payment("P3", "R1", "Ana", "CARD", "APPROVED", 50_00),
+        new Payment("P4", "R3", "Mia", "PAYPAL", "APPROVED", 300_00)
+);</code></pre>
+
+        <h3>map</h3>
+        <p><code>map</code> transforms each item into another value. If a payment is a row in a spreadsheet, <code>map</code> creates a new column from each row.</p>
+        <pre><code>List&lt;String&gt; guestNames = payments.stream()
+        .map(Payment::guestName)
+        .toList();
+
+List&lt;String&gt; labels = payments.stream()
+        .map(payment -> payment.id() + " - " + payment.status())
+        .toList();</code></pre>
+        <p>Use <code>map</code> when one input item becomes one output item. A payment becomes a guest name. A reservation becomes a response DTO. An entity becomes an API response.</p>
+
+        <h3>filter</h3>
+        <p><code>filter</code> keeps only items that pass a condition. In real life, it is like letting only guests with valid boarding documents continue through the line.</p>
+        <pre><code>List&lt;Payment&gt; approvedPayments = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .toList();
+
+List&lt;Payment&gt; largeApprovedPayments = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .filter(payment -> payment.amountInCents() >= 100_00)
+        .toList();</code></pre>
+        <p>Multiple filters are often more readable than one large condition because each rule has its own line.</p>
+
+        <h3>flatMap</h3>
+        <p><code>flatMap</code> is used when each item contains another collection or stream, and the final result should be one flat stream. It transforms and flattens at the same time.</p>
+        <pre><code>public record CruiseReservation(
+        String id,
+        String guestName,
+        List&lt;String&gt; excursionCodes
+) {}
+
+List&lt;CruiseReservation&gt; reservations = List.of(
+        new CruiseReservation("R1", "Ana", List.of("CASTAWAY-5K", "SPA")),
+        new CruiseReservation("R2", "Luke", List.of("SNORKELING"))
+);
+
+List&lt;String&gt; allExcursions = reservations.stream()
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .toList();</code></pre>
+        <p>Without <code>flatMap</code>, the result would be shaped like <code>Stream&lt;List&lt;String&gt;&gt;</code>. With <code>flatMap</code>, the result is shaped like <code>Stream&lt;String&gt;</code>.</p>
+        <pre><code>// map keeps the boxes:
+List&lt;List&lt;String&gt;&gt; excursionsByReservation = reservations.stream()
+        .map(CruiseReservation::excursionCodes)
+        .toList();
+
+// flatMap opens the boxes and puts all items in one line:
+List&lt;String&gt; flatExcursions = reservations.stream()
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .toList();</code></pre>
+
+        <h3>distinct</h3>
+        <p><code>distinct</code> removes duplicates using <code>equals</code> and <code>hashCode</code>. With records, Java generates those methods from the record components.</p>
+        <pre><code>List&lt;String&gt; uniqueGuestNames = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .toList();
+
+List&lt;String&gt; uniqueReservationIds = payments.stream()
+        .map(Payment::reservationId)
+        .distinct()
+        .toList();</code></pre>
+        <p>Use <code>distinct</code> when repeated values are not meaningful, such as unique guest names, reservation IDs, payment methods, or event IDs already seen.</p>
+
+        <h3>sorted</h3>
+        <p><code>sorted</code> orders stream elements. For simple values like strings and numbers, natural ordering often works directly.</p>
+        <pre><code>List&lt;String&gt; names = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .sorted()
+        .toList();</code></pre>
+        <p>For objects, use a <code>Comparator</code> to say which field should control the order.</p>
+        <pre><code>List&lt;Payment&gt; cheapestFirst = payments.stream()
+        .sorted(Comparator.comparingInt(Payment::amountInCents))
+        .toList();
+
+List&lt;Payment&gt; biggestFirst = payments.stream()
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .toList();</code></pre>
+
+        <h3>Comparator Main Methods</h3>
+        <ul>
+          <li><code>Comparator.comparing</code>: sort by an object field, such as name, status, method, or date.</li>
+          <li><code>Comparator.comparingInt</code>: sort by an <code>int</code> without boxing overhead.</li>
+          <li><code>Comparator.comparingLong</code>: sort by a <code>long</code>.</li>
+          <li><code>Comparator.comparingDouble</code>: sort by a <code>double</code>.</li>
+          <li><code>thenComparing</code>: add a tie-breaker when the first comparison is equal.</li>
+          <li><code>reversed</code>: reverse the whole comparator.</li>
+          <li><code>nullsFirst</code> and <code>nullsLast</code>: define where null values should appear.</li>
+          <li><code>naturalOrder</code> and <code>reverseOrder</code>: use normal ascending or descending order for comparable values.</li>
+        </ul>
+        <pre><code>List&lt;Payment&gt; ordered = payments.stream()
+        .sorted(Comparator
+                .comparing(Payment::status)
+                .thenComparing(Payment::guestName)
+                .thenComparingInt(Payment::amountInCents))
+        .toList();</code></pre>
+        <p>Real-life analogy: sorting luggage first by deck, then by room number, then by guest name. If two bags have the same deck, the room number breaks the tie. If the room is also the same, the guest name breaks the next tie.</p>
+        <pre><code>public record LuggageTag(
+        int deck,
+        int roomNumber,
+        String guestName
+) {}
+
+List&lt;LuggageTag&gt; deliveryOrder = tags.stream()
+        .sorted(Comparator
+                .comparingInt(LuggageTag::deck)
+                .thenComparingInt(LuggageTag::roomNumber)
+                .thenComparing(LuggageTag::guestName))
+        .toList();</code></pre>
+
+        <h3>limit and skip</h3>
+        <p><code>limit</code> keeps the first N items. <code>skip</code> ignores the first N items. Together, they are useful for pagination.</p>
+        <pre><code>int page = 2;
+int size = 10;
+
+List&lt;Payment&gt; secondPage = payments.stream()
+        .sorted(Comparator.comparing(Payment::id))
+        .skip((long) (page - 1) * size)
+        .limit(size)
+        .toList();</code></pre>
+
+        <h3>peek</h3>
+        <p><code>peek</code> lets code observe items passing through the pipeline. It is mainly useful for debugging. Avoid using it for business logic.</p>
+        <pre><code>List&lt;Payment&gt; approved = payments.stream()
+        .peek(payment -> System.out.println("Before filter: " + payment.id()))
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .peek(payment -> System.out.println("Approved: " + payment.id()))
+        .toList();</code></pre>
+
+        <h3>Terminal Operations</h3>
+        <p>Terminal operations start the stream. Without a terminal operation, the pipeline is just a description and nothing runs.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>toList</h3>
+            <p><code>toList</code> creates a list from the stream result. In modern Java, this list is unmodifiable.</p>
+            <pre><code>List&lt;String&gt; approvedIds = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>collect</h3>
+            <p><code>collect</code> uses a Collector to build a result such as a list, set, map, string, or grouped structure.</p>
+            <pre><code>Set&lt;String&gt; methods = payments.stream()
+        .map(Payment::method)
+        .collect(Collectors.toSet());</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>count</h3>
+            <p><code>count</code> returns how many items remain after filtering.</p>
+            <pre><code>long declinedCount = payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .count();</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>forEach</h3>
+            <p><code>forEach</code> performs an action for each item. It returns nothing, so it is usually for boundary actions such as logging or calling a void API.</p>
+            <pre><code>payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .forEach(payment -> System.out.println("Review payment " + payment.id()));</code></pre>
+          </article>
+        </div>
+
+        <h3>sum, average, min, and max</h3>
+        <p><code>sum</code> exists on primitive streams such as <code>IntStream</code>, <code>LongStream</code>, and <code>DoubleStream</code>. Convert with <code>mapToInt</code>, <code>mapToLong</code>, or <code>mapToDouble</code>.</p>
+        <pre><code>int approvedTotal = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .mapToInt(Payment::amountInCents)
+        .sum();
+
+double averagePayment = payments.stream()
+        .mapToInt(Payment::amountInCents)
+        .average()
+        .orElse(0);
+
+int biggestPayment = payments.stream()
+        .mapToInt(Payment::amountInCents)
+        .max()
+        .orElse(0);</code></pre>
+        <p>Real-life analogy: after filtering only completed purchases, <code>sum</code> is like adding every receipt total in the cash register at the end of the day.</p>
+
+        <h3>reduce</h3>
+        <p><code>reduce</code> combines many values into one value. Use it when there is no simpler operation like <code>sum</code>, <code>count</code>, or <code>Collectors.joining</code>.</p>
+        <pre><code>int total = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::amountInCents)
+        .reduce(0, Integer::sum);
+
+String paymentSummary = payments.stream()
+        .map(payment -> payment.id() + ":" + payment.status())
+        .reduce("", (left, right) -> left.isBlank() ? right : left + ", " + right);</code></pre>
+
+        <h3>findFirst, findAny, anyMatch, allMatch, noneMatch</h3>
+        <p>These operations answer questions without necessarily processing every item. They can stop early when the answer is known.</p>
+        <pre><code>Optional&lt;Payment&gt; firstDeclined = payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .findFirst();
+
+boolean hasDeclinedPayment = payments.stream()
+        .anyMatch(payment -> payment.status().equals("DECLINED"));
+
+boolean allApproved = payments.stream()
+        .allMatch(payment -> payment.status().equals("APPROVED"));
+
+boolean noNegativeAmounts = payments.stream()
+        .noneMatch(payment -> payment.amountInCents() < 0);</code></pre>
+        <p><code>anyMatch</code> is like asking whether at least one guest in line needs assistance. <code>allMatch</code> asks whether every guest has a valid ticket. <code>noneMatch</code> asks whether nobody is missing required documents.</p>
+
+        <h3>Collectors</h3>
+        <p><code>Collectors</code> are reusable recipes for turning a stream into a final structure.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>toList, toSet, toMap</h3>
+            <pre><code>List&lt;Payment&gt; approvedList = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .collect(Collectors.toList());
+
+Set&lt;String&gt; paymentMethods = payments.stream()
+        .map(Payment::method)
+        .collect(Collectors.toSet());
+
+Map&lt;String, Payment&gt; paymentById = payments.stream()
+        .collect(Collectors.toMap(
+                Payment::id,
+                payment -> payment));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>toMap With Duplicate Keys</h3>
+            <p>If keys can repeat, provide a merge function. This example keeps the larger payment per reservation.</p>
+            <pre><code>Map&lt;String, Payment&gt; largestPaymentByReservation = payments.stream()
+        .collect(Collectors.toMap(
+                Payment::reservationId,
+                payment -> payment,
+                (left, right) -> left.amountInCents() >= right.amountInCents()
+                        ? left
+                        : right));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>groupingBy</h3>
+            <p><code>groupingBy</code> creates buckets. It is like sorting cruise passengers into lines by boarding group.</p>
+            <pre><code>Map&lt;String, List&lt;Payment&gt;&gt; paymentsByStatus = payments.stream()
+        .collect(Collectors.groupingBy(Payment::status));
+
+Map&lt;String, List&lt;Payment&gt;&gt; paymentsByReservation = payments.stream()
+        .collect(Collectors.groupingBy(Payment::reservationId));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>partitioningBy</h3>
+            <p><code>partitioningBy</code> splits items into exactly two groups: true and false.</p>
+            <pre><code>Map&lt;Boolean, List&lt;Payment&gt;&gt; expensiveOrNot = payments.stream()
+        .collect(Collectors.partitioningBy(
+                payment -> payment.amountInCents() >= 100_00));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>joining</h3>
+            <p><code>joining</code> combines strings.</p>
+            <pre><code>String guestList = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .sorted()
+        .collect(Collectors.joining(", "));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>mapping and counting</h3>
+            <p>Collectors can be nested. This counts payments per status.</p>
+            <pre><code>Map&lt;String, Long&gt; countByStatus = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::status,
+                Collectors.counting()));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>summing and averaging</h3>
+            <pre><code>Map&lt;String, Integer&gt; totalByStatus = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::status,
+                Collectors.summingInt(Payment::amountInCents)));
+
+Map&lt;String, Double&gt; averageByMethod = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::method,
+                Collectors.averagingInt(Payment::amountInCents)));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>maxBy and minBy</h3>
+            <pre><code>Map&lt;String, Optional&lt;Payment&gt;&gt; largestByMethod = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::method,
+                Collectors.maxBy(
+                        Comparator.comparingInt(Payment::amountInCents))));</code></pre>
+          </article>
+        </div>
+
+        <h3>toList vs Collectors.toList</h3>
+        <ul>
+          <li><code>stream().toList()</code> is concise and returns an unmodifiable list.</li>
+          <li><code>collect(Collectors.toList())</code> returns a mutable list in common JDK implementations, but the interface does not strongly promise the exact list type.</li>
+          <li>Use <code>toCollection(ArrayList::new)</code> when you specifically need a mutable <code>ArrayList</code>.</li>
+        </ul>
+        <pre><code>List&lt;String&gt; unmodifiable = payments.stream()
+        .map(Payment::id)
+        .toList();
+
+List&lt;String&gt; mutable = payments.stream()
+        .map(Payment::id)
+        .collect(Collectors.toCollection(ArrayList::new));
+
+mutable.add("manual-adjustment");</code></pre>
+
+        <h3>End-to-End Payment Example</h3>
+        <p>This pipeline creates a simple operations view: approved card payments, ordered by largest amount first, converted into display rows.</p>
+        <pre><code>public record PaymentRow(
+        String paymentId,
+        String reservationId,
+        String guestName,
+        String amount
+) {}
+
+List&lt;PaymentRow&gt; dashboardRows = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .filter(payment -> payment.method().equals("CARD"))
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .map(payment -> new PaymentRow(
+                payment.id(),
+                payment.reservationId(),
+                payment.guestName(),
+                "$" + payment.amountInCents() / 100))
+        .toList();</code></pre>
+
+        <h3>End-to-End Cruise Example</h3>
+        <p>This pipeline finds all unique excursion codes selected by paid reservations, sorted alphabetically.</p>
+        <pre><code>List&lt;String&gt; excursionCatalogInUse = reservations.stream()
+        .filter(reservation -> paidReservationIds.contains(reservation.id()))
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .distinct()
+        .sorted()
+        .toList();</code></pre>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Using <code>map</code> when the function returns a collection and the result should be flattened. Use <code>flatMap</code>.</li>
+          <li>Expecting intermediate operations to run without a terminal operation.</li>
+          <li>Reusing a stream after <code>toList</code>, <code>collect</code>, <code>count</code>, or another terminal operation.</li>
+          <li>Using <code>forEach</code> to build lists manually instead of <code>map</code>, <code>filter</code>, and <code>toList</code>.</li>
+          <li>Using <code>sorted</code> on large datasets that should be sorted by the database with proper indexes.</li>
+          <li>Using parallel streams for I/O-heavy work without understanding thread pools, blocking calls, and ordering.</li>
         </ul>
       </section>
 
