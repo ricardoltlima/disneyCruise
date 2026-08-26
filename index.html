@@ -325,6 +325,7 @@
       <h1>Backend Engineering Guide</h1>
       <nav aria-label="Table of contents">
         <a href="#role">Engineering Focus</a>
+        <a href="#java-language-features">Java Language Features</a>
         <a href="#spring-request">Spring Request Lifecycle</a>
         <a href="#beans">Beans and Dependency Injection</a>
         <a href="#rest-api">REST API Design</a>
@@ -376,6 +377,132 @@
             </ul>
           </article>
         </div>
+      </section>
+
+      <section id="java-language-features">
+        <h2>Java 16, Java 17, and Java 21 Features</h2>
+        <p class="lead">Modern Java adds concise data modeling, safer type handling, stronger domain modeling, better concurrency options, and cleaner syntax for everyday backend code.</p>
+
+        <h3>Java 16</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Records</h3>
+            <p>Records are compact immutable data carriers. Java generates the constructor, accessors, <code>equals</code>, <code>hashCode</code>, and <code>toString</code>.</p>
+            <pre><code>public record ReservationResponse(
+        Long id,
+        String guestName,
+        String status
+) {}</code></pre>
+            <p>Use records for DTOs, API responses, commands, events, and value-style objects where identity and mutation are not the main concern.</p>
+          </article>
+
+          <article class="card">
+            <h3>Pattern Matching for instanceof</h3>
+            <p>Pattern matching removes the extra cast after an <code>instanceof</code> check and keeps type checks easier to read.</p>
+            <pre><code>if (event instanceof ReservationCreated created) {
+    return created.reservationId();
+}</code></pre>
+            <p>This is useful when handling events, exceptions, request payload variants, or generic domain objects.</p>
+          </article>
+        </div>
+
+        <h3>Java 17</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Sealed Classes and Interfaces</h3>
+            <p>Sealed types restrict which classes or records can implement or extend a type. They make domain models explicit and easier to reason about.</p>
+            <pre><code>public sealed interface PaymentEvent
+        permits PaymentAuthorized, PaymentDeclined {}
+
+public record PaymentAuthorized(String paymentId)
+        implements PaymentEvent {}
+
+public record PaymentDeclined(String paymentId, String reason)
+        implements PaymentEvent {}</code></pre>
+            <p>Use sealed hierarchies when the list of allowed variants is known, such as workflow states, commands, events, and result types.</p>
+          </article>
+
+          <article class="card">
+            <h3>Switch Expressions</h3>
+            <p>Switch expressions return values directly and avoid fall-through bugs from missing <code>break</code> statements.</p>
+            <pre><code>String message = switch (status) {
+    case "CONFIRMED" -> "Reservation is confirmed";
+    case "CANCELLED" -> "Reservation is cancelled";
+    case "PENDING" -> "Reservation is pending";
+    default -> "Unknown reservation status";
+};</code></pre>
+            <p>They are a good fit for mapping states, roles, event types, and simple decision tables.</p>
+          </article>
+
+          <article class="card">
+            <h3>Text Blocks</h3>
+            <p>Text blocks make multiline strings cleaner. They are helpful for SQL, JSON examples, logs, documentation snippets, and test fixtures.</p>
+            <pre><code>String json = """
+        {
+          "reservationId": "R123",
+          "status": "CONFIRMED"
+        }
+        """;</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Strong LTS Baseline</h3>
+            <p>Java 17 is a long-term support release and a common modern baseline for Spring Boot services. It combines records, sealed types, text blocks, switch expressions, and JVM/runtime improvements into a stable platform.</p>
+          </article>
+        </div>
+
+        <h3>Java 21</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Virtual Threads</h3>
+            <p>Virtual threads are lightweight JVM-managed threads. They make blocking-style code scale better when work spends most of its time waiting on I/O.</p>
+            <pre><code>try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    executor.submit(() -> reservationClient.fetchReservation(id));
+}</code></pre>
+            <p>They are useful for servlet-style services and blocking libraries. They do not remove the need for timeouts, connection pool limits, backpressure thinking, or careful resource management.</p>
+          </article>
+
+          <article class="card">
+            <h3>Pattern Matching for switch</h3>
+            <p>Switch can match by type, which works especially well with sealed hierarchies.</p>
+            <pre><code>String describe(PaymentEvent event) {
+    return switch (event) {
+        case PaymentAuthorized authorized ->
+                "Authorized: " + authorized.paymentId();
+        case PaymentDeclined declined ->
+                "Declined: " + declined.reason();
+    };
+}</code></pre>
+            <p>When all sealed variants are handled, the compiler can help detect missing cases.</p>
+          </article>
+
+          <article class="card">
+            <h3>Record Patterns</h3>
+            <p>Record patterns let code unpack record values directly during pattern matching.</p>
+            <pre><code>if (response instanceof ReservationResponse(Long id, String guest, String status)) {
+    return id + " - " + guest + " - " + status;
+}</code></pre>
+            <p>This is helpful when extracting values from small immutable data structures.</p>
+          </article>
+
+          <article class="card">
+            <h3>Sequenced Collections</h3>
+            <p>Sequenced collections provide a consistent API for collections with a defined encounter order, including first and last element access.</p>
+            <pre><code>SequencedCollection&lt;String&gt; steps = new ArrayList&lt;&gt;();
+steps.addFirst("validate");
+steps.addLast("publish event");</code></pre>
+            <p>This improves readability when order matters, such as workflow steps, ordered rules, or ordered response sections.</p>
+          </article>
+        </div>
+
+        <h3>Practical Backend Guidance</h3>
+        <ul>
+          <li>Use records for immutable DTOs and event payloads, but avoid them for persistence entities that require framework mutation or lazy loading.</li>
+          <li>Use sealed types to model a closed set of states, events, commands, or results.</li>
+          <li>Use switch expressions for clear value mapping and avoid mutation-heavy branching.</li>
+          <li>Use text blocks in tests and infrastructure code where multiline JSON, SQL, or configuration improves readability.</li>
+          <li>Use virtual threads for blocking I/O workloads where the stack supports them, but keep reactive pipelines non-blocking.</li>
+        </ul>
       </section>
 
       <section id="spring-request">
