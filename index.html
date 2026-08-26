@@ -326,6 +326,7 @@
       <nav aria-label="Table of contents">
         <a href="#role">Engineering Focus</a>
         <a href="#java-language-features">Java Language Features</a>
+        <a href="#functional-interfaces">Functional Interfaces</a>
         <a href="#java-streams">Java Streams</a>
         <a href="#spring-request">Spring Request Lifecycle</a>
         <a href="#beans">Beans and Dependency Injection</a>
@@ -394,6 +395,8 @@
         String guestName,
         String status
 ) {}</code></pre>
+            <p>Not all methods in a record are final. The record class itself is final, and the immutability comes from private final fields, no setters, and the canonical constructor initializing all fields.</p>
+            <p>Records are immutable because their fields are private final, they have no setters, and their state is fully initialized in the canonical constructor. This immutability is ideal for functional programming because it eliminates side effects, makes objects thread-safe, and ensures predictable behavior when passed through pipelines such as Stream or Reactor.</p>
             <p>Use records for DTOs, API responses, commands, events, and value-style objects where identity and mutation are not the main concern.</p>
           </article>
 
@@ -420,6 +423,8 @@ public record PaymentAuthorized(String paymentId)
 
 public record PaymentDeclined(String paymentId, String reason)
         implements PaymentEvent {}</code></pre>
+            <h3>How do records work with sealed interfaces?</h3>
+            <p>Records can implement sealed interfaces naturally because they are implicitly final, which satisfies the requirement of a sealed hierarchy. Since a sealed parent allows only subclasses that are final, sealed, or non-sealed, a record fits perfectly. The only rule is that the record must appear in the permits list of the sealed type. This makes records a great fit for modeling immutable domain events.</p>
             <p>Use sealed hierarchies when the list of allowed variants is known, such as workflow states, commands, events, and result types.</p>
           </article>
 
@@ -503,6 +508,231 @@ steps.addLast("publish event");</code></pre>
           <li>Use switch expressions for clear value mapping and avoid mutation-heavy branching.</li>
           <li>Use text blocks in tests and infrastructure code where multiline JSON, SQL, or configuration improves readability.</li>
           <li>Use virtual threads for blocking I/O workloads where the stack supports them, but keep reactive pipelines non-blocking.</li>
+        </ul>
+      </section>
+
+      <section id="functional-interfaces">
+        <h2>Functional Interfaces</h2>
+        <p class="lead">A functional interface is an interface with exactly one abstract method. It lets Java treat behavior as a value, so code can pass an action, rule, calculation, or transformation into another method.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a cruise terminal with different workers. One worker checks whether a guest can board. Another worker prints a boarding pass. Another sends a notification. A functional interface is like describing one job role: given this input, perform this one kind of work.</p>
+        <pre><code>@FunctionalInterface
+public interface BoardingRule {
+    boolean canBoard(Reservation reservation);
+}</code></pre>
+        <p>The interface has one abstract method, so Java can implement it with a lambda instead of a full class.</p>
+        <pre><code>BoardingRule isPaidAndConfirmed = reservation ->
+        reservation.isPaid() && reservation.status().equals("CONFIRMED");</code></pre>
+
+        <h3>Why Functional Interfaces Matter</h3>
+        <ul>
+          <li>They are the foundation of lambdas in Java.</li>
+          <li>They let methods receive behavior, not just data.</li>
+          <li>They power Stream operations such as <code>filter</code>, <code>map</code>, <code>flatMap</code>, and <code>forEach</code>.</li>
+          <li>They make business rules easier to compose and test.</li>
+          <li>They appear constantly in reactive programming, where pipelines receive small functions for transformation, validation, error handling, and side effects.</li>
+        </ul>
+
+        <h3>Lambda Shape</h3>
+        <p>A lambda is a compact implementation of a functional interface. It has inputs on the left, an arrow, and behavior on the right.</p>
+        <pre><code>payment -> payment.status().equals("APPROVED")</code></pre>
+        <p>Real-life analogy: the left side is the item handed to a worker, and the right side is what the worker does with it.</p>
+        <pre><code>// Input: one payment
+// Work: check whether it is approved
+Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");</code></pre>
+
+        <h3>Main Built-In Functional Interfaces</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Predicate&lt;T&gt;</h3>
+            <p>A <code>Predicate</code> receives one value and returns <code>true</code> or <code>false</code>. It represents a rule or question.</p>
+            <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Predicate&lt;Reservation&gt; canBoard = reservation ->
+        reservation.isPaid() && !reservation.isCancelled();</code></pre>
+            <p>Used by <code>filter</code>. In plain English: should this item stay in the pipeline?</p>
+          </article>
+
+          <article class="card">
+            <h3>Function&lt;T, R&gt;</h3>
+            <p>A <code>Function</code> receives one value and returns another value. It represents a transformation.</p>
+            <pre><code>Function&lt;Payment, String&gt; toReceiptLine = payment ->
+        payment.id() + " - $" + payment.amountInCents() / 100;
+
+Function&lt;Reservation, BoardingPass&gt; toBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());</code></pre>
+            <p>Used by <code>map</code>. In plain English: turn this thing into another thing.</p>
+          </article>
+
+          <article class="card">
+            <h3>Consumer&lt;T&gt;</h3>
+            <p>A <code>Consumer</code> receives one value and returns nothing. It represents doing something with the value.</p>
+            <pre><code>Consumer&lt;Payment&gt; logPayment = payment ->
+        System.out.println("Processed payment " + payment.id());
+
+Consumer&lt;BoardingPass&gt; printPass = pass ->
+        printer.print(pass);</code></pre>
+            <p>Used by <code>forEach</code> and side-effect hooks. In plain English: take this item and do an action.</p>
+          </article>
+
+          <article class="card">
+            <h3>Supplier&lt;T&gt;</h3>
+            <p>A <code>Supplier</code> receives nothing and returns a value. It represents delayed creation.</p>
+            <pre><code>Supplier&lt;String&gt; idGenerator = () ->
+        UUID.randomUUID().toString();
+
+Supplier&lt;PaymentAudit&gt; auditFactory = () ->
+        new PaymentAudit(Instant.now(), "SYSTEM");</code></pre>
+            <p>In plain English: when someone asks, produce a value.</p>
+          </article>
+
+          <article class="card">
+            <h3>BiFunction&lt;T, U, R&gt;</h3>
+            <p>A <code>BiFunction</code> receives two values and returns one value.</p>
+            <pre><code>BiFunction&lt;Integer, Integer, Integer&gt; add = (left, right) ->
+        left + right;
+
+BiFunction&lt;Payment, Integer, PaymentSummary&gt; toSummary = (payment, fee) ->
+        new PaymentSummary(payment.id(), payment.amountInCents() + fee);</code></pre>
+            <p>Use it when a calculation needs two inputs, such as payment plus fee, reservation plus room assignment, or old state plus new event.</p>
+          </article>
+
+          <article class="card">
+            <h3>UnaryOperator and BinaryOperator</h3>
+            <p><code>UnaryOperator&lt;T&gt;</code> is a Function where input and output have the same type. <code>BinaryOperator&lt;T&gt;</code> is a BiFunction where both inputs and the output have the same type.</p>
+            <pre><code>UnaryOperator&lt;String&gt; normalizeName = name ->
+        name.trim().toUpperCase();
+
+BinaryOperator&lt;Integer&gt; addAmounts = Integer::sum;</code></pre>
+            <p>These are good for cleanup, normalization, and combining values of the same type.</p>
+          </article>
+        </div>
+
+        <h3>Method References</h3>
+        <p>A method reference is a shorter lambda when the lambda only calls an existing method.</p>
+        <pre><code>Function&lt;Payment, String&gt; getStatus = Payment::status;
+
+Consumer&lt;String&gt; print = System.out::println;
+
+List&lt;String&gt; statuses = payments.stream()
+        .map(Payment::status)
+        .distinct()
+        .toList();</code></pre>
+        <p><code>Payment::status</code> means: given a Payment, call its <code>status()</code> method. It is the same idea as <code>payment -> payment.status()</code>.</p>
+
+        <h3>Composition</h3>
+        <p>Composition means building bigger behavior from smaller behaviors. This is like a cruise check-in process made from small steps: normalize the guest name, verify payment, assign boarding group, and print the pass.</p>
+        <pre><code>Function&lt;String, String&gt; trim = String::trim;
+Function&lt;String, String&gt; uppercase = String::toUpperCase;
+
+Function&lt;String, String&gt; normalizeGuestName = trim.andThen(uppercase);
+
+String normalized = normalizeGuestName.apply("  Ana  ");</code></pre>
+        <p><code>andThen</code> runs the first function, then the second. <code>compose</code> runs the function passed into it first.</p>
+        <pre><code>Function&lt;Payment, Integer&gt; amount = Payment::amountInCents;
+Function&lt;Integer, String&gt; formatDollars = cents -> "$" + cents / 100;
+
+Function&lt;Payment, String&gt; paymentAmountLabel = amount.andThen(formatDollars);</code></pre>
+
+        <h3>Predicate Composition</h3>
+        <p>Predicates can be combined with <code>and</code>, <code>or</code>, and <code>negate</code>. This keeps business rules readable.</p>
+        <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Predicate&lt;Payment&gt; isLarge = payment ->
+        payment.amountInCents() >= 500_00;
+
+Predicate&lt;Payment&gt; needsManualReview = isApproved.negate().or(isLarge);
+
+List&lt;Payment&gt; reviewQueue = payments.stream()
+        .filter(needsManualReview)
+        .toList();</code></pre>
+        <p>Plain analogy: a port security rule can say a guest needs review if their document is invalid OR their reservation needs special handling. Each rule stays separate, then the rules are combined.</p>
+
+        <h3>Custom Functional Interfaces</h3>
+        <p>Use built-in interfaces when their names are clear enough. Create a custom functional interface when the domain meaning matters.</p>
+        <pre><code>@FunctionalInterface
+public interface PaymentRule {
+    boolean passes(Payment payment);
+}
+
+PaymentRule approvedCardPayment = payment ->
+        payment.status().equals("APPROVED")
+                && payment.method().equals("CARD");</code></pre>
+        <p><code>Predicate&lt;Payment&gt;</code> works technically, but <code>PaymentRule</code> can communicate business meaning more clearly in important domain code.</p>
+
+        <h3>Pure Functions and Side Effects</h3>
+        <p>A pure function returns the same result for the same input and does not change outside state. Pure functions are easier to test, easier to reuse, and safer in asynchronous code.</p>
+        <pre><code>Function&lt;Payment, String&gt; pureReceiptLabel = payment ->
+        payment.id() + " - " + payment.status();
+
+Consumer&lt;Payment&gt; sideEffect = payment ->
+        auditRepository.save(payment);</code></pre>
+        <p>The first example only calculates a value. The second changes an external system. Side effects are sometimes necessary, but keep them at clear boundaries such as persistence, logging, messaging, or HTTP calls.</p>
+
+        <h3>Payment System Example</h3>
+        <p>This example builds a payment review pipeline from reusable functional interfaces.</p>
+        <pre><code>Predicate&lt;Payment&gt; isDeclined = payment ->
+        payment.status().equals("DECLINED");
+
+Predicate&lt;Payment&gt; isHighValue = payment ->
+        payment.amountInCents() >= 1_000_00;
+
+Function&lt;Payment, String&gt; toReviewMessage = payment ->
+        "Review " + payment.id()
+                + " for reservation " + payment.reservationId();
+
+List&lt;String&gt; reviewMessages = payments.stream()
+        .filter(isDeclined.or(isHighValue))
+        .map(toReviewMessage)
+        .toList();</code></pre>
+        <p>The predicates decide which payments matter. The function converts those payments into readable messages. The stream connects the rules into a full workflow.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This example uses functional interfaces to decide which reservations are ready for boarding.</p>
+        <pre><code>Predicate&lt;Reservation&gt; isConfirmed = reservation ->
+        reservation.status().equals("CONFIRMED");
+
+Predicate&lt;Reservation&gt; isPaid = Reservation::isPaid;
+
+Predicate&lt;Reservation&gt; hasRequiredDocuments = reservation ->
+        reservation.documents().contains("PASSPORT")
+                || reservation.documents().contains("BIRTH_CERTIFICATE");
+
+Function&lt;Reservation, BoardingPass&gt; createBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+List&lt;BoardingPass&gt; boardingPasses = reservations.stream()
+        .filter(isConfirmed.and(isPaid).and(hasRequiredDocuments))
+        .map(createBoardingPass)
+        .toList();</code></pre>
+        <p>This reads like a real process: keep confirmed reservations, keep paid reservations, keep guests with documents, then create boarding passes.</p>
+
+        <h3>How This Connects to Streams and Reactor</h3>
+        <p>Stream and Reactor operators receive functional interfaces. Once this idea is clear, the APIs become easier to read.</p>
+        <pre><code>// Stream
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED")) // Predicate
+        .map(Payment::id)                                      // Function
+        .forEach(System.out::println);                         // Consumer
+
+// Reactor
+paymentMono
+        .filter(payment -> payment.status().equals("APPROVED")) // Predicate
+        .map(Payment::id)                                       // Function
+        .doOnNext(System.out::println);                         // Consumer-style callback</code></pre>
+        <p>The difference is the execution model. Stream is usually synchronous and collection-focused. Reactor is asynchronous, lazy, and built around publishers such as <code>Mono</code> and <code>Flux</code>. But both rely heavily on the same functional-interface idea.</p>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Thinking a functional interface means many methods. It must have exactly one abstract method.</li>
+          <li>Forgetting that default and static methods are allowed because they are not abstract methods.</li>
+          <li>Putting database writes, HTTP calls, or shared mutable state inside lambdas that should be simple transformations.</li>
+          <li>Using a custom interface when <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code> would be clearer.</li>
+          <li>Using <code>Consumer</code> when a <code>Function</code> is needed. A Consumer returns nothing; a Function returns a transformed value.</li>
         </ul>
       </section>
 
