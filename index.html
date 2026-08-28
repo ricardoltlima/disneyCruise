@@ -513,7 +513,8 @@ steps.addLast("publish event");</code></pre>
 
       <section id="functional-interfaces">
         <h2>Functional Interfaces</h2>
-        <p class="lead">A functional interface is an interface with exactly one abstract method. It lets Java treat behavior as a value, so code can pass an action, rule, calculation, or transformation into another method.</p>
+        <p class="lead">A functional interface is an interface that contains exactly one abstract method. This enables Java to use lambda expressions and method references, because the compiler can unambiguously match a lambda to the single abstract method.</p>
+        <p>Functional interfaces often also contain default or static methods, which do not affect their functional nature. They let Java treat behavior as a value, so code can pass an action, rule, calculation, or transformation into another method.</p>
 
         <h3>Mental Model</h3>
         <p>Imagine a cruise terminal with different workers. One worker checks whether a guest can board. Another worker prints a boarding pass. Another sends a notification. A functional interface is like describing one job role: given this input, perform this one kind of work.</p>
@@ -532,6 +533,7 @@ public interface BoardingRule {
           <li>They power Stream operations such as <code>filter</code>, <code>map</code>, <code>flatMap</code>, and <code>forEach</code>.</li>
           <li>They make business rules easier to compose and test.</li>
           <li>They appear constantly in reactive programming, where pipelines receive small functions for transformation, validation, error handling, and side effects.</li>
+          <li>Without functional interfaces, Java's Stream API and Reactor would not be possible in their current declarative style.</li>
         </ul>
 
         <h3>Lambda Shape</h3>
@@ -544,6 +546,14 @@ Predicate&lt;Payment&gt; isApproved = payment ->
         payment.status().equals("APPROVED");</code></pre>
 
         <h3>Main Built-In Functional Interfaces</h3>
+        <p>The main functional interfaces used by Streams and Reactor are:</p>
+        <ul>
+          <li><code>Predicate&lt;T&gt;</code> for filtering with <code>test</code>.</li>
+          <li><code>Function&lt;T, R&gt;</code> and <code>BiFunction&lt;T, U, R&gt;</code> for transformations with <code>apply</code>.</li>
+          <li><code>Consumer&lt;T&gt;</code> for side-effect actions with <code>accept</code>.</li>
+          <li><code>Supplier&lt;T&gt;</code> for lazy value generation with <code>get</code>.</li>
+          <li><code>UnaryOperator&lt;T&gt;</code> and <code>BinaryOperator&lt;T&gt;</code> for transformations where the input and output stay the same type.</li>
+        </ul>
         <div class="grid">
           <article class="card">
             <h3>Predicate&lt;T&gt;</h3>
