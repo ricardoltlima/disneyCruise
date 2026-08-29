@@ -218,6 +218,52 @@
       margin: 6px 0;
     }
 
+    table {
+      width: 100%;
+      margin: 16px 0 18px;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.04);
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      color: #0f223f;
+      background: #edf3fa;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8fafd;
+    }
+
+    td code {
+      white-space: nowrap;
+    }
+
     code {
       padding: 2px 5px;
       background: var(--code-bg);
@@ -312,6 +358,12 @@
         grid-template-columns: 1fr;
       }
 
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
       .day {
         grid-template-columns: 1fr;
         gap: 4px;
@@ -326,8 +378,14 @@
       <nav aria-label="Table of contents">
         <a href="#role">Engineering Focus</a>
         <a href="#java-language-features">Java Language Features</a>
+        <a href="#functional-programming-foundations">Functional Programming Foundations</a>
+        <a href="#higher-order-functions">Higher-Order Functions</a>
+        <a href="#composability">Composability</a>
         <a href="#functional-interfaces">Functional Interfaces</a>
         <a href="#java-streams">Java Streams</a>
+        <a href="#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+        <a href="#reactor-deep-dive">Reactor Deep Dive</a>
+        <a href="#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
         <a href="#spring-request">Spring Request Lifecycle</a>
         <a href="#beans">Beans and Dependency Injection</a>
         <a href="#rest-api">REST API Design</a>
@@ -511,6 +569,461 @@ steps.addLast("publish event");</code></pre>
         </ul>
       </section>
 
+      <section id="functional-programming-foundations">
+        <h2>Functional Programming Foundations</h2>
+        <p class="lead">Functional programming is a style of writing code where data flows through small predictable operations. Instead of changing objects step by step, the code describes transformations from input to output.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a cruise boarding process. A reservation enters the process, then each station performs one clear job: validate documents, verify payment, assign boarding group, create a boarding pass. Each station should not secretly change another station's paperwork. It receives information, does its job, and hands forward a clear result.</p>
+        <pre><code>Reservation -> validate -> verify payment -> assign group -> boarding pass</code></pre>
+        <p>Functional programming tries to make code feel like that: small steps, clear inputs, clear outputs, and fewer hidden changes.</p>
+
+        <h3>Pure Functions</h3>
+        <p>A pure function always returns the same output for the same input and does not change anything outside itself. It does not update a database, mutate a list, write a file, call an API, log as part of business behavior, or depend on the current time unless the time is passed in as an input.</p>
+        <pre><code>public int calculateTotalInCents(List&lt;Payment&gt; payments) {
+    return payments.stream()
+            .filter(payment -> payment.status().equals("APPROVED"))
+            .mapToInt(Payment::amountInCents)
+            .sum();
+}</code></pre>
+        <p>This is pure if the same list always produces the same total and the method does not change the list or any external system.</p>
+        <pre><code>// Not pure: it changes external state.
+public int calculateTotalAndSaveAudit(List&lt;Payment&gt; payments) {
+    int total = calculateTotalInCents(payments);
+    auditRepository.save(new AuditRecord("TOTAL_CALCULATED", total));
+    return total;
+}</code></pre>
+        <p>Real-life analogy: pure function is like a calculator. If you type <code>10 + 20</code>, it returns <code>30</code> every time and does not change your bank account. An impure function is like a payment terminal: it may calculate, but it can also charge a card, print a receipt, and change real-world state.</p>
+
+        <h3>Why Pure Functions Help</h3>
+        <ul>
+          <li>They are easier to test because there is no hidden setup.</li>
+          <li>They are easier to debug because inputs explain outputs.</li>
+          <li>They are safer in concurrent code because they do not mutate shared state.</li>
+          <li>They fit naturally into Stream and Reactor pipelines.</li>
+          <li>They separate business calculations from side effects such as database writes and HTTP calls.</li>
+        </ul>
+
+        <h3>Immutability</h3>
+        <p>Immutability means an object's state does not change after it is created. Instead of editing the same object, code creates a new value with the desired change.</p>
+        <pre><code>public record Reservation(
+        String id,
+        String guestName,
+        String status,
+        int balanceInCents
+) {}
+
+public Reservation markPaid(Reservation reservation) {
+    return new Reservation(
+            reservation.id(),
+            reservation.guestName(),
+            "PAID",
+            0);
+}</code></pre>
+        <p>The original reservation remains unchanged. The method returns a new reservation representing the updated state.</p>
+        <pre><code>// Mutable style
+reservation.setStatus("PAID");
+reservation.setBalanceInCents(0);
+
+// Immutable style
+Reservation paidReservation = markPaid(reservation);</code></pre>
+        <p>Real-life analogy: changing a printed cruise itinerary with a pen can create confusion because people may hold different versions. Issuing a new itinerary with a new state is clearer: the old document existed, and the new document represents the updated truth.</p>
+
+        <h3>How do you avoid mutating lists in Java?</h3>
+        <p>Instead of modifying the original list, create a new one. In functional programming and reactive systems, immutability prevents side effects and makes data flows predictable.</p>
+        <pre><code>List&lt;String&gt; originalGuestIds = List.of("G1", "G2");
+
+List&lt;String&gt; updatedGuestIds = Stream.concat(
+        originalGuestIds.stream(),
+        Stream.of("G3"))
+        .toList();</code></pre>
+        <p><code>updatedGuestIds</code> contains the new value, but <code>originalGuestIds</code> is unchanged. This is crucial for thread safety and correctness in asynchronous pipelines.</p>
+        <pre><code>// Avoid this when shared state can be observed elsewhere.
+guestIds.add("G3");
+
+// Prefer this when you want predictable data flow.
+List&lt;String&gt; updatedGuestIds = Stream.concat(
+        guestIds.stream(),
+        Stream.of("G3"))
+        .toList();</code></pre>
+
+        <h3>Why Mutability Matters in Functional Programming and Reactor</h3>
+        <ol>
+          <li><strong>Mutability causes bugs in concurrent systems.</strong> Reactor uses non-blocking asynchronous execution. If multiple operations mutate shared data at the same time, the code can produce race conditions where the final result depends on timing instead of business rules.</li>
+          <li><strong>Pure functions require no side effects.</strong> Mutating an external list, updating a shared object, or changing state outside the function is a side effect. That makes the function harder to test and harder to reason about.</li>
+          <li><strong>Immutability creates safer, predictable data flow.</strong> If a value cannot change, every operator in a Stream or Reactor pipeline receives a stable value. The code becomes easier to understand because earlier steps cannot secretly change what later steps see.</li>
+          <li><strong>Reactive Streams do not expect mutation between operators.</strong> Modifying objects inside a pipeline breaks referential transparency. A pipeline is clearest when each step receives a value and returns a new value instead of mutating the existing one.</li>
+        </ol>
+        <h3>Why is immutability important in reactive programming?</h3>
+        <p>Immutability is essential in Reactor and WebFlux because reactive systems are asynchronous and often run work on multiple threads. When threads share mutable data, one thread can change a value while another thread is reading or processing it. That creates race conditions and unpredictable behavior.</p>
+        <ul>
+          <li><strong>Async code is safer with immutable values.</strong> If a value cannot change, it can move between threads without another operator secretly modifying it.</li>
+          <li><strong>Referential transparency is preserved.</strong> Pure functions and immutable data make it possible to replace an expression with its result without changing behavior.</li>
+          <li><strong>Non-blocking scheduling stays reliable.</strong> Reactor may shift work across schedulers and threads. Mutable shared state can break assumptions about ordering and visibility.</li>
+        </ul>
+        <p>By using immutable data, each value in a reactive pipeline is safe to share across threads and operators. This preserves referential transparency and makes the pipeline deterministic. That is what makes Reactor's non-blocking, concurrent execution model easier to trust.</p>
+        <pre><code>// Risky: mutates external shared state from inside the pipeline.
+List&lt;String&gt; approvedIds = new ArrayList&lt;&gt;();
+
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .forEach(payment -> approvedIds.add(payment.id()));
+
+// Safer: the pipeline produces the result directly.
+List&lt;String&gt; approvedIds = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();</code></pre>
+
+        <h3>Immutability in Payment Systems</h3>
+        <p>Payment systems benefit from immutability because historical facts should not be casually edited. A payment was authorized, declined, refunded, or settled. Instead of mutating the old event, systems usually add a new event.</p>
+        <pre><code>public sealed interface PaymentEvent
+        permits PaymentAuthorized, PaymentDeclined, PaymentRefunded {}
+
+public record PaymentAuthorized(String paymentId, int amountInCents)
+        implements PaymentEvent {}
+
+public record PaymentDeclined(String paymentId, String reason)
+        implements PaymentEvent {}
+
+public record PaymentRefunded(String paymentId, int amountInCents)
+        implements PaymentEvent {}</code></pre>
+        <p>This keeps the payment history understandable. A refund does not erase the original charge; it adds a new fact.</p>
+
+        <h3>Higher-Order Functions</h3>
+        <p>A higher-order function receives a function as an argument, returns a function, or both. In Java, this usually means receiving or returning a functional interface such as <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code>.</p>
+        <pre><code>public List&lt;Payment&gt; findPayments(
+        List&lt;Payment&gt; payments,
+        Predicate&lt;Payment&gt; rule
+) {
+    return payments.stream()
+            .filter(rule)
+            .toList();
+}</code></pre>
+        <p><code>findPayments</code> is higher-order because it receives a rule as a parameter. The caller decides what rule to use.</p>
+        <pre><code>List&lt;Payment&gt; declined = findPayments(payments,
+        payment -> payment.status().equals("DECLINED"));
+
+List&lt;Payment&gt; highValue = findPayments(payments,
+        payment -> payment.amountInCents() >= 1_000_00);</code></pre>
+        <p>Real-life analogy: the same security checkpoint can use different rules depending on the situation. One day it checks passports. Another day it checks boarding group. The checkpoint process is reusable because the rule can change.</p>
+
+        <h3>Returning Functions</h3>
+        <p>A method can also return a function. This is useful when code needs to build rules dynamically from configuration, user role, region, feature flag, or business context.</p>
+        <pre><code>public Predicate&lt;Payment&gt; paymentReviewRule(int highValueLimitInCents) {
+    return payment ->
+            payment.status().equals("DECLINED")
+                    || payment.amountInCents() >= highValueLimitInCents;
+}
+
+Predicate&lt;Payment&gt; reviewRule = paymentReviewRule(1_000_00);
+
+List&lt;Payment&gt; reviewQueue = payments.stream()
+        .filter(reviewRule)
+        .toList();</code></pre>
+        <p>The method creates a rule. The stream later applies that rule to every payment.</p>
+
+        <h3>Function Composition</h3>
+        <p>Function composition is the process of combining functions so that the output of one becomes the input of the next. In Java, this is done with methods such as <code>andThen()</code> and <code>compose()</code> on <code>Function</code>, and with composition methods such as <code>and()</code>, <code>or()</code>, and <code>negate()</code> on <code>Predicate</code>.</p>
+        <p>It allows code to build transformation pipelines from small, reusable pure functions. Each function handles one part of the work, and the output of one step becomes the input of the next step.</p>
+        <pre><code>Function&lt;String, String&gt; trim = String::trim;
+Function&lt;String, String&gt; uppercase = String::toUpperCase;
+Function&lt;String, String&gt; addPrefix = name -> "Guest: " + name;
+
+Function&lt;String, String&gt; formatGuestName =
+        trim.andThen(uppercase).andThen(addPrefix);
+
+String label = formatGuestName.apply("  Ana  ");</code></pre>
+        <p><code>andThen</code> reads left to right: trim, then uppercase, then add prefix. It is like an assembly line where each station performs a small step.</p>
+        <pre><code>Function&lt;Reservation, BoardingPass&gt; createPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+Function&lt;BoardingPass, BoardingPassEmail&gt; createEmail = pass ->
+        new BoardingPassEmail(pass.guestName(), "Your boarding pass is ready");
+
+Function&lt;Reservation, BoardingPassEmail&gt; createBoardingEmail =
+        createPass.andThen(createEmail);</code></pre>
+        <p>In reactive programming, composition is essential. Every operator in a Reactor pipeline, such as <code>map</code>, <code>filter</code>, and <code>flatMap</code>, is composing behavior into a larger data flow. This makes the logic declarative, easier to test, and avoids shared mutable state, which is crucial for asynchronous, non-blocking workflows.</p>
+
+        <h3>Declarative vs Imperative Thinking</h3>
+        <p>Imperative code focuses on how to do each step. Declarative code focuses on what result is wanted. Neither style is always wrong. The value of declarative code is that it often expresses business intent more clearly.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Imperative</h3>
+            <pre><code>List&lt;String&gt; approvedGuestNames = new ArrayList&lt;&gt;();
+
+for (Payment payment : payments) {
+    if (payment.status().equals("APPROVED")) {
+        String name = payment.guestName();
+        approvedGuestNames.add(name);
+    }
+}</code></pre>
+            <p>This says: create a list, loop over payments, check status, extract name, add to list.</p>
+          </article>
+
+          <article class="card">
+            <h3>Declarative</h3>
+            <pre><code>List&lt;String&gt; approvedGuestNames = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::guestName)
+        .toList();</code></pre>
+            <p>This says: from payments, keep approved ones, extract guest names, return a list.</p>
+          </article>
+        </div>
+        <p>Real-life analogy: imperative is like giving turn-by-turn driving directions. Declarative is like saying the destination. In code, declarative pipelines still execute step by step, but the source code emphasizes the outcome.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This example keeps the business rules separate from the pipeline, which makes the process easier to read and test.</p>
+        <pre><code>Predicate&lt;Reservation&gt; isConfirmed = reservation ->
+        reservation.status().equals("CONFIRMED");
+
+Predicate&lt;Reservation&gt; isPaid = reservation ->
+        reservation.balanceInCents() == 0;
+
+Function&lt;Reservation, BoardingPass&gt; toBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+List&lt;BoardingPass&gt; passes = reservations.stream()
+        .filter(isConfirmed.and(isPaid))
+        .map(toBoardingPass)
+        .toList();</code></pre>
+        <p>The pipeline reads like the business process: confirmed reservations, paid reservations, then boarding passes.</p>
+
+        <h3>Payment Example</h3>
+        <p>This example calculates approved revenue without changing payment objects or touching external systems.</p>
+        <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Function&lt;Payment, Integer&gt; amount = Payment::amountInCents;
+
+int approvedRevenue = payments.stream()
+        .filter(isApproved)
+        .map(amount)
+        .reduce(0, Integer::sum);</code></pre>
+        <p>The calculation is predictable: same payment list, same answer. Database writes, audit records, and notification sending should happen outside this pure calculation.</p>
+
+        <h3>Practical Guidance</h3>
+        <ul>
+          <li>Keep calculations pure when possible.</li>
+          <li>Use immutable data for DTOs, events, commands, and read models.</li>
+          <li>Pass rules and transformations as functional interfaces when it makes the workflow more reusable.</li>
+          <li>Compose small functions instead of writing one large method with many unrelated responsibilities.</li>
+          <li>Prefer declarative pipelines when they make business intent clearer.</li>
+          <li>Keep side effects at the edges: repositories, HTTP clients, messaging clients, logging, and monitoring.</li>
+          <li>Use names for important predicates and functions so the code explains the business rule.</li>
+        </ul>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Thinking functional programming means never using objects. Java functional programming still works with records, classes, services, and domain models.</li>
+          <li>Calling a function pure when it secretly reads time, random values, files, databases, or shared mutable state.</li>
+          <li>Mutating a list or object inside <code>map</code>, <code>filter</code>, or <code>forEach</code> and making the pipeline harder to reason about.</li>
+          <li>Using streams for everything, even when a simple loop would be clearer.</li>
+          <li>Mixing business calculation and side effects in the same method.</li>
+        </ul>
+      </section>
+
+      <section id="higher-order-functions">
+        <h2>Higher-Order Functions</h2>
+        <p class="lead">A higher-order function is a function that receives another function as an argument, returns a function as its result, or both. In Java, this usually means a method receives or returns a functional interface such as <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code>.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a payment review desk. The desk always does the same general workflow: receive payments, apply a rule, and return the payments that need attention. What changes is the rule. One day the rule is declined payments. Another day it is payments over $1,000. The desk is reusable because the rule is passed in.</p>
+
+        <h3>Receiving a Function as an Argument</h3>
+        <p>This method is higher-order because it receives a <code>Predicate&lt;Payment&gt;</code>. The method does not hard-code the rule; the caller supplies the rule.</p>
+        <pre><code>public List&lt;Payment&gt; findPayments(
+        List&lt;Payment&gt; payments,
+        Predicate&lt;Payment&gt; rule
+) {
+    return payments.stream()
+            .filter(rule)
+            .toList();
+}
+
+List&lt;Payment&gt; declinedPayments = findPayments(payments,
+        payment -> payment.status().equals("DECLINED"));
+
+List&lt;Payment&gt; highValuePayments = findPayments(payments,
+        payment -> payment.amountInCents() >= 1_000_00);</code></pre>
+        <p>The same method supports different business questions because the behavior is passed in as data.</p>
+
+        <h3>Returning a Function</h3>
+        <p>A method can build and return a function. This is useful when a rule depends on configuration, region, product type, guest tier, or feature flags.</p>
+        <pre><code>public Predicate&lt;Payment&gt; createReviewRule(int highValueLimitInCents) {
+    return payment ->
+            payment.status().equals("DECLINED")
+                    || payment.amountInCents() >= highValueLimitInCents;
+}
+
+Predicate&lt;Payment&gt; standardReviewRule = createReviewRule(1_000_00);
+Predicate&lt;Payment&gt; vipReviewRule = createReviewRule(500_00);
+
+List&lt;Payment&gt; standardQueue = payments.stream()
+        .filter(standardReviewRule)
+        .toList();</code></pre>
+        <p>The method creates a rule once, and that rule can be reused in a stream, service method, validator, or test.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This higher-order method can find reservations based on any rule: ready to board, missing documents, unpaid, cancelled, or VIP.</p>
+        <pre><code>public List&lt;Reservation&gt; findReservations(
+        List&lt;Reservation&gt; reservations,
+        Predicate&lt;Reservation&gt; rule
+) {
+    return reservations.stream()
+            .filter(rule)
+            .toList();
+}
+
+Predicate&lt;Reservation&gt; readyToBoard = reservation ->
+        reservation.status().equals("CONFIRMED")
+                && reservation.balanceInCents() == 0
+                && reservation.hasRequiredDocuments();
+
+List&lt;Reservation&gt; boardingQueue =
+        findReservations(reservations, readyToBoard);</code></pre>
+        <p>Real-life analogy: the same crew member can use different checklists. One checklist is for boarding readiness. Another is for missing documents. The process is the same; the rule changes.</p>
+
+        <h3>Transforming with a Function Argument</h3>
+        <p>Higher-order functions are not only for filtering. They can also receive transformations.</p>
+        <pre><code>public List&lt;String&gt; createLabels(
+        List&lt;Payment&gt; payments,
+        Function&lt;Payment, String&gt; labelFunction
+) {
+    return payments.stream()
+            .map(labelFunction)
+            .toList();
+}
+
+List&lt;String&gt; receiptLabels = createLabels(payments,
+        payment -> payment.id() + " - $" + payment.amountInCents() / 100);
+
+List&lt;String&gt; reservationLabels = createLabels(payments,
+        payment -> payment.reservationId() + " - " + payment.guestName());</code></pre>
+        <p>The same method can create different outputs because the transformation is supplied from outside.</p>
+
+        <h3>Connection to Streams and Reactor</h3>
+        <p>Many common Java APIs are built from higher-order functions. <code>filter</code> receives a <code>Predicate</code>. <code>map</code> receives a <code>Function</code>. <code>forEach</code> receives a <code>Consumer</code>. Reactor follows the same idea with asynchronous data.</p>
+        <pre><code>// Stream: synchronous collection pipeline
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();
+
+// Reactor: asynchronous publisher pipeline
+paymentFlux
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id);</code></pre>
+        <p>Reactor and WebFlux also depend on higher-order functions. Each operator receives functions as inputs.</p>
+        <pre><code>flux.flatMap(this::callApi)
+        .map(this::transform)
+        .filter(this::isValid);</code></pre>
+        <p>The operators are higher-order because they receive behavior and compose it into a pipeline. This is why functional programming is so important for reactive systems.</p>
+
+        <h3>Why Higher-Order Functions Matter</h3>
+        <ul>
+          <li><strong>They allow composition.</strong> Code can build powerful pipelines by passing functions into other functions.</li>
+          <li><strong>They enable declarative, functional code.</strong> Instead of manually controlling every loop and temporary variable, the code describes behavior.</li>
+          <li><strong>They reduce boilerplate.</strong> Many workflows no longer need repetitive loops, nested <code>if</code> statements, or manual collection building.</li>
+          <li><strong>They make code more reusable.</strong> The same method can accept different functions to customize behavior for payments, reservations, guests, or events.</li>
+        </ul>
+
+        <h3>Practical Guidance</h3>
+        <ul>
+          <li>Use higher-order functions when the workflow is stable but the rule or transformation changes.</li>
+          <li>Name important rules with variables such as <code>readyToBoard</code> or <code>requiresManualReview</code>.</li>
+          <li>Keep passed functions small and focused.</li>
+          <li>Prefer pure functions for calculations and transformations.</li>
+          <li>Keep side effects such as saving, sending, and logging at clear boundaries.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">A higher-order function is a function that either takes another function as an argument or returns a function. In Java, this is common with Streams and Reactor, where operators like <code>map</code>, <code>filter</code>, and <code>flatMap</code> receive functions. Higher-order functions enable functional composition, reusability, and declarative programming.</p>
+      </section>
+
+      <section id="composability">
+        <h2>Composability</h2>
+        <p class="lead">Composable means small, independent pieces can be combined to build bigger and more complex behavior without modifying the pieces themselves.</p>
+
+        <h3>Simple Definition</h3>
+        <p>Think LEGO blocks, not glue. If something is composable, you can plug it together with other things, each piece keeps doing one job, and you do not need to rewrite existing code to combine behavior.</p>
+        <ul>
+          <li>Each piece has a clear responsibility.</li>
+          <li>Each piece can be reused in different workflows.</li>
+          <li>Pieces can be added, removed, or reordered more easily.</li>
+          <li>The original pieces do not need to be modified every time the workflow changes.</li>
+        </ul>
+
+        <h3>Composable in Functional Programming</h3>
+        <p>Functions are composable when the output of one function can become the input of another function.</p>
+        <pre><code>Function&lt;Integer, Integer&gt; doubleIt = x -> x * 2;
+Function&lt;Integer, Integer&gt; addOne = x -> x + 1;
+
+Function&lt;Integer, Integer&gt; composed =
+        doubleIt.andThen(addOne);
+
+int result = composed.apply(10);</code></pre>
+        <p><code>doubleIt</code> is reusable. <code>addOne</code> is reusable. <code>composed</code> is built by combining them. That is composability.</p>
+        <p>Real-life analogy: a payment workflow may have separate steps for validating the request, calculating fees, authorizing the payment, and creating a receipt. Each step does one job, and the workflow combines them.</p>
+
+        <h3>Composable in Streams</h3>
+        <p>Stream pipelines are composable because each operator does one job and returns a new stream for the next operator.</p>
+        <pre><code>List&lt;Integer&gt; result = numbers.stream()
+        .filter(n -> n > 10)
+        .map(n -> n * 2)
+        .sorted()
+        .toList();</code></pre>
+        <p>Each operation can be added, removed, or reordered when the business rule changes. <code>filter</code> keeps matching data. <code>map</code> transforms it. <code>sorted</code> orders it. <code>toList</code> produces the final result.</p>
+        <pre><code>List&lt;PaymentSummary&gt; summaries = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .map(payment -> new PaymentSummary(
+                payment.id(),
+                payment.reservationId(),
+                payment.amountInCents()))
+        .toList();</code></pre>
+        <p>The payment pipeline reads as separate business steps: keep approved payments, order by amount, convert to summaries.</p>
+
+        <h3>Composable in Reactor</h3>
+        <p>Composability is especially important in Reactor. Each step receives input, returns a <code>Mono</code> or <code>Flux</code>, and can be chained without changing the previous steps.</p>
+        <pre><code>getUserId()
+        .flatMap(this::findUserById)
+        .filter(this::isActive)
+        .flatMap(this::sendNotification);</code></pre>
+        <p>This is why Reactor code scales well. The pipeline can grow from simple behavior into a larger asynchronous workflow while each operator remains focused.</p>
+        <pre><code>public Mono&lt;BoardingPass&gt; createBoardingPass(String reservationId) {
+    return reservationRepository.findById(reservationId)
+            .filter(this::isConfirmed)
+            .flatMap(this::verifyPayment)
+            .flatMap(this::verifyDocuments)
+            .map(this::toBoardingPass);
+}</code></pre>
+        <p>The Disney cruise workflow is composed from separate steps: find reservation, check confirmation, verify payment, verify documents, create boarding pass.</p>
+
+        <h3>What Is Not Composable</h3>
+        <p>Imperative code can become hard to compose when the logic is tangled, deeply nested, and full of side effects.</p>
+        <pre><code>User user = getUser();
+if (user != null) {
+    if (user.isActive()) {
+        save(user);
+        sendEmail(user);
+    }
+}</code></pre>
+        <p>This style can work, but it is harder to reuse steps, harder to reorder behavior, and easier to mix validation, persistence, and notification side effects in one place.</p>
+
+        <h3>Why Composability Matters in Reactive Systems</h3>
+        <p>Reactive systems are asynchronous, concurrent, and non-blocking. Composable code helps keep that complexity manageable.</p>
+        <ul>
+          <li>It avoids shared mutable state because each step can return a new value or publisher.</li>
+          <li>It is easier to reason about because each operator has a focused role.</li>
+          <li>It is easier to test because individual rules and transformations can be tested separately.</li>
+          <li>It is safer in asynchronous environments because behavior is expressed as a pipeline instead of scattered side effects.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">Composable means that small, independent pieces of logic can be combined together to build more complex behavior without modifying the original pieces. In functional and reactive programming, functions and operators are composable, which allows code to build declarative pipelines that are easy to extend, reuse, and reason about.</p>
+      </section>
+
       <section id="functional-interfaces">
         <h2>Functional Interfaces</h2>
         <p class="lead">A functional interface is an interface that contains exactly one abstract method. This enables Java to use lambda expressions and method references, because the compiler can unambiguously match a lambda to the single abstract method.</p>
@@ -547,6 +1060,47 @@ Predicate&lt;Payment&gt; isApproved = payment ->
 
         <h3>Main Built-In Functional Interfaces</h3>
         <p>The main functional interfaces used by Streams and Reactor are:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Interface</th>
+              <th>Signature</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Function&lt;T, R&gt;</strong></td>
+              <td><code>T -&gt; R</code></td>
+              <td>transformations</td>
+            </tr>
+            <tr>
+              <td><strong>Predicate&lt;T&gt;</strong></td>
+              <td><code>T -&gt; boolean</code></td>
+              <td>filtering</td>
+            </tr>
+            <tr>
+              <td><strong>Consumer&lt;T&gt;</strong></td>
+              <td><code>T -&gt; void</code></td>
+              <td>performing actions</td>
+            </tr>
+            <tr>
+              <td><strong>Supplier&lt;T&gt;</strong></td>
+              <td><code>() -&gt; T</code></td>
+              <td>lazy creation</td>
+            </tr>
+            <tr>
+              <td><strong>UnaryOperator&lt;T&gt;</strong></td>
+              <td><code>T -&gt; T</code></td>
+              <td>transformations T to T</td>
+            </tr>
+            <tr>
+              <td><strong>BiFunction&lt;T, U, R&gt;</strong></td>
+              <td><code>(T, U) -&gt; R</code></td>
+              <td>merging, combining</td>
+            </tr>
+          </tbody>
+        </table>
         <ul>
           <li><code>Predicate&lt;T&gt;</code> for filtering with <code>test</code>.</li>
           <li><code>Function&lt;T, R&gt;</code> and <code>BiFunction&lt;T, U, R&gt;</code> for transformations with <code>apply</code>.</li>
@@ -1146,6 +1700,1045 @@ List&lt;PaymentRow&gt; dashboardRows = payments.stream()
           <li>Using <code>sorted</code> on large datasets that should be sorted by the database with proper indexes.</li>
           <li>Using parallel streams for I/O-heavy work without understanding thread pools, blocking calls, and ordering.</li>
         </ul>
+      </section>
+
+      <section id="project-reactor-fundamentals">
+        <h2>Project Reactor Fundamentals</h2>
+        <p class="lead">Project Reactor is a reactive programming library for Java. It lets backend code describe asynchronous data pipelines using <code>Mono</code> and <code>Flux</code>, instead of blocking a thread while waiting for work to finish.</p>
+
+        <h3>What Reactive Programming Is</h3>
+        <p>Reactive programming is a style where code reacts to data as it becomes available. Instead of saying "call this method, wait here, then continue", the code builds a pipeline that says "when a value arrives, transform it, validate it, maybe call another service, handle errors, and return the final result."</p>
+        <p>Reactive programming is about asynchronous execution, non-blocking processing, event-driven data flows, and backpressure-aware streams.</p>
+        <pre><code>// Pulling data in a blocking style:
+User user = repository.findById(id);
+
+// Describing non-blocking data that will arrive later:
+Mono&lt;User&gt; userMono = repository.findById(id);</code></pre>
+        <p>Nothing happens until someone subscribes. In WebFlux, the framework subscribes for you when it handles the HTTP request.</p>
+        <p>Real-life analogy: a restaurant does not make one waiter stand frozen while the kitchen prepares food. The waiter takes the order, the kitchen works, and the waiter can handle other tables until the food is ready. Reactive systems follow the same idea: do not block threads while waiting for databases, APIs, queues, or files.</p>
+        <pre><code>Mono&lt;ReservationResponse&gt; response = reservationRepository.findById(id)
+        .filter(reservation -> reservation.status().equals("CONFIRMED"))
+        .flatMap(paymentService::loadPayment)
+        .map(payment -> new ReservationResponse(id, payment.status()));</code></pre>
+        <p>The code describes the work. It does not immediately execute the work just because the pipeline was created.</p>
+
+        <h3>Mono vs Flux</h3>
+        <p>This distinction is very important: <code>Mono</code> is for zero or one value, and <code>Flux</code> is for zero to many values.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Mono&lt;T&gt;</h3>
+            <p>A <code>Mono</code> represents zero or one value. It is similar to <code>Optional&lt;T&gt;</code>, but asynchronous. Use it when the operation returns one thing, or possibly nothing.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation =
+        reservationRepository.findById("R123");
+
+Mono&lt;PaymentReceipt&gt; receipt =
+        paymentService.authorize(paymentRequest);
+
+Mono&lt;User&gt; userMono =
+        Mono.just(new User("1"));</code></pre>
+            <p>Examples: find by ID, make an HTTP request returning one object, authorize one payment, save one record, fetch one profile, return one HTTP response, or complete an operation with no value using <code>Mono&lt;Void&gt;</code>.</p>
+          </article>
+
+          <article class="card">
+            <h3>Flux&lt;T&gt;</h3>
+            <p>A <code>Flux</code> represents zero to N values. It is an asynchronous stream of elements. Use it when the operation can emit multiple items.</p>
+            <pre><code>Flux&lt;Reservation&gt; reservations =
+        reservationRepository.findByGuestId("G123");
+
+Flux&lt;PaymentEvent&gt; events =
+        paymentEventConsumer.receive();
+
+Flux&lt;User&gt; usersFlux =
+        Flux.just(user1, user2, user3);</code></pre>
+            <p>Examples: list users, list reservations, stream payment events, consume a Kafka topic, process Kinesis records, handle WebSocket messages, return multiple search results, or send server-sent events.</p>
+          </article>
+        </div>
+        <p>Plain rule: use <code>Mono</code> for one answer and <code>Flux</code> for many answers. A single cruise reservation lookup is <code>Mono</code>. A stream of all reservations for a sailing is <code>Flux</code>.</p>
+        <p><code>Mono</code> represents an asynchronous stream that emits zero or one element, while <code>Flux</code> represents an asynchronous stream that can emit zero to many elements. <code>Mono</code> is typically used for operations like finding a user by ID or saving an entity, where only one result is expected. <code>Flux</code> is used for streams of data such as fetching all users, consuming messages from Kafka, or handling continuous event streams. Both represent reactive pipelines that emit data and then complete.</p>
+
+        <h3>Lazy Execution</h3>
+        <p>Reactor pipelines are lazy. Creating a <code>Mono</code> or <code>Flux</code> usually describes work, but the work does not start until something subscribes.</p>
+        <p>Project Reactor is considered lazy because a reactive pipeline is not executed until a <code>Subscriber</code> subscribes to a <code>Publisher</code>. Defining a <code>Mono</code> or <code>Flux</code> only describes how data should flow, but no work is done upfront.</p>
+        <p>When a subscriber subscribes, it also signals demand, which allows Reactor to control the flow of data through backpressure. This laziness avoids unnecessary computation, gives the subscriber control over consumption, and is essential for building efficient, non-blocking systems.</p>
+        <pre><code>Mono&lt;String&gt; guestName = Mono.fromCallable(() -> {
+    System.out.println("Loading guest");
+    return "Ana";
+});
+
+// Nothing printed yet.
+
+guestName.subscribe(System.out::println);
+// Now "Loading guest" runs, then "Ana" is printed.</code></pre>
+        <p>In Spring WebFlux controllers, you normally do not call <code>subscribe()</code> yourself. You return the <code>Mono</code> or <code>Flux</code>, and Spring subscribes as part of handling the HTTP request.</p>
+        <pre><code>@GetMapping("/reservations/{id}")
+public Mono&lt;ReservationResponse&gt; getReservation(@PathVariable String id) {
+    return reservationService.getReservation(id);
+}</code></pre>
+
+        <h3>Most Important Reactor Operators</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>map</code></td>
+              <td>Transform data</td>
+            </tr>
+            <tr>
+              <td><code>filter</code></td>
+              <td>Keep matching data</td>
+            </tr>
+            <tr>
+              <td><code>flatMap</code></td>
+              <td>Async composition</td>
+            </tr>
+            <tr>
+              <td><code>defaultIfEmpty</code></td>
+              <td>Fallback value</td>
+            </tr>
+            <tr>
+              <td><code>switchIfEmpty</code></td>
+              <td>Alternate publisher</td>
+            </tr>
+            <tr>
+              <td><code>doOnNext</code></td>
+              <td>Side effects, such as logging</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="grid">
+          <article class="card">
+            <h3>map</h3>
+            <p>Use <code>map</code> for synchronous one-to-one transformations.</p>
+            <pre><code>Mono&lt;ReservationResponse&gt; response =
+        reservationMono.map(reservation ->
+                new ReservationResponse(
+                        reservation.id(),
+                        reservation.guestName(),
+                        reservation.status()));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>flatMap</h3>
+            <p>Use <code>flatMap</code> when the next step returns another <code>Mono</code> or <code>Flux</code>, usually an asynchronous operation.</p>
+            <pre><code>Mono&lt;PaymentReceipt&gt; receipt =
+        reservationMono.flatMap(reservation ->
+                paymentService.authorize(reservation.id()));</code></pre>
+            <p>If the function returns <code>Mono&lt;PaymentReceipt&gt;</code>, <code>flatMap</code> keeps the result as <code>Mono&lt;PaymentReceipt&gt;</code> instead of creating <code>Mono&lt;Mono&lt;PaymentReceipt&gt;&gt;</code>.</p>
+            <p><code>flatMap</code> is used when composing asynchronous operations. If the mapping function returns another reactive type like <code>Mono</code> or <code>Flux</code>, using <code>map</code> would result in a nested publisher such as <code>Mono&lt;Mono&lt;T&gt;&gt;</code>. <code>flatMap</code> flattens this structure and keeps the pipeline as a single reactive stream, allowing the pipeline to continue correctly.</p>
+          </article>
+
+          <article class="card">
+            <h3>filter</h3>
+            <p>Use <code>filter</code> to keep only values that pass a rule. If a <code>Mono</code> value does not pass, it becomes empty.</p>
+            <pre><code>Mono&lt;Reservation&gt; activeReservation =
+        reservationMono.filter(reservation ->
+                !reservation.status().equals("CANCELLED"));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>switchIfEmpty</h3>
+            <p>Use <code>switchIfEmpty</code> when no value was emitted. It is common for 404-style behavior.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation = repository.findById(id)
+        .switchIfEmpty(Mono.error(
+                new ReservationNotFoundException(id)));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorResume</h3>
+            <p>Use <code>onErrorResume</code> to recover from an error with another publisher.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = paymentClient.getStatus(paymentId)
+        .onErrorResume(TimeoutException.class, error ->
+                Mono.just(PaymentStatus.UNKNOWN));</code></pre>
+            <p>Use fallbacks only when they are truthful. Do not pretend a payment succeeded if the payment provider failed.</p>
+          </article>
+
+          <article class="card">
+            <h3>onErrorMap</h3>
+            <p>Use <code>onErrorMap</code> to translate one exception into another.</p>
+            <pre><code>Mono&lt;PaymentReceipt&gt; receipt = paymentClient.authorize(request)
+        .onErrorMap(WebClientException.class, error ->
+                new PaymentProviderException("Payment provider failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>doOnNext and doOnError</h3>
+            <p>Use <code>doOnNext</code> and <code>doOnError</code> for observation such as logging or metrics. Avoid putting core business changes there.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation = repository.findById(id)
+        .doOnNext(value -> log.info("Loaded reservation {}", value.id()))
+        .doOnError(error -> log.warn("Reservation load failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>then and thenReturn</h3>
+            <p>Use <code>then</code> when you care that one operation completes before another starts, but you do not need the previous value.</p>
+            <pre><code>Mono&lt;Void&gt; result = repository.deleteById(id)
+        .then(auditService.recordDeletion(id));
+
+Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleted = repository.deleteById(id)
+        .thenReturn(ResponseEntity.noContent().build());</code></pre>
+          </article>
+        </div>
+
+        <h3>Cold Publishers</h3>
+        <p>A cold publisher starts producing data for each subscriber. Each subscriber gets its own execution of the pipeline.</p>
+        <ul>
+          <li>It starts emitting when a subscriber subscribes.</li>
+          <li>Each subscriber gets the full sequence.</li>
+          <li>Each subscriber usually triggers a separate execution of the source.</li>
+        </ul>
+        <pre><code>Flux&lt;Integer&gt; cold = Flux.range(1, 3);</code></pre>
+        <pre><code>Flux&lt;Integer&gt; coldNumbers = Flux.range(1, 3)
+        .doOnNext(number -> System.out.println("Producing " + number));
+
+coldNumbers.subscribe(number -> System.out.println("A: " + number));
+coldNumbers.subscribe(number -> System.out.println("B: " + number));</code></pre>
+        <p>Each subscriber receives <code>1, 2, 3</code>. Real-life analogy: a recorded training video starts from the beginning for every person who presses play.</p>
+
+        <h3>Hot Publishers</h3>
+        <p>A hot publisher is a reactive stream that produces data independently of subscribers. It emits data whether or not anyone is listening, and new subscribers may miss previously emitted values.</p>
+        <ul>
+          <li>It emits continuously or independently of individual subscribers.</li>
+          <li>Subscribers share the same stream.</li>
+          <li>Subscribers may miss data if they arrive late.</li>
+        </ul>
+        <p>Think of it like live radio. If you tune in late, you do not hear what was already broadcast.</p>
+
+        <h3>Common Examples of Hot Publishers</h3>
+        <ul>
+          <li><strong>Kafka topic:</strong> messages are produced whether consumers are connected or not.</li>
+          <li><strong>WebSocket messages:</strong> clients only receive messages after connecting.</li>
+          <li><strong>Mouse or UI events:</strong> events happen regardless of listeners.</li>
+          <li><strong>Shared interval streams:</strong> <code>Flux.interval()</code> can become hot when shared.</li>
+        </ul>
+        <pre><code>Flux&lt;Long&gt; hotTicks = Flux.interval(Duration.ofSeconds(1))
+        .share();
+
+hotTicks.subscribe(tick -> System.out.println("First: " + tick));
+
+// A later subscriber sees only future ticks.
+hotTicks.subscribe(tick -> System.out.println("Second: " + tick));</code></pre>
+        <p>Real-life analogy: a live show on the ship keeps going whether or not someone is in the theater. If a guest walks in halfway through, they do not see the beginning.</p>
+
+        <h3>Simple Hot Publisher Example</h3>
+        <pre><code>Flux&lt;Long&gt; hot = Flux.interval(Duration.ofSeconds(1))
+        .share();
+
+hot.subscribe(v -> System.out.println("Subscriber 1: " + v));
+
+Thread.sleep(3000);
+
+hot.subscribe(v -> System.out.println("Subscriber 2: " + v));</code></pre>
+        <pre><code>Subscriber 1: 0
+Subscriber 1: 1
+Subscriber 1: 2
+Subscriber 2: 3   // missed 0, 1, 2</code></pre>
+        <p class="answer">A hot publisher emits data independently of subscribers. It produces values continuously, and subscribers only receive items emitted after they subscribe. Examples include Kafka topics, WebSocket streams, UI events, and shared <code>Flux.interval()</code> streams.</p>
+
+        <h3>Thinking in Reactive Pipelines</h3>
+        <p>Imperative code often says: get a value, store it in a variable, check it, call something else, mutate another variable, return. Reactive code says: when the value arrives, apply this chain of operations.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Imperative Shape</h3>
+            <pre><code>Reservation reservation = repository.findById(id);
+
+if (reservation == null) {
+    throw new ReservationNotFoundException(id);
+}
+
+Payment payment = paymentClient.load(reservation.paymentId());
+
+return mapper.toResponse(reservation, payment);</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Reactive Shape</h3>
+            <pre><code>return repository.findById(id)
+        .switchIfEmpty(Mono.error(
+                new ReservationNotFoundException(id)))
+        .flatMap(reservation ->
+                paymentClient.load(reservation.paymentId())
+                        .map(payment ->
+                                mapper.toResponse(reservation, payment)));</code></pre>
+          </article>
+        </div>
+        <p>The reactive version keeps the work inside the pipeline. It does not call <code>block()</code>, does not manually subscribe, and does not rely on mutable temporary state.</p>
+
+        <h3>End-to-End Payment Example</h3>
+        <p>This flow loads a reservation, validates that it can be paid, authorizes payment, saves the receipt, and returns a response.</p>
+        <pre><code>public Mono&lt;PaymentResponse&gt; payReservation(String reservationId, PaymentRequest request) {
+    return reservationRepository.findById(reservationId)
+            .switchIfEmpty(Mono.error(
+                    new ReservationNotFoundException(reservationId)))
+            .filter(reservation -> reservation.status().equals("PENDING_PAYMENT"))
+            .switchIfEmpty(Mono.error(
+                    new InvalidReservationStateException(reservationId)))
+            .flatMap(reservation ->
+                    paymentClient.authorize(request)
+                            .flatMap(receipt -> paymentRepository.save(receipt))
+                            .map(savedReceipt -> new PaymentResponse(
+                                    reservation.id(),
+                                    savedReceipt.id(),
+                                    savedReceipt.status())));
+}</code></pre>
+
+        <h3>End-to-End Disney Cruise Example</h3>
+        <p>This flow finds all confirmed reservations for a sailing, loads their payment status, keeps paid reservations, and creates boarding pass previews.</p>
+        <pre><code>public Flux&lt;BoardingPassPreview&gt; previewBoardingPasses(String sailingId) {
+    return reservationRepository.findBySailingId(sailingId)
+            .filter(reservation -> reservation.status().equals("CONFIRMED"))
+            .flatMap(reservation ->
+                    paymentClient.getStatus(reservation.paymentId())
+                            .filter(status -> status.equals(PaymentStatus.PAID))
+                            .map(status -> new BoardingPassPreview(
+                                    reservation.id(),
+                                    reservation.guestName(),
+                                    reservation.boardingGroup())));
+}</code></pre>
+
+        <h3>Practical Rules</h3>
+        <ul>
+          <li>Use <code>Mono</code> for zero or one value.</li>
+          <li>Use <code>Flux</code> for zero to many values.</li>
+          <li>Use <code>map</code> for synchronous transformations.</li>
+          <li>Use <code>flatMap</code> for asynchronous composition.</li>
+          <li>Use <code>switchIfEmpty</code> for missing values.</li>
+          <li>Use <code>onErrorResume</code> for recovery and <code>onErrorMap</code> for translation.</li>
+          <li>Do not call <code>block()</code> inside WebFlux request handling.</li>
+          <li>Do not call <code>subscribe()</code> inside controllers or services just to make work happen.</li>
+          <li>Keep data immutable and avoid shared mutable state inside pipelines.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">Reactive programming is a way to build asynchronous, non-blocking data flows. In Project Reactor, <code>Mono</code> represents zero or one value, while <code>Flux</code> represents zero to many values. Reactor pipelines are lazy, so the work starts on subscription. Operators like <code>map</code>, <code>filter</code>, and <code>flatMap</code> compose small functions into a larger pipeline, allowing services to handle asynchronous work without blocking threads.</p>
+      </section>
+
+      <section id="reactor-deep-dive">
+        <h2>Reactor Deep Dive</h2>
+        <p class="lead">Once the basic <code>Mono</code>, <code>Flux</code>, and operator model is clear, the next step is understanding execution: which thread runs the work, where blocking work belongs, how errors flow, how context travels, and how backpressure protects systems.</p>
+
+        <h3>How Reactor Uses Threads</h3>
+        <p>Reactor does not create threads unless the pipeline reaches an asynchronous boundary or code explicitly uses a <code>Scheduler</code>. By default, Reactor runs on the caller thread. There is no magic thread pool unless one is specified.</p>
+        <pre><code>Mono.just("A")
+        .map(value -> {
+            System.out.println(Thread.currentThread().getName());
+            return value;
+        })
+        .subscribe();</code></pre>
+        <pre><code>main</code></pre>
+        <p>If this code is subscribed from the main thread, the simple synchronous work runs on the main thread. In WebFlux, request handling usually starts on an event-loop thread. That event-loop thread must not be blocked.</p>
+        <p>Real-life analogy: a cruise check-in employee can handle many guests efficiently if nobody makes them stand still waiting for a slow printer. If one guest blocks the employee for a long time, the whole line suffers. Event-loop threads are like those employees: keep them free and fast.</p>
+
+        <h3>Why Threading Is Hard in Reactive Systems</h3>
+        <p>Reactive systems are asynchronous, non-blocking, and concurrent. Problems happen when blocking code runs on non-blocking threads, when thread pools are exhausted, or when multiple threads share mutable state. Schedulers help by isolating different kinds of work onto thread pools designed for that purpose.</p>
+        <ul>
+          <li>Blocking code on event-loop threads can create latency spikes.</li>
+          <li>Too many blocking calls can exhaust available threads.</li>
+          <li>Shared mutable state can create race conditions when work moves across threads.</li>
+          <li>Wrong scheduler choices can make a reactive service slower or less stable than imperative code.</li>
+        </ul>
+
+        <h3>Mono.fromCallable</h3>
+        <p><code>Mono.fromCallable(...)</code> means: create a <code>Mono</code> that will run this <code>Callable</code> later, then emit its result or emit an error signal if it throws.</p>
+        <p>A <code>Callable&lt;T&gt;</code> is similar to a <code>Supplier&lt;T&gt;</code>, but it is allowed to throw checked exceptions. That makes <code>fromCallable</code> useful when adapting imperative code into a reactive pipeline.</p>
+        <p>Reactive programming is non-blocking, but real systems still contain blocking code: JDBC, blocking REST clients, file I/O, legacy libraries, and calls such as <code>Thread.sleep(...)</code>. These must be integrated without breaking the reactive system. That is where <code>fromCallable</code> is useful.</p>
+        <ul>
+          <li>Blocking database calls such as JDBC.</li>
+          <li>Reading files.</li>
+          <li>Calling legacy libraries.</li>
+          <li>Any operation that returns a value and may throw.</li>
+        </ul>
+        <h3>Common Beginner Mistake</h3>
+        <p>This looks innocent, but it is wrong when <code>blockingCall()</code> blocks:</p>
+        <pre><code>Mono&lt;String&gt; mono =
+        Mono.just(blockingCall());</code></pre>
+        <p><code>blockingCall()</code> is executed immediately, before any scheduler, before any subscription, and before any backpressure can apply. That can block the caller thread, the Netty event loop, or the whole application under load.</p>
+        <p><strong>Key rule:</strong> never put blocking code inside <code>Mono.just()</code>. Use <code>Mono.just(value)</code> only when the value already exists.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Mono.just(value)</code></td>
+              <td>I already have the value.</td>
+            </tr>
+            <tr>
+              <td><code>Mono.fromCallable(fn)</code></td>
+              <td>Call this later to get the value.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono&lt;String&gt; mono = Mono.fromCallable(() -> {
+    // This can block and can throw.
+    return blockingCallThatReturnsString();
+});</code></pre>
+        <p>With <code>fromCallable</code>, you are not calling the method yet. You are describing how to call it later. Reactor will call it only on subscription and capture exceptions as error signals.</p>
+        <p><code>fromCallable</code> is lazy. Nothing runs until someone subscribes.</p>
+        <pre><code>Mono&lt;String&gt; mono = Mono.fromCallable(() -> {
+    System.out.println("Calling...");
+    Thread.sleep(1000);
+    return "data";
+});
+
+// At this moment nothing is printed, blocked, or executed.
+
+mono.subscribe();</code></pre>
+        <p><code>fromCallable</code> describes blocking work. <code>subscribeOn</code> decides where it runs. The safe pattern for unavoidable blocking code is:</p>
+        <pre><code>Mono.fromCallable(() -> blockingCall())
+        .subscribeOn(Schedulers.boundedElastic());</code></pre>
+        <p>This runs the blocking call on a scheduler designed for blocking work, without tying up reactive event-loop threads.</p>
+        <pre><code>Mono.fromCallable(() -> {
+    throw new RuntimeException("boom");
+})
+.onErrorReturn("fallback");</code></pre>
+        <p>If the callable throws, Reactor turns the exception into an error signal. That error can then be handled with operators such as <code>onErrorReturn</code>, <code>onErrorResume</code>, or <code>onErrorMap</code>.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .map(this::cpuTransform)
+        .subscribe();</code></pre>
+        <p>Meaning: the blocking database call runs on <code>boundedElastic</code>, CPU work runs on <code>parallel</code>, and the pipeline keeps blocking work separated from reactive threads.</p>
+        <p class="answer"><code>fromCallable</code> defers blocking work until subscription and converts exceptions into reactive error signals. It should be paired with <code>subscribeOn(Schedulers.boundedElastic())</code> to safely integrate blocking code into Reactor.</p>
+
+        <h3>subscribeOn vs publishOn</h3>
+        <p><code>subscribeOn</code> controls where subscription and source-side work starts. <code>publishOn</code> changes the execution context for downstream operators after that point in the pipeline.</p>
+        <p>Classic rule: <code>subscribeOn</code> decides where the source runs; <code>publishOn</code> decides where downstream operators run.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>subscribeOn</h3>
+            <p>Use <code>subscribeOn</code> near a blocking or expensive source to move that source work onto the right scheduler.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = Mono.fromCallable(() ->
+        legacyPaymentClient.getStatus(paymentId))
+        .subscribeOn(Schedulers.boundedElastic());</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>publishOn</h3>
+            <p>Use <code>publishOn</code> when downstream processing should continue on another scheduler.</p>
+            <pre><code>Flux&lt;PaymentEvent&gt; processed = paymentEvents
+        .publishOn(Schedulers.parallel())
+        .map(this::calculateRiskScore);</code></pre>
+          </article>
+        </div>
+        <pre><code>Mono.fromCallable(this::blockingCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .map(this::cpuTask)
+        .subscribe();</code></pre>
+        <p>In this example, the blocking source runs on <code>boundedElastic</code>. After <code>publishOn</code>, the CPU-oriented mapping runs on <code>parallel</code>.</p>
+        <pre><code>Mono.fromCallable(() -> {
+    System.out.println("source thread = " + Thread.currentThread().getName());
+    return "data";
+})
+.subscribeOn(Schedulers.boundedElastic())
+.publishOn(Schedulers.parallel())
+.map(value -> {
+    System.out.println("map thread = " + Thread.currentThread().getName());
+    return value.toUpperCase();
+})
+.subscribe();</code></pre>
+        <p>The source thread prints something like <code>boundedElastic-...</code>. The map thread prints something like <code>parallel-...</code>. That is the clean separation: source work on one scheduler, downstream CPU work on another.</p>
+        <p>Where <code>publishOn</code> appears matters. Only operators after <code>publishOn</code> move to the new scheduler.</p>
+        <pre><code>Mono.just("x")
+        .map(value -> {
+            // Runs on the current thread.
+            return value;
+        })
+        .publishOn(Schedulers.parallel())
+        .map(value -> {
+            // Runs on a parallel thread.
+            return value;
+        });</code></pre>
+
+        <h3>What Happens Without publishOn</h3>
+        <p>If a pipeline uses <code>subscribeOn(Schedulers.boundedElastic())</code> but never uses <code>publishOn</code>, the downstream operators continue on <code>boundedElastic</code>.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .map(this::cpuTransform)
+        .subscribe();</code></pre>
+        <p>This means the blocking database call runs on <code>boundedElastic</code>, and <code>cpuTransform</code> also runs on <code>boundedElastic</code>. There is one scheduler and no handoff.</p>
+        <p>This is not wrong. It is safe because <code>boundedElastic</code> is allowed to block, and small CPU work can run there too. It may be suboptimal if the CPU work is heavy.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic()) // I/O
+        .publishOn(Schedulers.parallel())         // switch
+        .map(this::cpuTransform)                  // CPU
+        .subscribe();</code></pre>
+        <p>Add <code>publishOn(Schedulers.parallel())</code> when you want thread responsibility separation: <code>boundedElastic</code> for blocking I/O and <code>parallel</code> for CPU-heavy computation.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Without publishOn</th>
+              <th>With publishOn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Correctness</td>
+              <td>Safe</td>
+              <td>Safe</td>
+            </tr>
+            <tr>
+              <td>Blocking safety</td>
+              <td>Safe</td>
+              <td>Safe</td>
+            </tr>
+            <tr>
+              <td>CPU efficiency</td>
+              <td>Potentially suboptimal</td>
+              <td>Better for heavy CPU work</td>
+            </tr>
+            <tr>
+              <td>Thread separation</td>
+              <td>No</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Clarity of intent</td>
+              <td>Less explicit</td>
+              <td>Clearer</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Common trap:</strong> you do not always need <code>publishOn</code> after <code>subscribeOn(boundedElastic)</code>. It is only needed when you want to switch execution to a different scheduler. Without it, downstream operators continue on the same scheduler.</p>
+        <ul>
+          <li>Use <code>publishOn</code> when CPU-heavy transformations follow blocking I/O.</li>
+          <li>Use <code>publishOn</code> when clear separation of responsibilities improves readability and performance under load.</li>
+          <li>Skip <code>publishOn</code> when the pipeline is short, CPU work is minimal, thread separation is unnecessary, and simplicity is preferred.</li>
+        </ul>
+        <p class="answer"><code>subscribeOn</code> chooses where execution starts. <code>publishOn</code> is optional and only needed to change threads downstream. Missing <code>publishOn</code> means there is no thread switch; nothing breaks because of that alone.</p>
+
+        <h3>Choosing the Right Scheduler</h3>
+        <p>Schedulers define where work runs. Think of them as thread pools with specific purposes.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Scheduler</th>
+              <th>Best For</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Schedulers.boundedElastic()</code></td>
+              <td>Blocking I/O or legacy blocking APIs; grows as needed within limits</td>
+              <td><code>Mono.fromCallable(this::blockingCall).subscribeOn(Schedulers.boundedElastic())</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.parallel()</code></td>
+              <td>CPU-bound work; fixed-size pool, usually based on CPU cores</td>
+              <td><code>.publishOn(Schedulers.parallel()).map(this::cpuHeavyTask)</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.single()</code></td>
+              <td>Ordered execution on one shared worker</td>
+              <td><code>.publishOn(Schedulers.single())</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.immediate()</code></td>
+              <td>Current thread; mostly useful for simple cases and tests</td>
+              <td>No scheduling boundary</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>public Mono&lt;Reservation&gt; loadFromBlockingLegacySystem(String id) {
+    return Mono.fromCallable(() -> legacyReservationClient.findById(id))
+            .subscribeOn(Schedulers.boundedElastic());
+}</code></pre>
+        <p>Use <code>boundedElastic</code> for unavoidable blocking work. If the whole stack is already non-blocking, such as WebClient plus R2DBC, do not add schedulers just because the code is reactive. Never run blocking work on <code>parallel</code>; it is meant for CPU work, not waiting on I/O.</p>
+
+        <h3>Why Blocking Is Dangerous</h3>
+        <p>Reactive threads are few, shared, and optimized for asynchronous work. Blocking them with database calls, blocking REST clients, <code>Thread.sleep()</code>, or file I/O can cause thread starvation, latency spikes, and eventually system instability. Blocking code must be isolated on <code>Schedulers.boundedElastic()</code> when it cannot be avoided.</p>
+        <pre><code>// Correct for unavoidable blocking I/O:
+Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic());
+
+// Wrong idea: parallel is for CPU work, not blocking I/O.
+Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.parallel());</code></pre>
+
+        <h3>Error Handling in Reactive Pipelines</h3>
+        <p>In Reactor, errors are signals in the pipeline. An error is terminal unless the pipeline handles it and switches to another value or publisher.</p>
+        <p>Unlike normal imperative code, errors are not thrown down the stack in the usual <code>try/catch</code> style. A reactive stream communicates with three signal types:</p>
+        <ul>
+          <li><code>onNext(value)</code>: emits a value.</li>
+          <li><code>onComplete()</code>: completes successfully.</li>
+          <li><code>onError(error)</code>: fails and terminates the stream.</li>
+        </ul>
+        <p>Once a stream emits <code>onError</code>, it is done unless an operator recovers by returning a fallback value or fallback publisher.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>onErrorReturn</code></td>
+              <td>Fallback value</td>
+            </tr>
+            <tr>
+              <td><code>onErrorResume</code></td>
+              <td>Fallback publisher</td>
+            </tr>
+            <tr>
+              <td><code>doOnError</code></td>
+              <td>Side effects such as logging or metrics</td>
+            </tr>
+            <tr>
+              <td><code>retry</code></td>
+              <td>Retry immediately</td>
+            </tr>
+            <tr>
+              <td><code>retryWhen</code></td>
+              <td>Retry with a strategy, such as delay or backoff</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retry(3)
+        .onErrorResume(error -> Mono.just("fallback"));</code></pre>
+        <div class="grid">
+          <article class="card">
+            <h3>onErrorReturn</h3>
+            <p>Return a fixed fallback value. Use this when the fallback is constant and the exception details do not matter.</p>
+            <pre><code>Mono&lt;String&gt; status = paymentClient.status(id)
+        .onErrorReturn("UNKNOWN");</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorReturn("fallback");</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorResume</h3>
+            <p>Recover with another reactive operation. This is the most common recovery operator because the fallback can depend on the error or call another async source.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = paymentClient.status(id)
+        .onErrorResume(TimeoutException.class, error ->
+                paymentCache.lastKnownStatus(id));</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorResume(error -> Mono.just("fallback"));
+
+Mono&lt;String&gt; pathSpecific = Mono.fromCallable(this::callApi)
+        .onErrorResume(TimeoutException.class, error ->
+                Mono.just("timeout-fallback"))
+        .onErrorResume(error ->
+                Mono.just("generic-fallback"));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorMap</h3>
+            <p>Translate a low-level error into a domain exception. Use this when the service should expose consistent error types or hide low-level implementation details.</p>
+            <pre><code>Mono&lt;Receipt&gt; receipt = paymentClient.authorize(request)
+        .onErrorMap(WebClientException.class, error ->
+                new PaymentProviderException("Authorization failed", error));</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorMap(error ->
+                new MyServiceException("API failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>doOnError</h3>
+            <p>Observe an error without recovering from it. Use it for side effects only, such as logging and metrics.</p>
+            <pre><code>Mono&lt;Receipt&gt; receipt = paymentClient.authorize(request)
+        .doOnError(error ->
+                log.warn("Payment authorization failed", error));</code></pre>
+            <pre><code>mono.doOnError(error ->
+        log.error("failed", error));</code></pre>
+          </article>
+        </div>
+        <h3>onErrorResume vs onErrorReturn</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Behavior</th>
+              <th>Use When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>onErrorReturn("fallback")</code></td>
+              <td>Always returns the same fallback value.</td>
+              <td>The fallback is simple, static, and does not need exception details.</td>
+            </tr>
+            <tr>
+              <td><code>onErrorResume(error -> ...)</code></td>
+              <td>Chooses a dynamic fallback based on the exception.</td>
+              <td>The fallback depends on exception type, or recovery needs another async operation.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono.fromCallable(this::risky)
+        .retry(2)
+        .onErrorResume(error -> {
+            if (error instanceof TimeoutException) {
+                return Mono.just("timeout-fallback");
+            }
+            return Mono.error(new RuntimeException("wrapped", error));
+        });</code></pre>
+        <p>This is a common real-world pattern: retry transient failures first, use a fallback for known recoverable cases, and wrap or propagate unexpected failures.</p>
+        <h3>Retry</h3>
+        <p><code>retry(n)</code> retries a fixed number of times immediately. The total attempts are the original attempt plus the retries.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retry(2); // total attempts = 1 original + 2 retries = 3</code></pre>
+        <p>If the operation keeps failing after retries, the stream emits <code>onError</code>.</p>
+        <p><code>retryWhen(...)</code> retries with a strategy, such as delay, exponential backoff, or filtering which exceptions are retryable.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retryWhen(Retry.backoff(2, Duration.ofMillis(200)));
+
+Mono.fromCallable(this::callApi)
+        .retryWhen(
+                Retry.backoff(2, Duration.ofMillis(200))
+                        .filter(error -> error instanceof TimeoutException)
+        );</code></pre>
+        <h3>Production-Style Error Pattern</h3>
+        <p>A common structure is: do the risky call, log if an error happens, retry if appropriate, and fall back if it still fails.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .doOnError(error -> log.warn("API call failed", error))
+        .retryWhen(Retry.backoff(2, Duration.ofMillis(200)))
+        .onErrorResume(error -> Mono.just("fallback"));</code></pre>
+        <h3>Error Operator Ordering</h3>
+        <p>Ordering matters. <code>retry</code> must come before <code>onErrorReturn</code> or <code>onErrorResume</code>, because once the error is recovered, there is no error left to retry.</p>
+        <pre><code>// Correct: retry first, then recover.
+Mono.fromCallable(this::callApi)
+        .retry(2)
+        .onErrorReturn("fallback");
+
+// Wrong: retry will not happen because the error is already handled.
+Mono.fromCallable(this::callApi)
+        .onErrorReturn("fallback")
+        .retry(2);</code></pre>
+        <h3>Error Handling Mental Model</h3>
+        <ul>
+          <li><code>doOnError</code>: log the crash.</li>
+          <li><code>onErrorReturn</code>: if it crashes, use this default value.</li>
+          <li><code>onErrorResume</code>: if it crashes, take another route.</li>
+          <li><code>retry</code>: try again.</li>
+          <li><code>onErrorMap</code>: rename or wrap the crash.</li>
+        </ul>
+        <p>Be careful with blanket error mapping. If code creates a <code>ReservationNotFoundException</code> with <code>switchIfEmpty</code>, a later broad <code>onErrorMap</code> can accidentally convert that 404-style error into a 500-style error.</p>
+        <pre><code>return repository.findById(id)
+        .switchIfEmpty(Mono.error(new ReservationNotFoundException(id)))
+        .onErrorMap(DatabaseException.class, error ->
+                new ReservationDataAccessException(error));</code></pre>
+        <p>This maps only database errors and preserves the not-found error.</p>
+
+        <h3>Reactor Context</h3>
+        <p>Reactor Context is an immutable per-subscriber key/value store that travels with the reactive chain. It is useful for metadata such as correlation IDs, trace IDs, tenant IDs, auth tokens, or request-scoped values that should not be passed manually through every method argument.</p>
+        <pre><code>Mono&lt;String&gt; result = Mono.deferContextual(context ->
+        Mono.just("traceId=" + context.get("traceId")))
+        .contextWrite(Context.of("traceId", "abc-123"));</code></pre>
+        <pre><code>Mono.just("data")
+        .contextWrite(context -> context.put("traceId", "123"))
+        .flatMap(value ->
+                Mono.deferContextual(context ->
+                        Mono.just(context.get("traceId"))));</code></pre>
+        <p>Real-life analogy: a guest wristband travels with the guest through the ship. Each station can read the wristband to know the guest's package, room, or permissions without asking them to carry separate paperwork for every activity.</p>
+        <pre><code>public Mono&lt;PaymentReceipt&gt; authorize(PaymentRequest request) {
+    return Mono.deferContextual(context -> {
+        String correlationId = context.getOrDefault("correlationId", "missing");
+        return paymentClient.authorize(request)
+                .doOnNext(receipt ->
+                        log.info("correlationId={} payment={}", correlationId, receipt.id()));
+    });
+}</code></pre>
+        <p>Reactor Context is not <code>ThreadLocal</code>. It follows the reactive subscription, not a specific Java thread. Do not use Reactor Context as a replacement for domain parameters. If a value is part of the business operation, pass it normally. Use Context for cross-cutting metadata.</p>
+
+        <h3>Backpressure</h3>
+        <p>Backpressure means the consumer can control how fast the producer emits data. It is not buffering forever and it is not crashing when the consumer is slow. It is controlled flow.</p>
+        <p>Real-life analogy: imagine a factory and a delivery truck. The factory is the producer, and the truck is the consumer. Without backpressure, the factory keeps producing boxes as fast as possible even if trucks are slow and storage is limited. The warehouse fills up, boxes fall, and the system crashes. With backpressure, the truck says, "I can take 10 boxes at a time." The factory produces 10 and waits for the next request.</p>
+        <p>The Reactive Streams contract is simple: the subscriber requests <code>n</code> items, the publisher emits at most <code>n</code> items, and the subscriber requests more when it is ready. This is built in; most application code does not manually implement demand management.</p>
+        <pre><code>Flux.range(1, 1_000)
+        .doOnRequest(n -> System.out.println("Requested " + n))
+        .subscribe(new BaseSubscriber&lt;&gt;() {
+            @Override
+            protected void hookOnSubscribe(Subscription subscription) {
+                request(10);
+            }
+
+            @Override
+            protected void hookOnNext(Integer value) {
+                System.out.println(value);
+                request(1);
+            }
+        });</code></pre>
+        <h3>What Happens by Default</h3>
+        <p>For many Reactor sources and operators, backpressure is handled automatically. Reactor requests data in controlled batches instead of pulling everything into memory at once.</p>
+        <pre><code>Flux.range(1, 1_000_000)
+        .subscribe(value -> slowConsumer(value));</code></pre>
+        <p>Behind the scenes, Reactor does not need to load all one million values into memory at the same time. Demand moves through the pipeline so memory stays safer.</p>
+
+        <h3>When Backpressure Becomes Visible</h3>
+        <p>You usually notice backpressure when the producer is much faster than the consumer, the consumer is slow, or the source is push-based, such as Kafka, WebSockets, sockets, UI events, or intervals.</p>
+        <pre><code>Flux.interval(Duration.ofMillis(10)) // fast producer
+        .doOnNext(value -> Thread.sleep(100)) // slow consumer
+        .subscribe();</code></pre>
+        <p>The producer emits every 10 ms, but the consumer takes 100 ms per item. Without demand control or an overflow strategy, memory can grow, latency can spike, and the process can fail with <code>OutOfMemoryError</code>.</p>
+
+        <h3>When Backpressure Is Not Enough</h3>
+        <p>Some sources cannot always be slowed down by the subscriber. Message brokers, sockets, UI events, and externally pushed streams may keep producing. In those cases, Reactor needs an explicit strategy: buffer, drop, keep latest, or fail.</p>
+        <p>Important clarification: backpressure is not buffering by default. Backpressure is demand signaling. Buffering is one possible reaction when demand is exceeded.</p>
+        <p>In real services, backpressure matters when processing event streams, WebSocket traffic, file streams, Kafka/Kinesis-like data, or any producer that can be faster than the consumer.</p>
+        <pre><code>Flux.range(1, 100)
+        .onBackpressureBuffer()
+        .subscribe();</code></pre>
+        <p>Without backpressure or a clear overflow strategy, fast producers can create memory pressure, <code>OutOfMemoryError</code>, high latency, and system instability.</p>
+        <h3>Backpressure Strategies</h3>
+        <ul>
+          <li><code>onBackpressureBuffer</code>: store extra items until the consumer catches up. Risk: memory growth if the consumer stays too slow.</li>
+          <li><code>onBackpressureDrop</code>: drop items that cannot be handled. Useful for metrics, UI events, and lossy streams.</li>
+          <li><code>onBackpressureLatest</code>: keep only the most recent item. Useful for dashboards and real-time status updates.</li>
+          <li><code>onBackpressureError</code>: fail fast when demand is exceeded. Useful when losing data is unacceptable and buffering would be dangerous.</li>
+          <li><code>limitRate</code>: request data upstream in smaller batches.</li>
+        </ul>
+        <pre><code>Flux&lt;PaymentEvent&gt; events = paymentEvents
+        .onBackpressureBuffer(1_000)
+        .limitRate(100)
+        .flatMap(this::processPaymentEvent, 20);</code></pre>
+        <p>The <code>flatMap</code> concurrency limit protects downstream systems by allowing only a fixed number of payment events to process at the same time.</p>
+        <p>Reactor is safer than plain async code because demand is explicit, flow is controlled, and overload behavior can be designed. In many non-reactive async systems, producers push blindly and queues grow without bounds.</p>
+        <p class="answer">Backpressure is a mechanism that allows a reactive consumer to signal demand to a producer, ensuring that data is emitted only as fast as it can be processed. This prevents overwhelming consumers and avoids memory and stability issues in asynchronous systems.</p>
+
+        <h3>Big Picture</h3>
+        <p>Reactive programming is about composing asynchronous tasks, controlling threads explicitly, avoiding blocking, handling backpressure, and handling failures declaratively. The goal is not to make code look fancy. The goal is to keep services responsive when they are waiting on databases, payment providers, event streams, and other remote systems.</p>
+
+        <h3>Reference Answer</h3>
+        <p class="answer">Reactor does not create a new thread for every operation. Work runs on the subscribing thread until an asynchronous boundary or scheduler changes it. I use <code>boundedElastic</code> for unavoidable blocking I/O, <code>parallel</code> for CPU-bound work, and avoid blocking event-loop threads in WebFlux. Errors are terminal signals unless handled with operators such as <code>onErrorResume</code> or <code>onErrorMap</code>. Reactor Context carries cross-cutting metadata like trace IDs through the pipeline. Backpressure lets subscribers control demand so fast producers do not overwhelm slower consumers, which is critical for reliable reactive and event-driven systems.</p>
+      </section>
+
+      <section id="spring-webflux-fundamentals">
+        <h2>Spring WebFlux Fundamentals</h2>
+        <p class="lead">Spring WebFlux is Spring's reactive web framework. It lets backend services handle HTTP requests using non-blocking I/O and reactive types such as <code>Mono</code> and <code>Flux</code>.</p>
+
+        <h3>What Spring WebFlux Is</h3>
+        <p>Spring WebFlux is an alternative to Spring MVC for building web APIs. Instead of tying one request to one blocking thread, WebFlux is designed around asynchronous, non-blocking request handling. Controller methods can return <code>Mono&lt;T&gt;</code> for one result or <code>Flux&lt;T&gt;</code> for many results.</p>
+        <pre><code>@RestController
+@RequestMapping("/api/reservations")
+public class ReservationWebFluxController {
+    private final ReservationService reservationService;
+
+    public ReservationWebFluxController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
+
+    @GetMapping("/{id}")
+    public Mono&lt;ReservationResponse&gt; getReservation(@PathVariable String id) {
+        return reservationService.findById(id);
+    }
+}</code></pre>
+        <p>Real-life analogy: Spring MVC is like assigning one crew member to one guest until the entire request is finished. WebFlux is like a small coordination team that starts work, waits for async responses, and keeps helping other guests instead of standing still.</p>
+
+        <h3>Spring MVC vs Spring WebFlux</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Topic</th>
+              <th>Spring MVC</th>
+              <th>Spring WebFlux</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Execution model</td>
+              <td>Servlet-based, usually one request per thread while work is active</td>
+              <td>Reactive, event-loop based, non-blocking request handling</td>
+            </tr>
+            <tr>
+              <td>Return types</td>
+              <td>Objects, <code>ResponseEntity</code>, <code>Callable</code>, async wrappers</td>
+              <td><code>Mono</code>, <code>Flux</code>, reactive <code>ResponseEntity</code></td>
+            </tr>
+            <tr>
+              <td>Common server</td>
+              <td>Tomcat, Jetty, Undertow</td>
+              <td>Netty by default in many Spring Boot WebFlux apps</td>
+            </tr>
+            <tr>
+              <td>Best fit</td>
+              <td>Traditional CRUD APIs, blocking stacks, servlet ecosystem</td>
+              <td>High-concurrency I/O, streaming, non-blocking clients and databases</td>
+            </tr>
+            <tr>
+              <td>Blocking tolerance</td>
+              <td>Blocking is expected, within thread-pool limits</td>
+              <td>Blocking event-loop threads is dangerous</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Spring MVC is not obsolete. It is still an excellent choice for many backend APIs, especially when the application uses blocking libraries such as JDBC. WebFlux is most valuable when the stack is non-blocking end to end or when streaming/high concurrency is central to the service.</p>
+
+        <h3>WebFlux Execution Model</h3>
+        <p>WebFlux does not create one thread per request. Instead, it uses a small number of event-loop threads. Each request builds a reactive pipeline, and threads are released while waiting for I/O.</p>
+        <pre><code>// Spring MVC mental model:
+Request -> Thread -> Block -> Response
+
+// Spring WebFlux mental model:
+Request -> Event loop -> Reactive pipeline -> Callback -> Response</code></pre>
+        <p>The key difference is what happens while the application waits for a database, payment provider, or another service. In a blocking model, the thread waits. In WebFlux, the event loop can keep handling other work while the asynchronous operation completes.</p>
+
+        <h3>Netty and the Event Loop</h3>
+        <p>Many WebFlux applications run on Reactor Netty by default. Netty uses a small number of event-loop threads, non-blocking sockets, and asynchronous callbacks to handle many connections. These threads are designed to stay free and react to events quickly: request received, bytes read, response ready, connection writable.</p>
+        <pre><code>Client request
+  -> Netty event loop receives request
+  -> WebFlux invokes controller
+  -> Controller returns Mono or Flux
+  -> Non-blocking work continues
+  -> Netty writes response when data is ready</code></pre>
+        <p><strong>Never block Netty event-loop threads.</strong> If one event-loop thread is blocked, every request depending on that thread can be delayed.</p>
+        <p>Event-loop threads are like a cruise operations desk with a few coordinators handling many radio calls. They should delegate slow work and keep moving. If one coordinator goes to physically search every cabin, the radio desk stops responding.</p>
+
+        <h3>Why Blocking Is Dangerous in WebFlux</h3>
+        <p>Blocking means a thread waits and does nothing useful. In WebFlux, blocking an event-loop thread can hurt many requests because those threads are few and shared.</p>
+        <pre><code>@GetMapping("/bad")
+public Mono&lt;String&gt; bad() {
+    return Mono.just(blockingDbCall()); // blocks event loop
+}</code></pre>
+        <p>This blocks the Netty thread, prevents other requests from being handled efficiently, and kills scalability under load.</p>
+        <pre><code>// Dangerous in WebFlux request handling:
+public Mono&lt;ReservationResponse&gt; getReservation(String id) {
+    Reservation reservation = blockingRepository.findById(id);
+    return Mono.just(mapper.toResponse(reservation));
+}</code></pre>
+        <p>This blocks before the <code>Mono</code> is even returned. Under load, this can cause thread starvation, latency spikes, timeouts, and a service that appears frozen.</p>
+        <pre><code>@GetMapping("/good")
+public Mono&lt;String&gt; good() {
+    return Mono.fromCallable(this::blockingDbCall)
+            .subscribeOn(Schedulers.boundedElastic());
+}</code></pre>
+        <p>This keeps the event loop free, isolates blocking work, and allows the system to scale more safely.</p>
+        <pre><code>// Safer if the blocking call cannot be replaced yet:
+public Mono&lt;ReservationResponse&gt; getReservation(String id) {
+    return Mono.fromCallable(() -> blockingRepository.findById(id))
+            .subscribeOn(Schedulers.boundedElastic())
+            .map(mapper::toResponse);
+}</code></pre>
+        <p>The better long-term option is to use non-blocking libraries when possible, such as WebClient for HTTP and reactive database drivers like R2DBC or reactive MongoDB.</p>
+
+        <h3>When to Use WebFlux</h3>
+        <p>WebFlux does not automatically mean faster raw execution. It is mainly about scalability and resource efficiency for I/O-heavy systems.</p>
+        <ul>
+          <li>Use WebFlux when the service makes many non-blocking remote calls and needs high concurrency.</li>
+          <li>Use WebFlux for streaming responses, server-sent events, WebSocket-style flows, and event-heavy systems.</li>
+          <li>Use WebFlux when the database/client stack is reactive end to end.</li>
+          <li>Use WebFlux when backpressure-aware processing matters.</li>
+          <li>Use WebFlux for microservices that spend significant time waiting on other services.</li>
+          <li>Do not choose WebFlux only because it sounds newer. If most dependencies are blocking, Spring MVC may be simpler and more appropriate.</li>
+        </ul>
+        <p class="answer">Do not use WebFlux when the application is mostly blocking, CPU-bound, or simple CRUD with low concurrency. In those cases, Spring MVC is often simpler and more appropriate.</p>
+
+        <h3>Basic Reactive Controllers</h3>
+        <p>A WebFlux controller should return the reactive pipeline. It should not call <code>block()</code> or manually call <code>subscribe()</code> to force execution.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>GET One</h3>
+            <pre><code>@GetMapping("/{id}")
+public Mono&lt;ResponseEntity&lt;ReservationResponse&gt;&gt; getById(@PathVariable String id) {
+    return reservationService.findById(id)
+            .map(ResponseEntity::ok)
+            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>GET Many</h3>
+            <pre><code>@GetMapping
+public Flux&lt;ReservationResponse&gt; getAll() {
+    return reservationService.findAll();
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>POST</h3>
+            <pre><code>@PostMapping
+public Mono&lt;ResponseEntity&lt;ReservationResponse&gt;&gt; create(
+        @Valid @RequestBody CreateReservationRequest request) {
+    return reservationService.create(request)
+            .map(response -> ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(response));
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>DELETE</h3>
+            <pre><code>@DeleteMapping("/{id}")
+public Mono&lt;ResponseEntity&lt;Void&gt;&gt; delete(@PathVariable String id) {
+    return reservationService.delete(id)
+            .thenReturn(ResponseEntity.noContent().build());
+}</code></pre>
+          </article>
+        </div>
+
+        <h3>Annotation-Based Controllers</h3>
+        <p>Annotation-based controllers are the most common WebFlux style. They look similar to Spring MVC controllers, but return <code>Mono</code> or <code>Flux</code>.</p>
+        <pre><code>@RestController
+class UserController {
+
+    @GetMapping("/users/{id}")
+    public Mono&lt;User&gt; getUser(@PathVariable String id) {
+        return userService.findById(id);
+    }
+
+    @GetMapping("/users")
+    public Flux&lt;User&gt; getUsers() {
+        return userService.findAll();
+    }
+}</code></pre>
+
+        <h3>Functional Routing</h3>
+        <p>Functional routing is an advanced WebFlux style where routes are defined as functions instead of controller annotations. It is less common in many enterprise codebases, but it is worth recognizing.</p>
+        <pre><code>RouterFunction&lt;ServerResponse&gt; routes =
+        route(GET("/users/{id}"),
+                request -> ServerResponse.ok()
+                        .body(
+                                userService.findById(request.pathVariable("id")),
+                                User.class
+                        )
+        );</code></pre>
+
+        <h3>Payment System Example</h3>
+        <p>This WebFlux endpoint authorizes a payment without blocking the request thread. The controller returns the pipeline, and Spring subscribes.</p>
+        <pre><code>@PostMapping("/reservations/{id}/payments")
+public Mono&lt;ResponseEntity&lt;PaymentResponse&gt;&gt; pay(
+        @PathVariable String id,
+        @Valid @RequestBody PaymentRequest request) {
+    return paymentService.authorize(id, request)
+            .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
+            .onErrorResume(ReservationNotFoundException.class, error ->
+                    Mono.just(ResponseEntity.notFound().build()));
+}</code></pre>
+        <p>The service can compose repository calls, payment-provider calls, validation, and saving without blocking.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This endpoint streams boarding pass previews as they are produced. A <code>Flux</code> is a good fit because there may be many reservations for one sailing.</p>
+        <pre><code>@GetMapping(value = "/sailings/{id}/boarding-passes",
+        produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public Flux&lt;BoardingPassPreview&gt; streamBoardingPasses(@PathVariable String id) {
+    return boardingService.previewBoardingPasses(id);
+}</code></pre>
+        <p>Instead of waiting to build one giant response, the service can emit items as they become available.</p>
+
+        <h3>Controller Rules</h3>
+        <ul>
+          <li>Return <code>Mono</code> or <code>Flux</code> from controllers.</li>
+          <li>Do not call <code>block()</code> in request-handling code.</li>
+          <li>Do not manually call <code>subscribe()</code> in controllers or services.</li>
+          <li>Use <code>map</code> for synchronous DTO transformations.</li>
+          <li>Use <code>flatMap</code> when calling another reactive operation.</li>
+          <li>Use <code>switchIfEmpty</code> for not-found cases.</li>
+          <li>Use <code>onErrorResume</code> for controlled fallback or response mapping.</li>
+        </ul>
+
+        <h3>Reference Answer</h3>
+        <p class="answer">Spring WebFlux is Spring's reactive web framework for building asynchronous, non-blocking APIs with Reactor types such as <code>Mono</code> and <code>Flux</code>. It differs from Spring MVC because WebFlux is event-loop based and designed for non-blocking I/O, often using Reactor Netty, while MVC commonly uses a servlet thread-per-request model. WebFlux is a good fit for high-concurrency I/O, streaming, WebSockets, and reactive end-to-end stacks. Blocking is dangerous because event-loop threads are few and shared, so blocking one thread can delay many requests. If blocking code cannot be avoided, isolate it with <code>Mono.fromCallable(...).subscribeOn(Schedulers.boundedElastic())</code>.</p>
       </section>
 
       <section id="spring-request">
