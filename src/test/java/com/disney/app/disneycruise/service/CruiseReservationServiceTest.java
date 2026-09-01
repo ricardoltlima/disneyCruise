@@ -3,6 +3,7 @@ package com.disney.app.disneycruise.service;
 import com.disney.app.disneycruise.dto.CruiseReservationRequest;
 import com.disney.app.disneycruise.dto.CruiseReservationResponse;
 import com.disney.app.disneycruise.entity.CruiseReservationEntity;
+import com.disney.app.disneycruise.error.ReservationNotFoundException;
 import com.disney.app.disneycruise.repository.CruiseReservationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -135,5 +136,20 @@ class CruiseReservationServiceTest {
                     assertThat(response.reservationStatus()).isEqualTo("PENDING");
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    void getReservationByIdShouldReturnErrorWhenReservationDoesNotExist() {
+        when(repository.findById("missing-id"))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(service.getReservation("missing-id"))
+                .expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(ReservationNotFoundException.class);
+                    assertThat(error.getMessage()).isEqualTo("Reservation not found: missing-id");
+                })
+                .verify();
+
+        verify(repository).findById("missing-id");
     }
 }
