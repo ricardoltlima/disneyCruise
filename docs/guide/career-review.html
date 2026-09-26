@@ -1,0 +1,646 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career and Review | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="#reference-answers">Reference Answers</a>
+            <a href="#ai">AI at Work</a>
+            <a href="#production-support">Production Support</a>
+            <a href="#modernization">Modernization</a>
+            <a href="#collaboration">Collaboration Scenarios</a>
+            <a href="#practice-pack">Practice Question Pack</a>
+            <a href="#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Career and Review</h2>
+        <p>Reference answers, AI at work, production support, modernization, collaboration, practice questions, and review plan.</p>
+      </header>
+
+<section id="reference-answers">
+        <h2>Reference Answers</h2>
+        <div class="qa">
+          <article class="card">
+            <h3>What happens when a request reaches a Spring Boot service?</h3>
+            <p class="answer">When a request reaches a Spring Boot service, the embedded server receives it and passes it to Spring MVC. The <code>DispatcherServlet</code> routes it to the matching controller method based on the HTTP method and path. The controller handles HTTP-specific concerns and delegates to a service. The service contains the business workflow and may call repositories, external services, or publish events. The repository handles persistence. The result comes back up the stack, and Spring uses Jackson to serialize the response DTO to JSON.</p>
+          </article>
+
+          <article class="card">
+            <h3>What is a Spring bean?</h3>
+            <p class="answer">A Spring bean is an object managed by the Spring container. Spring creates it, injects its dependencies, manages its lifecycle, and can apply framework features around it. Beans can be discovered through annotations like <code>@Service</code>, <code>@Repository</code>, and <code>@Component</code>, or declared manually with <code>@Bean</code>.</p>
+          </article>
+
+          <article class="card">
+            <h3>Why is constructor injection preferred?</h3>
+            <p class="answer">Constructor injection is preferred because dependencies are explicit, fields can be final, the object cannot be partially initialized, and the class is easy to test without Spring. It supports loose coupling and makes required collaborators visible in the class API.</p>
+          </article>
+
+          <article class="card">
+            <h3>What problem does Qualifier solve?</h3>
+            <p class="answer"><code>@Qualifier</code> solves ambiguity when multiple beans match the same dependency type. If two classes implement <code>PaymentClient</code>, and a constructor asks for <code>PaymentClient</code>, Spring needs to know which implementation to inject.</p>
+          </article>
+
+          <article class="card">
+            <h3>Why avoid mutable request fields in services?</h3>
+            <p class="answer">Most Spring beans are singleton by default, so the same service instance may handle many requests concurrently. Request-specific data should stay in method parameters or local variables. Mutable service fields can be overwritten by concurrent requests and create race conditions.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you design a reliable REST API?</h3>
+            <p class="answer">I design REST APIs around resources, so URLs are nouns and HTTP methods express actions. I use DTOs for request and response contracts instead of exposing entities, because the API contract should be separate from the database model. I validate input at the boundary using annotations and <code>@Valid</code>, so invalid requests fail before business logic runs. I centralize exception handling with <code>@RestControllerAdvice</code> to keep controllers clean and return consistent error responses. For reliability, I think about idempotency, pagination, timeouts, retries, error codes, trace IDs, authentication, authorization, and observability. When calling another service, I make sure the call has a timeout and that retries are safe, especially for operations like payments or reservations.</p>
+          </article>
+
+          <article class="card">
+            <h3>What is idempotency and why does it matter?</h3>
+            <p class="answer">Idempotency means that performing the same operation once or multiple times has the same final effect. It matters in distributed systems because clients, gateways, or services may retry after timeouts or network failures. If the original request succeeded but the response was lost, a retry can create duplicate side effects like duplicate payments or bookings. For risky operations, I use idempotency keys, request hashes, unique database constraints, or conditional writes. For event consumers, I assume at-least-once delivery and make handlers idempotent using event IDs or business keys.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you handle timeouts and retries between services?</h3>
+            <p class="answer">I configure explicit timeouts for every outbound dependency call so my service does not wait indefinitely and exhaust threads, memory, or connection pools. I distinguish connection timeouts from read timeouts and align them with the overall request deadline. For retries, I only retry failures that are likely transient, such as timeouts, <code>503</code>, <code>504</code>, or sometimes <code>429</code> while respecting <code>Retry-After</code>. I avoid retrying validation, authentication, authorization, and business-rule errors. I also make sure the operation is safe to retry, either naturally idempotent or protected by an idempotency key, unique constraint, or conditional write. To avoid retry storms, I use limited attempts, exponential backoff, jitter, and eventually circuit breakers or asynchronous recovery.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do circuit breakers and fallbacks improve reliability?</h3>
+            <p class="answer">A circuit breaker prevents repeated calls to a dependency that appears unhealthy. In the closed state, calls flow normally and the breaker records successes, failures, and slow calls. If failures exceed a threshold, it opens and fails fast instead of continuing to consume resources. After a wait period, it moves to half-open and allows a small number of test calls. If they succeed, it closes; if they fail, it opens again. For fallback behavior, I only use alternatives that are truthful and safe, such as cached non-critical data, default recommendations, or queuing work for later. I would not use fallback to pretend that a payment, authorization, or inventory operation succeeded.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you handle errors and observability in a Spring Boot microservice?</h3>
+            <p class="answer">I centralize error handling with <code>@RestControllerAdvice</code> so controllers stay clean and API errors are consistent. I separate expected business or client errors from unexpected server and dependency failures, map them to appropriate <code>4xx</code> or <code>5xx</code> status codes, and return stable error codes with safe messages and trace IDs. I avoid leaking stack traces, SQL details, tokens, or internal hostnames in API responses. For observability, I use structured logs, metrics, and distributed tracing. Logs tell me what happened, metrics show health and trends, and traces show where time was spent across services. I make sure trace or correlation IDs are propagated across service boundaries and included in logs and error responses, so production issues can be debugged quickly.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you choose between synchronous and asynchronous communication?</h3>
+            <p class="answer">I use synchronous communication when the caller needs an immediate answer or the next step cannot proceed without the result, such as authorization, reads, validation, or payment authorization before confirming a booking. I use asynchronous communication when work can happen later, multiple consumers need to react to the same event, or the system needs buffering, replay, and decoupling. Synchronous calls are simpler but can create tight coupling and cascading failures, so they need timeouts, retries, circuit breakers, and observability. Asynchronous systems improve resilience and scalability, but require idempotent consumers, schema management, duplicate handling, ordering decisions, and acceptance of eventual consistency.</p>
+          </article>
+
+          <article class="card">
+            <h3>How does OAuth2/JWT work in a Spring Boot API?</h3>
+            <p class="answer">In this setup, the Spring Boot API acts as an OAuth2 resource server. A client obtains an access token from an authorization server such as Okta, Cognito, or Azure AD, then sends it to the API in the <code>Authorization: Bearer</code> header. Spring Security's filter chain extracts the bearer token, validates the JWT signature and claims such as issuer, expiration, and audience, then creates an authenticated principal. Scopes or roles from the token are mapped to authorities and checked against endpoint rules. For finer-grained authorization, the service still needs business checks, such as whether the authenticated guest owns the reservation. If the token is missing or invalid, the API returns <code>401</code>. If the token is valid but lacks permission, it returns <code>403</code>.</p>
+          </article>
+
+          <article class="card">
+            <h3>What are the roles of a gateway and load balancer?</h3>
+            <p class="answer">An API gateway is the front door for API traffic. It routes requests to the right backend service and often handles cross-cutting concerns like authentication, rate limiting, TLS termination, CORS, request limits, logging, and metrics. A load balancer distributes traffic across healthy instances of a service so the system can scale horizontally and tolerate instance failures. Conceptually, the gateway decides which service should handle the request, and the load balancer decides which instance should receive it. The gateway may enforce coarse-grained checks like token validation and scopes, but each backend service still owns fine-grained business authorization.</p>
+          </article>
+
+          <article class="card">
+            <h3>How do you test Spring Boot services with JUnit and Mockito?</h3>
+            <p class="answer">I use JUnit 5 for test structure and assertions, and Mockito to isolate the class under test from dependencies like repositories, external clients, and publishers. For service unit tests, I usually do not start the Spring context. I instantiate the service with mocked dependencies, stub expected dependency responses, execute the method, assert the result or exception, and verify important interactions. I cover both happy paths and failure paths, such as not found, validation or business rule failures, declined payments, and dependency errors. I avoid over-mocking domain objects and prefer constructor injection because it makes unit tests simple and explicit.</p>
+          </article>
+        </div>
+      </section>
+
+<section id="ai">
+        <h2>AI at Work</h2>
+        <p class="lead">For workplace discussion, AI usage should sound like senior engineering judgment, not blind tool adoption. The useful framing is: AI can accelerate understanding and execution, but the engineer still owns correctness, security, design, production impact, and final review.</p>
+        <div class="callout">
+          <p><strong>Strong framing:</strong> I use AI to accelerate understanding, boilerplate, tests, refactoring ideas, and documentation, but I keep ownership of correctness, security, architecture, and production behavior.</p>
+        </div>
+
+        <h3>How AI Helps at Work</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Good Uses</h3>
+            <ul>
+              <li>Understanding unfamiliar code.</li>
+              <li>Generating first drafts of unit tests.</li>
+              <li>Explaining stack traces.</li>
+              <li>Summarizing pull requests.</li>
+              <li>Suggesting refactoring approaches.</li>
+              <li>Creating migration checklists.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>What To Avoid</h3>
+            <ul>
+              <li>Pasting secrets, credentials, tokens, customer data, or unapproved proprietary information into AI tools.</li>
+              <li>Accepting generated code without review.</li>
+              <li>Using AI-generated security or authorization code blindly.</li>
+              <li>Letting AI perform destructive actions without approval.</li>
+              <li>Relying on AI for production diagnosis without validating logs, metrics, and traces.</li>
+              <li>Introducing dependencies or licenses without checking policy.</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3>Best Use Cases for a Backend Engineer</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Code Understanding</h3>
+            <p>Ask AI to map request flows, explain unfamiliar classes, identify ownership boundaries, and summarize how a feature works before changing it.</p>
+            <pre><code>Read the reservation API flow from controller to repository.
+Identify the main classes, data models, validations, and error paths.
+Do not edit files yet. Give me a concise map first.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Implementation Help</h3>
+            <p>Use AI to draft focused changes after it has inspected the codebase. The best requests include the desired behavior, constraints, files to preserve, and expected tests.</p>
+            <pre><code>Add a WebFlux endpoint to cancel a reservation.
+Follow the existing controller/service/repository style.
+Return 404 when missing, 409 when already boarded, and 204 on success.
+Add focused unit tests.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Testing</h3>
+            <p>AI is useful for generating test cases, edge cases, mocks, and failure-path coverage. You should still verify that the tests assert behavior, not just implementation details.</p>
+            <pre><code>Create StepVerifier tests for this service method.
+Cover success, not found, duplicate request, dependency timeout,
+and event-publish failure. Use the project's existing test style.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Production Support</h3>
+            <p>AI can help organize an investigation, read logs, compare recent changes, and propose hypotheses. It should not replace dashboards, traces, runbooks, or production judgment.</p>
+            <pre><code>Here are error logs and the deploy diff.
+Build a timeline, identify likely failure points,
+and propose the safest mitigation before root-cause cleanup.</code></pre>
+          </article>
+        </div>
+
+        <h3>How to Ask AI for Demanding Tasks</h3>
+        <p>For larger tasks, give AI the role, goal, constraints, expected verification, and stopping rules. Vague prompts produce vague work. A strong prompt makes the agent inspect first, plan briefly, change only what is needed, and verify the result.</p>
+        <pre><code>Role: act as a senior Java Spring WebFlux engineer.
+Goal: add idempotent reservation creation.
+Context: use existing controller, service, reactive MongoDB repository,
+and global error handler patterns.
+Constraints:
+  - Do not block.
+  - Do not introduce new dependencies without explaining why.
+  - Preserve existing endpoint behavior.
+  - Keep changes small.
+Verification:
+  - Run unit tests.
+  - Add tests for duplicate idempotency key and concurrent retry risk.
+Output:
+  - Summarize changed files and test results.</code></pre>
+
+        <h3>What AI Must Persist During a Task</h3>
+        <p>For serious engineering work, the agent should maintain working context instead of acting one prompt at a time. This is especially important in large codebases.</p>
+        <ul>
+          <li>The user's current goal and latest instruction.</li>
+          <li>Important constraints, such as no blocking code in WebFlux or no new dependencies.</li>
+          <li>Repo conventions: package structure, naming, test style, error response style, logging style.</li>
+          <li>Files already inspected and what was learned from them.</li>
+          <li>Files changed and why they were changed.</li>
+          <li>Open risks, assumptions, and anything that still needs user approval.</li>
+          <li>Verification already run and whether it passed or failed.</li>
+        </ul>
+        <p>A good agent does not repeatedly rediscover the same context or overwrite unrelated user changes. It should keep momentum while staying grounded in the actual codebase.</p>
+
+        <h3>Before Starting a New API</h3>
+        <p>When starting a new API, ask AI to investigate before implementing. The goal is to align with the existing architecture and avoid creating a one-off style.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Questions to Ask</h3>
+            <ul>
+              <li>What similar endpoints already exist?</li>
+              <li>What controller, service, repository, DTO, mapper, and error patterns are already used?</li>
+              <li>What validation rules belong at the request boundary?</li>
+              <li>What business states can cause 400, 401, 403, 404, 409, 422, 500, or 503?</li>
+              <li>Does the operation need idempotency?</li>
+              <li>Does it call dependencies that need timeouts, retries, or circuit breakers?</li>
+              <li>Does it publish an event or write an outbox row?</li>
+              <li>What observability fields should be logged or traced?</li>
+              <li>What tests prove the behavior?</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Prompt Example</h3>
+            <pre><code>I need to add a new API.
+Before coding, inspect the project and answer:
+1. Which existing endpoint is the best pattern to follow?
+2. What DTO, validation, service, repository, and error handler conventions exist?
+3. What status codes should this API return?
+4. What tests should we add?
+5. What production risks should we handle?
+Then propose a short implementation plan.</code></pre>
+          </article>
+        </div>
+
+        <h3>Routine the Agent Should Run</h3>
+        <p>For code changes, an AI coding agent should follow a repeatable routine. The exact commands depend on the project, but the discipline stays the same.</p>
+        <ol>
+          <li>Check git status so it does not overwrite unrelated work.</li>
+          <li>Inspect project structure and similar existing code.</li>
+          <li>Read build files to understand Java, Spring Boot, and dependency versions.</li>
+          <li>Identify the smallest safe change.</li>
+          <li>Edit only the necessary files.</li>
+          <li>Add or update focused tests.</li>
+          <li>Run formatting or compile checks if the project uses them.</li>
+          <li>Run relevant tests, then broader tests if the change has wider risk.</li>
+          <li>Summarize changed files, verification, and remaining risks.</li>
+        </ol>
+        <pre><code>Typical Java/Spring checks:
+  git status --short
+  ./mvnw test
+  ./mvnw -DskipTests package
+
+For a focused test:
+  ./mvnw -Dtest=CruiseReservationServiceTest test</code></pre>
+
+        <h3>Can You Edit AGENTS.md?</h3>
+        <p>Yes, if the project uses an <code>AGENTS.md</code> file, you can edit it. Coding agents commonly read this file before working so they understand local instructions, project conventions, and required routines. In this repository, I do not currently see an <code>AGENTS.md</code> file at the project root.</p>
+        <p>Use <code>AGENTS.md</code> for stable project instructions, not temporary task details. Temporary task details belong in the chat prompt.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Good AGENTS.md Content</h3>
+            <ul>
+              <li>Project overview and architecture boundaries.</li>
+              <li>Build, test, and formatting commands.</li>
+              <li>Java, Spring Boot, WebFlux, MongoDB, Kafka, and testing conventions.</li>
+              <li>Error response style and status-code rules.</li>
+              <li>Logging, tracing, and security expectations.</li>
+              <li>Rules like do not call <code>block()</code> in WebFlux request paths.</li>
+              <li>Where to add tests for controllers, services, repositories, and integrations.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Do Not Put This There</h3>
+            <ul>
+              <li>Secrets, passwords, tokens, API keys, or private certificates.</li>
+              <li>Customer data or sensitive production data.</li>
+              <li>One-time instructions for a single task.</li>
+              <li>Instructions that conflict with team standards or CI.</li>
+              <li>Long outdated documentation that nobody maintains.</li>
+            </ul>
+          </article>
+        </div>
+        <pre><code># AGENTS.md example
+
+## Project
+Java Spring Boot backend using WebFlux, reactive MongoDB, and Kafka.
+
+## Rules
+- Do not use block() or subscribe() in request/response service code.
+- Follow existing controller/service/repository package structure.
+- Use constructor injection.
+- Return stable API error responses through the global handler.
+- Add tests for success and failure paths.
+
+## Verification
+- Run focused tests for changed behavior.
+- Run ./mvnw test before finalizing broad backend changes.
+
+## Security
+- Do not log secrets, tokens, payment data, or raw guest PII.
+- Do not add dependencies without explaining the need.</code></pre>
+
+        <h3>Best Practices</h3>
+        <ul>
+          <li>Ask AI to inspect before it implements.</li>
+          <li>Keep requests specific: desired behavior, constraints, files, tests, and output format.</li>
+          <li>Use AI for first drafts, comparisons, checklists, and edge cases, then review like a senior engineer.</li>
+          <li>Never paste secrets or unapproved sensitive company data.</li>
+          <li>Ask for tradeoffs, not just code.</li>
+          <li>Ask for tests at the same time as implementation.</li>
+          <li>Ask AI to explain risky changes before making them.</li>
+          <li>Require verification output: what command ran and whether it passed.</li>
+          <li>Keep stable repo instructions in <code>AGENTS.md</code> when the tool supports it.</li>
+          <li>Do not let AI silently add dependencies, change architecture, or widen scope.</li>
+        </ul>
+
+        <h3>Prompt Patterns</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Code Review</h3>
+            <pre><code>Review this change like a senior backend engineer.
+Focus on bugs, regressions, missing tests, security,
+WebFlux blocking risks, and production behavior.
+List findings first with file and line references.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Design Review</h3>
+            <pre><code>Evaluate this API design.
+Discuss resource naming, status codes, idempotency,
+validation, authorization, error handling, observability,
+and whether sync or async communication is appropriate.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Incident Help</h3>
+            <pre><code>Use these logs, metrics, traces, and recent deploy notes.
+Build a timeline, identify likely causes, propose mitigation,
+and list follow-up fixes and tests.</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Learning Mode</h3>
+            <pre><code>Teach me this code path step by step.
+Use simple mental models, then show the production concerns,
+then ask me interview-style questions with reference answers.</code></pre>
+          </article>
+        </div>
+
+        <h3>How to Talk About AI in an Interview</h3>
+        <p class="answer">I use AI as an engineering accelerator, not as a replacement for engineering judgment. I ask it to inspect code, explain unfamiliar flows, draft tests, propose refactoring options, summarize incidents, and build checklists. I do not paste secrets or sensitive data, and I do not accept generated code blindly. For backend work, I still verify architecture, security, error handling, observability, performance, and tests. When using an AI coding agent, I expect it to inspect the repo first, follow existing conventions, avoid unrelated changes, run relevant verification, and clearly report what changed and what risks remain.</p>
+
+        <div class="note callout">
+          <p><strong>References to know:</strong> <a href="https://www.nist.gov/itl/ai-risk-management-framework">NIST AI Risk Management Framework</a>, <a href="https://www.nist.gov/itl/ai-risk-management-framework/ai-rmf-generative-ai-profile">NIST Generative AI Profile</a>, <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for LLM Applications</a>, and <a href="https://github.com/features/copilot/trust">GitHub Copilot Trust Center</a>.</p>
+        </div>
+      </section>
+
+<section id="production-support">
+        <h2>Production Support</h2>
+        <p class="lead">Core question: how do you investigate and stabilize a production issue without guessing?</p>
+        <div class="callout">
+          <p><strong>Senior mindset:</strong> assess impact, stabilize customer/business impact first, then continue root cause analysis and prevention work.</p>
+        </div>
+        <h3>Incident Flow</h3>
+        <ol>
+          <li>Detect the issue through alerts, dashboards, logs, or user reports.</li>
+          <li>Triage scope: affected endpoints, users, regions, versions, workflows, and time window.</li>
+          <li>Mitigate if impact is high: rollback, feature flag off, scale, rate limit, open circuit, route traffic, or degrade non-critical functionality.</li>
+          <li>Investigate using logs, metrics, traces, dependency dashboards, and recent change history.</li>
+          <li>Resolve the root issue and verify recovery.</li>
+          <li>Prevent recurrence with tests, alerts, dashboards, runbooks, guardrails, or code changes.</li>
+        </ol>
+        <h3>Golden Signals</h3>
+        <div class="grid">
+          <article class="card"><h3>Latency</h3><p>How long requests or dependency calls take. Watch p50, p95, p99, database query time, and dependency latency.</p></article>
+          <article class="card"><h3>Traffic</h3><p>How much load the system receives: requests per second, transactions per minute, events per second, and consumer throughput.</p></article>
+          <article class="card"><h3>Errors</h3><p>Failure counts and rates: 4xx, 5xx, exceptions, timeouts, dependency failures, and publish failures.</p></article>
+          <article class="card"><h3>Saturation</h3><p>Resource pressure: CPU, memory, GC, thread pools, connection pools, queue depth, consumer lag, and database connections.</p></article>
+        </div>
+        <h3>Latency Spike Checklist</h3>
+        <ul>
+          <li>Check whether one endpoint, all endpoints, one region, one version, or one customer group is affected.</li>
+          <li>Check traffic volume and retry behavior. Retry storms can double or triple load.</li>
+          <li>Check error rates and timeout counts.</li>
+          <li>Use traces to find the slow span: controller, service logic, downstream API, database, cache, or event publishing.</li>
+          <li>Check dependency dashboards: payment, inventory, database, Redis, Kafka/Kinesis, and third-party APIs.</li>
+          <li>Check saturation: CPU, memory, GC pauses, thread pool usage, HTTP/database connection pools.</li>
+          <li>Check recent deploys, configuration changes, feature flags, schema changes, and dependency releases.</li>
+        </ul>
+        <h3>Database Bottleneck Signs</h3>
+        <p>Common symptoms include slow query logs, high database CPU, table scans, missing indexes, N+1 queries, lock waits, deadlocks, exhausted connection pools, long-running transactions, and query timeouts.</p>
+        <div class="warning callout">
+          <p><strong>Important:</strong> increasing a database connection pool can make things worse if the database is already saturated. More concurrent queries can add pressure instead of improving throughput.</p>
+        </div>
+        <h3>JVM and Thread Issues</h3>
+        <p>For memory or GC issues, check heap usage, non-heap usage, allocation rate, GC pause duration, object retention, container restarts, and recent code changes. For thread pool exhaustion, check active thread count, queue size, blocked calls, missing timeouts, deadlocks, and slow downstream dependencies.</p>
+        <h3>Root Cause Analysis</h3>
+        <ul>
+          <li>Timeline: when it started, when detected, actions taken, and when mitigated.</li>
+          <li>Impact: users, endpoints, regions, error rate, latency, and business workflows affected.</li>
+          <li>Root cause: what failed, why it failed, and why safeguards did not catch it.</li>
+          <li>Corrective actions: tests, monitoring, alerts, runbooks, retry/circuit policies, capacity changes, and deployment guardrails.</li>
+        </ul>
+      </section>
+
+<section id="modernization">
+        <h2>Modernization</h2>
+        <p class="lead">Core question: how do you modernize a legacy Java backend without destabilizing production?</p>
+        <h3>Safe Modernization Strategy</h3>
+        <ol>
+          <li>Understand current behavior, dependencies, deployment process, owners, and production pain points.</li>
+          <li>Add characterization tests around important existing behavior before refactoring.</li>
+          <li>Upgrade incrementally: Java, Spring Boot, dependencies, build plugins, CI/CD, container images, then architecture.</li>
+          <li>Keep changes small and reversible. Use feature flags, canary releases, blue/green deployments, and rollback plans.</li>
+          <li>Improve observability before and during migration so regressions are visible.</li>
+          <li>Document risks, compatibility changes, and operational runbooks.</li>
+        </ol>
+        <h3>Java 8/11 to 17/21 Risks</h3>
+        <ul>
+          <li>Removed or strongly encapsulated JDK internals and reflection behavior.</li>
+          <li>Dependency incompatibilities with older libraries, app servers, and build plugins.</li>
+          <li>Changes in GC defaults, container memory behavior, TLS/cipher support, and timezone/certificate handling.</li>
+          <li>Build pipeline changes: Maven compiler plugin, surefire/failsafe, Docker base images, and CI Java version.</li>
+        </ul>
+        <h3>Spring Boot Upgrade Risks</h3>
+        <ul>
+          <li>Spring Boot 2 to 3 includes migration from <code>javax.*</code> to <code>jakarta.*</code>.</li>
+          <li>Security configuration style changes, dependency version changes, and actuator endpoint changes.</li>
+          <li>Serialization, validation, persistence, and test configuration changes.</li>
+        </ul>
+        <h3>Strangler Pattern</h3>
+        <p>The strangler pattern incrementally replaces legacy functionality with new services or modules. Route one capability at a time to the new implementation while the old system continues running. This reduces big-bang migration risk.</p>
+        <h3>Reference Answer</h3>
+        <p class="answer">I modernize legacy systems incrementally. First I understand behavior and production risk, then add tests and observability around critical flows. I upgrade Java, Spring Boot, dependencies, and build pipelines in small reversible steps, using feature flags, canaries, and rollback plans. For large architecture changes, I prefer a strangler approach so we can move one capability at a time instead of doing a risky big-bang rewrite.</p>
+      </section>
+
+<section id="collaboration">
+        <h2>Collaboration Scenarios</h2>
+        <p class="lead">Core goal: tell senior-level stories that show ownership, judgment, delivery, and production responsibility.</p>
+        <h3>Scenario Structure</h3>
+        <ul>
+          <li><strong>Situation:</strong> what was happening and why it mattered.</li>
+          <li><strong>Task:</strong> your responsibility.</li>
+          <li><strong>Action:</strong> what you personally did.</li>
+          <li><strong>Result:</strong> measurable outcome and what changed afterward.</li>
+        </ul>
+        <h3>Stories To Prepare</h3>
+        <ul>
+          <li>Production incident: how you triaged, mitigated, communicated, and prevented recurrence.</li>
+          <li>Modernization: how you upgraded or refactored a system safely.</li>
+          <li>Ownership: a time you took responsibility for an ambiguous or messy codebase.</li>
+          <li>Conflict: a technical disagreement and how you resolved it with data and collaboration.</li>
+          <li>Cross-team delivery: coordinating with product, QA, DevOps, security, or another service team.</li>
+          <li>Quality improvement: adding tests, observability, CI/CD, or reliability safeguards.</li>
+        </ul>
+        <h3>Backend Ownership Summary</h3>
+        <p class="answer">I am a backend Java engineer focused on building reliable enterprise services. This material emphasizes experience with Spring Boot APIs, service-layer business logic, production troubleshooting, testing, and modern backend patterns. I am comfortable stepping into existing systems, understanding how requests and data flow, improving reliability, and collaborating across teams. The focus is a strong backend ownership mindset: clean APIs, safe changes, observability, and practical reliability for high-volume guest-facing experiences.</p>
+      </section>
+
+<section id="practice-pack">
+        <h2>Practice Question Pack</h2>
+        <p class="lead">Use these questions for self-study while traveling. Answer out loud, then compare against the Reference Answers in this guide.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Java and Spring</h3>
+            <ul>
+              <li>Explain the Spring Boot request lifecycle.</li>
+              <li>What is a Spring bean?</li>
+              <li>Why use constructor injection?</li>
+              <li>How do controllers, services, repositories, DTOs, and entities differ?</li>
+              <li>Why avoid mutable request state in singleton services?</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>APIs and Security</h3>
+            <ul>
+              <li>How do you design a reliable REST API?</li>
+              <li>Explain idempotency and idempotency keys.</li>
+              <li>How does OAuth2/JWT work in Spring Boot?</li>
+              <li>What is the difference between 401 and 403?</li>
+              <li>Why is endpoint-level authorization not always enough?</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Reliability</h3>
+            <ul>
+              <li>How do you configure timeouts and retries?</li>
+              <li>What is a retry storm?</li>
+              <li>How does a circuit breaker work?</li>
+              <li>When is fallback safe or dangerous?</li>
+              <li>How do logs, metrics, and traces differ?</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>AWS and Events</h3>
+            <ul>
+              <li>Explain Kinesis shards and partition keys.</li>
+              <li>How do you model DynamoDB tables from access patterns?</li>
+              <li>How do Lambda retries and idempotency work?</li>
+              <li>What is the outbox pattern?</li>
+              <li>Compare Kafka, RabbitMQ, and Kinesis.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>System Design Prompt</h3>
+        <p>Design a cruise reservation event platform. Guests create reservations through an API. The system must authorize payment, store reservation state, publish real-time events, send notifications, update loyalty points, support analytics, prevent duplicates, and remain observable in production.</p>
+        <h3>Expected Design Themes</h3>
+        <ul>
+          <li>REST API with DTO validation, idempotency key, OAuth2/JWT, and consistent error responses.</li>
+          <li>Synchronous payment authorization if confirmation depends on payment.</li>
+          <li>Database transaction plus outbox event for <code>ReservationCreated</code>.</li>
+          <li>Kinesis/Kafka stream for downstream consumers.</li>
+          <li>Idempotent consumers for email, loyalty, analytics, and notifications.</li>
+          <li>DynamoDB for high-scale access patterns where appropriate.</li>
+          <li>Lambda for event-driven background processing where appropriate.</li>
+          <li>Timeouts, retries, circuit breakers, DLQs, logs, metrics, traces, dashboards, and alerts.</li>
+        </ul>
+      </section>
+
+<section id="next">
+        <h2>Review Plan</h2>
+        <p class="lead">Offline travel study plan: review one major section per day and answer the practice questions out loud.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Daily Review</h3>
+            <p>Day 1: REST, idempotency, timeouts, retries. Day 2: OAuth2, gateway, load balancing. Day 3: production support and modernization. Day 4: Kinesis. Day 5: DynamoDB. Day 6: Lambda and event-driven architecture. Day 7: collaboration stories and full practice.</p>
+          </article>
+          <article class="card">
+            <h3>Final Checklist</h3>
+            <ul>
+              <li>Practice the 60-second intro.</li>
+              <li>Prepare five incident and collaboration stories.</li>
+              <li>Explain one Spring Boot request flow.</li>
+              <li>Explain one reliability incident investigation.</li>
+              <li>Design one AWS event-driven workflow.</li>
+              <li>Prepare architecture and operations discussion questions.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

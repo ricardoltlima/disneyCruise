@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security and Traffic | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="#spring-security">Spring Security OAuth2</a>
+            <a href="#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Security and Traffic</h2>
+        <p>OAuth2, gateway design, load balancing, and security review topics.</p>
+      </header>
+
+<section id="spring-security">
+        <h2>Spring Security, OAuth2, and JWT</h2>
+        <p class="lead">Core question: how does a Spring Boot API authenticate and authorize a request using OAuth2 and JWT?</p>
+
+        <h3>Authentication vs Authorization</h3>
+        <ul>
+          <li><strong>Authentication:</strong> verifies who the caller is.</li>
+          <li><strong>Authorization:</strong> verifies what the authenticated caller is allowed to do.</li>
+        </ul>
+        <p>A simple way to remember it: authentication is identity; authorization is permission.</p>
+
+        <h3>OAuth2 Roles</h3>
+        <ul>
+          <li><strong>Resource owner:</strong> usually the user.</li>
+          <li><strong>Client:</strong> the application requesting access, such as a mobile app, web app, or backend service.</li>
+          <li><strong>Authorization server:</strong> authenticates users or clients and issues tokens, such as Okta, Auth0, Cognito, Azure AD, or Ping Identity.</li>
+          <li><strong>Resource server:</strong> the protected API. A Spring Boot API commonly plays this role.</li>
+        </ul>
+
+        <h3>JWT Structure</h3>
+        <p>A JWT is commonly used as an access token and has three parts: header, payload, and signature.</p>
+        <pre><code>header.payload.signature</code></pre>
+        <ul>
+          <li><strong>Header:</strong> token type and signing algorithm.</li>
+          <li><strong>Payload:</strong> claims such as subject, issuer, audience, expiration, scopes, and roles.</li>
+          <li><strong>Signature:</strong> proves the token was signed by a trusted issuer and was not modified.</li>
+        </ul>
+        <div class="warning callout">
+          <p><strong>Important:</strong> a normal JWT payload is encoded, not encrypted. Do not put secrets, credentials, or sensitive data in JWT claims unless there is a specific encrypted-token design.</p>
+        </div>
+
+        <h3>Resource Server Flow</h3>
+        <ol>
+          <li>Request enters the Spring Security filter chain.</li>
+          <li>Bearer token filter extracts the token from the <code>Authorization</code> header.</li>
+          <li>JWT decoder validates signature and claims such as issuer, expiration, and audience.</li>
+          <li>Spring creates an authenticated principal.</li>
+          <li>Scopes or roles are mapped to authorities.</li>
+          <li>Authorization rules are checked.</li>
+          <li>The controller is called only if access is allowed.</li>
+        </ol>
+
+        <h3>401 vs 403</h3>
+        <ul>
+          <li><strong>401 Unauthorized:</strong> the caller is not authenticated. Common causes include missing token, expired token, invalid signature, wrong issuer, or malformed <code>Authorization</code> header.</li>
+          <li><strong>403 Forbidden:</strong> the caller is authenticated but not allowed. Common causes include missing scope, wrong role, or failing a business authorization rule.</li>
+        </ul>
+
+        <h3>Scopes, Roles, and Business Authorization</h3>
+        <p>Scopes usually describe permissions, such as <code>reservation:read</code> or <code>payment:authorize</code>. Roles usually describe who the caller is, such as <code>GUEST</code>, <code>ADMIN</code>, or <code>SERVICE_ACCOUNT</code>.</p>
+        <p>Endpoint-level authorization checks whether the caller can access an operation. Business authorization checks whether the caller can access this specific resource.</p>
+        <pre><code>Endpoint permission:
+Can this caller use GET /api/reservations/{id}?
+
+Business permission:
+Does reservation 123 belong to this authenticated guest?</code></pre>
+
+        <h3>Spring Security Configuration Concept</h3>
+        <pre><code>@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.GET, "/api/reservations/**")
+                    .hasAuthority("SCOPE_reservation:read")
+                    .requestMatchers(HttpMethod.POST, "/api/reservations")
+                    .hasAuthority("SCOPE_reservation:write")
+                    .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt())
+            .build();
+}</code></pre>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>Authentication verifies identity; authorization verifies permission.</li>
+          <li>A Spring Boot API usually acts as an OAuth2 resource server.</li>
+          <li>A JWT has a header, payload, and signature.</li>
+          <li>Do not put secrets in a normal JWT payload because it is encoded, not encrypted.</li>
+          <li><code>401</code> means missing or invalid authentication; <code>403</code> means authenticated but not permitted.</li>
+          <li>Endpoint-level authorization is not enough when access depends on the specific resource, such as whether a reservation belongs to the authenticated guest.</li>
+        </ul>
+      </section>
+
+<section id="gateway-load-balancing">
+        <h2>Gateway and Load Balancing</h2>
+        <p class="lead">Core question: how does traffic flow from a client through a gateway and load balancer into backend microservices?</p>
+
+        <h3>Common Traffic Flow</h3>
+        <pre><code>Client
+  -> DNS
+  -> CDN / WAF
+  -> API Gateway
+  -> Load Balancer
+  -> Backend Service Instance
+  -> Database / Cache / Event System</code></pre>
+
+        <h3>API Gateway</h3>
+        <p>An API gateway is the front door for API traffic. It routes requests to the right backend service and often handles cross-cutting concerns such as authentication, TLS termination, rate limiting, request limits, CORS, logging, metrics, API versioning, and request or response transformation.</p>
+
+        <h3>Load Balancer</h3>
+        <p>A load balancer distributes requests across healthy instances of a service. It supports scalability, availability, fault tolerance, rolling deployments, and traffic distribution.</p>
+
+        <h3>Gateway vs Load Balancer</h3>
+        <p>Conceptually, the gateway decides which service should handle a request, while the load balancer decides which healthy instance of that service should receive it.</p>
+        <pre><code>/api/reservations/** -> reservation-service
+reservation-service -> instance 1, 2, or 3</code></pre>
+
+        <h3>TLS Termination</h3>
+        <p>TLS termination means the HTTPS connection ends at a layer such as the gateway, load balancer, or ingress controller. Internal traffic may then continue as HTTP or be re-encrypted with TLS or mTLS depending on the security model.</p>
+
+        <h3>Rate Limiting</h3>
+        <p>Rate limiting protects services from excessive traffic, abuse, and traffic spikes. If a caller exceeds the configured limit, the API commonly returns <code>429 Too Many Requests</code>.</p>
+
+        <h3>Health Checks</h3>
+        <p>A load balancer should only send traffic to healthy instances. Spring Boot Actuator commonly exposes endpoints such as <code>/actuator/health</code>, but health checks need careful design so non-critical dependency failures do not remove every instance from service.</p>
+        <ul>
+          <li><strong>Liveness:</strong> asks whether the process is alive or should be restarted.</li>
+          <li><strong>Readiness:</strong> asks whether the instance is ready to receive traffic.</li>
+        </ul>
+
+        <h3>Horizontal Scaling</h3>
+        <p>Horizontal scaling means adding more service instances. Backend services should usually be stateless or externalize state to a database, cache, token, or external store so any healthy instance can handle any request.</p>
+
+        <h3>Gateway Security vs Service Security</h3>
+        <p>The gateway can enforce coarse-grained security such as token validation and scopes, but services still own fine-grained business authorization. For example, the gateway may know a caller has <code>reservation:read</code>, while the reservation service must check whether the reservation belongs to that authenticated guest.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>The gateway routes traffic to the correct service and handles API-level policies.</li>
+          <li>The load balancer chooses a healthy instance of that service.</li>
+          <li>Gateway routing chooses the service; load balancing chooses the instance.</li>
+          <li>Horizontally scaled services should be stateless because requests may go to different instances, and in-memory session state is not shared reliably.</li>
+          <li>Liveness checks whether the process should be restarted. Readiness checks whether the instance should receive traffic.</li>
+          <li>Gateway-level authorization is not enough for resource-specific business rules.</li>
+        </ul>
+      </section>
+
+<section id="security">
+        <h2>Security, Gateway, Load Balancing</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Spring Security and OAuth2</h3>
+            <ul>
+              <li>Authentication vs authorization.</li>
+              <li>OAuth2 concepts.</li>
+              <li>JWT access tokens.</li>
+              <li>Authorization server vs resource server.</li>
+              <li>Scopes, roles, and claims.</li>
+              <li>Spring Security filter chain.</li>
+              <li>401 vs 403 troubleshooting.</li>
+            </ul>
+            <p><strong>Goal:</strong> explain how a request with an OAuth2/JWT token is authenticated and authorized by a Spring Boot API.</p>
+          </article>
+          <article class="card">
+            <h3>Gateway and Load Balancing</h3>
+            <ul>
+              <li>API gateway routing.</li>
+              <li>Cross-cutting concerns.</li>
+              <li>Rate limiting.</li>
+              <li>TLS termination.</li>
+              <li>Authentication at the edge vs service level.</li>
+              <li>Server-side and client-side load balancing.</li>
+              <li>Health checks and horizontal scaling.</li>
+            </ul>
+            <p><strong>Goal:</strong> explain traffic flow from client to gateway or load balancer into backend microservices.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

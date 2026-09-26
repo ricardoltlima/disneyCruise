@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spring Boot APIs | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="#spring-request">Spring Request Lifecycle</a>
+            <a href="#beans">Beans and Dependency Injection</a>
+            <a href="#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Spring Boot APIs</h2>
+        <p>Spring request lifecycle, beans and dependency injection, and REST API design.</p>
+      </header>
+
+<section id="spring-request">
+        <h2>Spring Boot Request Lifecycle</h2>
+        <p class="lead">Core question: what happens when an HTTP request reaches a Spring Boot backend application?</p>
+        <div class="flow" aria-label="Request flow">
+          <span>Client sends GET /api/reservations/123</span>
+          <span>Load balancer or gateway forwards traffic to the service</span>
+          <span>Embedded server, usually Tomcat, receives the HTTP request</span>
+          <span>Spring MVC DispatcherServlet receives the request</span>
+          <span>Spring maps the request to the correct controller method</span>
+          <span>Controller handles HTTP boundary concerns</span>
+          <span>Service layer executes the business workflow</span>
+          <span>Repository or client accesses data or external systems</span>
+          <span>Response DTO returns through the controller</span>
+          <span>Jackson serializes Java object to JSON</span>
+        </div>
+
+        <h3>Spring Boot</h3>
+        <p>Spring Boot helps build production-ready Java services by providing auto-configuration, embedded servers, dependency injection, and integrations for web APIs, persistence, security, monitoring, and testing.</p>
+
+        <h3>Embedded Server</h3>
+        <p>A Spring Boot REST API usually runs with an embedded server such as Tomcat. Instead of deploying a WAR file to an external server, the application can often be started with:</p>
+        <pre><code>java -jar reservation-service.jar</code></pre>
+
+        <h3>DispatcherServlet</h3>
+        <p>The <code>DispatcherServlet</code> is the central entry point for Spring MVC requests. It receives the HTTP request, uses handler mappings to find the matching controller method, invokes that method, and coordinates the response.</p>
+
+        <h3>Controller</h3>
+        <p>The controller owns the HTTP boundary: routes, path variables, query parameters, request bodies, validation trigger, and response status. Controllers should stay thin and delegate business rules to services.</p>
+        <pre><code>@RestController
+@RequestMapping("/api/reservations")
+public class ReservationController {
+    private final ReservationService reservationService;
+
+    public ReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
+
+    @GetMapping("/{id}")
+    public ReservationResponse getReservation(@PathVariable Long id) {
+        return reservationService.getReservation(id);
+    }
+}</code></pre>
+
+        <h3>Service</h3>
+        <p>The service layer owns the business workflow. It applies business rules, coordinates repositories and external clients, manages transactions, handles domain-level exceptions, and decides what should happen for a use case.</p>
+        <pre><code>@Service
+public class ReservationService {
+    private final ReservationRepository reservationRepository;
+
+    public ReservationService(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
+    }
+
+    public ReservationResponse getReservation(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ReservationNotFoundException(id));
+
+        return new ReservationResponse(
+                reservation.getId(),
+                reservation.getGuestName(),
+                reservation.getStatus()
+        );
+    }
+}</code></pre>
+
+        <h3>Repository</h3>
+        <p>The repository layer abstracts persistence. With Spring Data JPA, the framework can generate implementations for common operations such as <code>findById</code>, <code>save</code>, <code>delete</code>, and <code>findAll</code>.</p>
+        <pre><code>@Repository
+public interface ReservationRepository extends JpaRepository&lt;Reservation, Long&gt; {
+}</code></pre>
+
+        <h3>DTO vs Entity</h3>
+        <p>DTOs define the shape of data crossing the API boundary. Entities represent persisted domain data and are usually mapped to database tables or documents. Avoid exposing entities directly from APIs because that can leak internal database structure and make API contracts harder to evolve.</p>
+        <pre><code>public record ReservationResponse(
+        Long id,
+        String guestName,
+        String status
+) {}</code></pre>
+      </section>
+
+<section id="beans">
+        <h2>Beans and Dependency Injection</h2>
+        <p class="lead">Core question: how does Spring create objects and connect them together?</p>
+
+        <h3>Spring Bean</h3>
+        <p>A Spring bean is an object managed by the Spring container. Spring creates it, injects its dependencies, manages its lifecycle, and can apply framework behavior around it.</p>
+        <p>Beans can be discovered with annotations such as <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code>, <code>@RestController</code>, and <code>@Configuration</code>. They can also be declared manually through <code>@Bean</code> methods.</p>
+
+        <h3>Spring Container</h3>
+        <p>The Spring container, usually represented by <code>ApplicationContext</code>, discovers bean definitions, creates objects, wires dependencies, manages lifecycle callbacks, and makes beans available for injection.</p>
+        <pre><code>@SpringBootApplication
+public class ReservationApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ReservationApplication.class, args);
+    }
+}</code></pre>
+
+        <h3>Component Scanning</h3>
+        <p><code>@SpringBootApplication</code> includes component scanning. By default, Spring scans the package where the main application class lives and its subpackages. If a bean is not being injected, one thing to check is whether it is inside the component scan path.</p>
+
+        <h3>Constructor Injection</h3>
+        <p>Constructor injection is preferred because required dependencies are explicit, fields can be <code>final</code>, objects cannot be created in an incomplete state, and classes are easier to unit test without starting Spring.</p>
+        <pre><code>@Service
+public class ReservationService {
+    private final ReservationRepository reservationRepository;
+
+    public ReservationService(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
+    }
+}</code></pre>
+
+        <h3>Multiple Beans and Qualifier</h3>
+        <p>If multiple beans match the same dependency type, Spring needs disambiguation. Use <code>@Qualifier</code> to name the dependency explicitly or <code>@Primary</code> to define a default bean.</p>
+        <pre><code>public PaymentService(@Qualifier("stripePaymentClient") PaymentClient paymentClient) {
+    this.paymentClient = paymentClient;
+}</code></pre>
+
+        <h3>Bean Scope and Concurrency</h3>
+        <p>Most Spring beans are singleton by default, meaning one instance per Spring container. Since the same service instance can handle many requests concurrently, request-specific mutable data should stay in method parameters or local variables, not service fields.</p>
+        <div class="warning callout">
+          <p><strong>Avoid this pattern:</strong> storing <code>currentReservationId</code> or similar request data as a field in a singleton service. Concurrent requests can overwrite each other's data and cause race conditions.</p>
+        </div>
+
+        <h3>Configuration Beans</h3>
+        <p>Use <code>@Configuration</code> and <code>@Bean</code> when you need custom construction logic or want to register a third-party object with Spring.</p>
+        <pre><code>@Configuration
+public class AwsConfig {
+    @Bean
+    public DynamoDbClient dynamoDbClient() {
+        return DynamoDbClient.builder()
+                .region(Region.US_EAST_1)
+                .build();
+    }
+}</code></pre>
+
+        <h3>Bean Lifecycle</h3>
+        <ol>
+          <li>Bean definition discovered.</li>
+          <li>Object instantiated.</li>
+          <li>Dependencies injected.</li>
+          <li>Initialization callbacks run.</li>
+          <li>Bean is used by the application.</li>
+          <li>Shutdown callbacks run when the app stops.</li>
+        </ol>
+      </section>
+
+<section id="rest-api">
+        <h2>REST API Design</h2>
+        <p class="lead">Core question: how do you design a clean, reliable REST API in Spring Boot?</p>
+
+        <h3>Resource-Oriented URLs</h3>
+        <p>REST APIs usually model URLs around resources, not actions. The URL identifies the thing, and the HTTP method expresses the action.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Good</h3>
+            <pre><code>GET /api/reservations/123
+POST /api/reservations
+PATCH /api/reservations/123
+DELETE /api/reservations/123</code></pre>
+          </article>
+          <article class="card">
+            <h3>Less Ideal</h3>
+            <pre><code>GET /api/getReservation?id=123
+POST /api/createReservation
+POST /api/updateReservation
+POST /api/deleteReservation</code></pre>
+          </article>
+        </div>
+
+        <h3>HTTP Methods</h3>
+        <ul>
+          <li><code>GET</code>: read a resource.</li>
+          <li><code>POST</code>: create a resource or trigger a non-idempotent operation.</li>
+          <li><code>PUT</code>: replace a resource.</li>
+          <li><code>PATCH</code>: partially update a resource.</li>
+          <li><code>DELETE</code>: delete or cancel a resource.</li>
+        </ul>
+
+        <h3>Status Codes</h3>
+        <ul>
+          <li><code>200 OK</code>: successful read or update.</li>
+          <li><code>201 Created</code>: resource created, often with a <code>Location</code> header.</li>
+          <li><code>202 Accepted</code>: request accepted for asynchronous processing.</li>
+          <li><code>204 No Content</code>: successful operation with no response body.</li>
+          <li><code>400 Bad Request</code>: invalid request syntax or validation failure.</li>
+          <li><code>401 Unauthorized</code>: missing or invalid authentication.</li>
+          <li><code>403 Forbidden</code>: authenticated caller is not allowed.</li>
+          <li><code>404 Not Found</code>: resource does not exist.</li>
+          <li><code>409 Conflict</code>: state conflict or duplicate business operation.</li>
+          <li><code>429 Too Many Requests</code>: rate limit exceeded.</li>
+          <li><code>500 Internal Server Error</code>: unexpected server failure.</li>
+          <li><code>503 Service Unavailable</code>: temporary outage or dependency unavailable.</li>
+        </ul>
+
+        <h3>DTOs</h3>
+        <p>Use DTOs for request and response contracts instead of exposing entities directly. DTOs separate the API contract from the persistence model, prevent leaking internal fields or sensitive data, and let the API evolve without forcing every database change to become a client-facing change.</p>
+        <pre><code>public record CreateReservationRequest(
+        @NotBlank String guestName,
+        @NotNull Long cruiseId,
+        @Min(1) int partySize
+) {}
+
+public record ReservationResponse(
+        Long id,
+        String guestName,
+        Long cruiseId,
+        int partySize,
+        String status
+) {}</code></pre>
+
+        <h3>Validation</h3>
+        <p><code>@Valid</code> tells Spring to apply validation rules on the request DTO before the controller method continues. If validation fails, Spring raises a validation exception and the service layer is not called.</p>
+        <pre><code>@PostMapping
+public ResponseEntity&lt;ReservationResponse&gt; createReservation(
+        @Valid @RequestBody CreateReservationRequest request
+) {
+    ReservationResponse response = reservationService.createReservation(request);
+    URI location = URI.create("/api/reservations/" + response.id());
+    return ResponseEntity.created(location).body(response);
+}</code></pre>
+
+        <h3>Global Exception Handling</h3>
+        <p><code>@RestControllerAdvice</code> centralizes exception handling across controllers. It keeps controllers clean, maps exceptions to proper HTTP status codes, and returns consistent error responses.</p>
+        <pre><code>@RestControllerAdvice
+public class ApiExceptionHandler {
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity&lt;ApiError&gt; handleNotFound(ReservationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiError("RESERVATION_NOT_FOUND", ex.getMessage()));
+    }
+}</code></pre>
+
+        <h3>Error Response Design</h3>
+        <p>Reliable APIs should return predictable errors with stable error codes, clear messages, and trace IDs for supportability.</p>
+        <pre><code>{
+  "code": "VALIDATION_ERROR",
+  "message": "Request validation failed",
+  "traceId": "abc-123",
+  "fieldErrors": [
+    {
+      "field": "partySize",
+      "message": "partySize must be at least 1"
+    }
+  ]
+}</code></pre>
+
+        <h3>Pagination and Versioning</h3>
+        <p>Avoid unbounded list endpoints. Use <code>page</code> and <code>size</code> for simple cases, and cursor-based pagination for high-volume or frequently changing datasets.</p>
+        <pre><code>GET /api/reservations?page=0&amp;size=50
+GET /api/reservations?limit=50&amp;cursor=eyJpZCI6MTIzfQ</code></pre>
+        <p>Prefer backward-compatible API changes when possible. For breaking changes, use a clear versioning strategy such as <code>/api/v1/reservations</code> and a migration plan.</p>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microservices | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Microservices</h2>
+        <p>Core microservices concepts and tradeoffs for backend systems.</p>
+      </header>
+
+<section id="microservices-concepts">
+        <h2>Microservices Concepts</h2>
+        <p class="lead">Core question: how do backend services stay scalable, resilient, independently deployable, observable, and safe when a system is split across many smaller services?</p>
+        <img class="wide-image" src="../microservices-concepts/microservices-concepts-full.png" alt="Infographic showing 15 microservices concepts every backend engineer should know" />
+
+        <h3>Big Picture</h3>
+        <p>Microservices are not just many small applications. A microservice architecture is a distributed system where each service owns a business capability, deploys independently, communicates through APIs or events, and usually owns its own data. The benefit is team autonomy and scalability. The cost is operational complexity: network failures, eventual consistency, versioning, tracing, deployments, and data ownership become everyday design concerns.</p>
+        <div class="callout">
+          <p><strong>Senior mindset:</strong> good microservice architecture is about tradeoffs. Split a system when service boundaries, team ownership, scalability, deployment independence, and data ownership justify the extra distributed-system complexity.</p>
+        </div>
+
+        <div class="grid">
+          <article class="card concept-card">
+            <img src="../microservices-concepts/01-api-gateway.png" alt="API Gateway concept diagram" />
+            <h3>1. API Gateway</h3>
+            <p>An API gateway is the entry point between clients and backend services. It can route requests, authenticate users, apply rate limits, transform requests, terminate TLS, and hide internal service topology from clients.</p>
+            <p><strong>Example:</strong> a mobile app calls <code>/api/reservations/123</code>. The gateway validates the token, applies rate limiting, and routes the request to the reservation service.</p>
+            <pre><code>Client -> API Gateway -> Reservation Service
+       -> API Gateway -> Payment Service
+       -> API Gateway -> Guest Profile Service</code></pre>
+            <p>Keep the gateway focused on edge concerns. Business rules belong in domain services.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/02-service-discovery.png" alt="Service Discovery concept diagram" />
+            <h3>2. Service Discovery</h3>
+            <p>Service discovery lets services find other services dynamically. In cloud systems, instances come and go because of scaling, deployments, crashes, and health checks.</p>
+            <p><strong>Example:</strong> the reservation service needs the payment service. Instead of hardcoding one host, it asks discovery for healthy payment-service instances.</p>
+            <pre><code>payment-service
+  instance A: healthy
+  instance B: unhealthy
+  instance C: healthy</code></pre>
+            <p>Modern platforms often provide this through Kubernetes Services, Consul, Eureka, or cloud load balancers.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/03-load-balancing.png" alt="Load Balancing concept diagram" />
+            <h3>3. Load Balancing</h3>
+            <p>Load balancing distributes traffic across healthy service instances. It improves availability and helps services scale horizontally.</p>
+            <p><strong>Example:</strong> three reservation-service instances are running. The load balancer spreads traffic across them and removes unhealthy instances from rotation.</p>
+            <pre><code>Incoming requests
+  -> reservation-service-1
+  -> reservation-service-2
+  -> reservation-service-3</code></pre>
+            <p>Common strategies include round-robin, least connections, weighted routing, and latency-aware routing.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/04-circuit-breaker.png" alt="Circuit Breaker concept diagram" />
+            <h3>4. Circuit Breaker</h3>
+            <p>A circuit breaker prevents repeated calls to a failing dependency. It protects your service from waiting on a dependency that is already unhealthy and helps prevent cascading failures.</p>
+            <p><strong>Example:</strong> if the payment provider times out repeatedly, the circuit opens and the reservation service fails fast instead of tying up resources.</p>
+            <pre><code>Closed: calls flow normally
+Open: calls fail fast
+Half-open: allow small test traffic</code></pre>
+            <p>Fallbacks must be truthful. A cached itinerary can be acceptable. Pretending a payment succeeded is not.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/05-event-driven-communication.png" alt="Event-Driven Communication concept diagram" />
+            <h3>5. Event-Driven Communication</h3>
+            <p>Event-driven communication lets services publish facts that other services consume asynchronously. This reduces direct coupling between services.</p>
+            <p><strong>Example:</strong> after a reservation is created, the reservation service publishes <code>ReservationCreated</code>. Email, loyalty, analytics, and notification services consume it independently.</p>
+            <pre><code>Reservation Service -> reservation-created topic
+Email Service       -> consumes event
+Loyalty Service     -> consumes event
+Analytics Service   -> consumes event</code></pre>
+            <p>Consumers must be idempotent because events can be delivered more than once.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/06-cqrs.png" alt="CQRS concept diagram" />
+            <h3>6. CQRS</h3>
+            <p>CQRS means Command Query Responsibility Segregation. The write model handles commands that change state. The read model is optimized for queries.</p>
+            <p><strong>Example:</strong> reservation creation writes to the reservation command model. A separate read model stores reservation summaries optimized for fast guest lookup.</p>
+            <pre><code>Command side:
+  CreateReservation -> validate -> save -> publish event
+
+Query side:
+  GetGuestTrips -> read optimized summary view</code></pre>
+            <p>CQRS is useful when read and write workloads have different shapes. It adds complexity because read models may be eventually consistent.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/07-saga-pattern.png" alt="Saga Pattern concept diagram" />
+            <h3>7. Saga Pattern</h3>
+            <p>A saga coordinates a distributed transaction using local transactions and compensating actions. It avoids trying to hold one database transaction across many services.</p>
+            <p><strong>Example:</strong> book cabin, authorize payment, confirm reservation. If payment fails, release the cabin hold.</p>
+            <pre><code>1. Hold cabin
+2. Authorize payment
+3. Confirm reservation
+
+Compensation:
+  payment failed -> release cabin hold</code></pre>
+            <p>Sagas can be orchestrated by a workflow service or choreographed through events.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/08-service-mesh.png" alt="Service Mesh concept diagram" />
+            <h3>8. Service Mesh</h3>
+            <p>A service mesh moves service-to-service networking concerns into infrastructure, often through sidecar proxies. It can handle mTLS, retries, traffic policies, observability, and rate limits.</p>
+            <p><strong>Example:</strong> Istio sidecars encrypt calls between reservation, payment, and itinerary services without each team hand-writing TLS logic.</p>
+            <pre><code>Reservation Service -> Sidecar Proxy
+Sidecar Proxy       -> Payment Sidecar
+Payment Sidecar     -> Payment Service</code></pre>
+            <p>A mesh is powerful but operationally heavy. Use it when the platform needs consistent cross-service networking policy.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/09-distributed-tracing.png" alt="Distributed Tracing concept diagram" />
+            <h3>9. Distributed Tracing</h3>
+            <p>Distributed tracing follows one request across multiple services. A trace is made of spans, where each span represents work done by one service or dependency call.</p>
+            <p><strong>Example:</strong> a checkout request touches gateway, reservation, payment, cabin inventory, and notification services. A trace shows where latency or failure happened.</p>
+            <pre><code>traceId=abc123
+  gateway span: 20 ms
+  reservation span: 80 ms
+  payment span: 900 ms
+  inventory span: 40 ms</code></pre>
+            <p>Logs tell what happened. Metrics show trends. Traces show where time went across service boundaries.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/10-containerization.png" alt="Containerization concept diagram" />
+            <h3>10. Containerization</h3>
+            <p>Containers package an application with its runtime dependencies so it runs consistently across environments. Docker is the common packaging tool; Kubernetes often runs containers in production.</p>
+            <p><strong>Example:</strong> the reservation service is built once as an image and promoted through dev, QA, and production.</p>
+            <pre><code>Build once:
+  reservation-service:1.24.0
+
+Run in:
+  dev
+  qa
+  prod</code></pre>
+            <p>Containers improve consistency, but they still need configuration, secrets management, health checks, and resource limits.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/11-database-per-service.png" alt="Database per Service concept diagram" />
+            <h3>11. Database per Service</h3>
+            <p>Each microservice owns its own data and database schema. Other services should not directly query or modify that database.</p>
+            <p><strong>Example:</strong> the payment service owns payment records. The reservation service asks the payment service for payment state or consumes payment events; it does not query the payment database directly.</p>
+            <pre><code>Reservation Service -> reservation_db
+Payment Service     -> payment_db
+Guest Service       -> guest_db</code></pre>
+            <p>This preserves service autonomy, but cross-service queries often require APIs, events, read models, or CQRS.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/12-bulkhead-pattern.png" alt="Bulkhead Pattern concept diagram" />
+            <h3>12. Bulkhead Pattern</h3>
+            <p>The bulkhead pattern isolates resources so one failing area does not take down the whole system.</p>
+            <p><strong>Example:</strong> payment calls use a separate connection pool from itinerary calls. If payment slows down, itinerary lookups can still work.</p>
+            <pre><code>Payment dependency:
+  max concurrent calls = 30
+
+Itinerary dependency:
+  max concurrent calls = 100</code></pre>
+            <p>Bulkheads can be thread pools, connection pools, queue limits, rate limits, or separate service instances.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/13-backend-for-frontend.png" alt="Backend for Frontend concept diagram" />
+            <h3>13. Backend for Frontend</h3>
+            <p>A Backend for Frontend is a client-specific backend that shapes data for one frontend experience, such as mobile, web, desktop, or kiosk.</p>
+            <p><strong>Example:</strong> the mobile app needs compact reservation summaries, while the web admin tool needs operational details. A mobile BFF and admin BFF can optimize separately.</p>
+            <pre><code>Mobile App -> Mobile BFF -> Microservices
+Web Admin  -> Admin BFF  -> Microservices</code></pre>
+            <p>BFFs reduce over-fetching and under-fetching, but avoid duplicating core business rules across every frontend backend.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/14-blue-green-deployment.png" alt="Blue-Green Deployment concept diagram" />
+            <h3>14. Blue-Green Deployment</h3>
+            <p>Blue-green deployment runs two production-like environments. One serves traffic while the other receives the new version. Traffic switches after validation.</p>
+            <p><strong>Example:</strong> blue runs reservation-service v1. Green deploys v2. Smoke tests pass, traffic moves to green, and blue remains available for rollback.</p>
+            <pre><code>Before:
+  Blue  = v1, 100% traffic
+  Green = v2, 0% traffic
+
+After:
+  Blue  = v1, rollback target
+  Green = v2, 100% traffic</code></pre>
+            <p>The hard part is data compatibility. The new and old versions may need to work with the same database schema during rollout.</p>
+          </article>
+
+          <article class="card concept-card">
+            <img src="../microservices-concepts/15-strangler-fig-pattern.png" alt="Strangler Fig Pattern concept diagram" />
+            <h3>15. Strangler Fig Pattern</h3>
+            <p>The strangler fig pattern incrementally replaces a legacy system. New functionality is routed to new services while old functionality continues running until it can be retired.</p>
+            <p><strong>Example:</strong> route new reservation search traffic to a new WebFlux service while legacy booking flows remain in the monolith. Move one capability at a time.</p>
+            <pre><code>Client -> Router
+       -> New reservation-search service
+       -> Legacy monolith for remaining features</code></pre>
+            <p>This reduces big-bang migration risk. It needs clear routing, data synchronization, observability, and a plan to remove old paths.</p>
+          </article>
+        </div>
+
+        <h3>End-to-End Disney Cruise Example</h3>
+        <p>A guest books a cruise from the mobile app. The request enters through an API gateway, routes to a reservation service, calls payment and cabin inventory services, saves reservation data in the reservation database, and publishes <code>ReservationCreated</code>. Notification, loyalty, and analytics services consume the event. Distributed tracing follows the request, circuit breakers protect failing dependencies, containers package each service, and blue-green deployment releases new versions safely.</p>
+        <pre><code>Mobile App
+  -> API Gateway
+  -> Reservation Service
+     -> Cabin Inventory Service
+     -> Payment Service
+     -> reservation_db
+     -> reservation-created event
+        -> Notification Service
+        -> Loyalty Service
+        -> Analytics Service</code></pre>
+
+        <h3>Reference Answer</h3>
+        <p class="answer">Microservices split a system into independently deployable services around business capabilities. The major concepts include API gateways for edge routing, service discovery and load balancing for dynamic traffic, circuit breakers and bulkheads for resilience, event-driven communication for loose coupling, CQRS and sagas for complex data and workflow patterns, service mesh and distributed tracing for platform-level communication and observability, containers for consistent deployment, database per service for ownership, BFFs for client-specific APIs, blue-green deployments for safer releases, and the strangler fig pattern for modernizing legacy systems gradually. The main tradeoff is that microservices increase distributed-system complexity, so I design around failure, latency, idempotency, observability, deployment safety, and clear ownership boundaries.</p>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>
+

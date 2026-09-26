@@ -1,0 +1,1495 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spring WebFlux | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Spring WebFlux</h2>
+        <p>WebFlux fundamentals, error handling, reactive architecture patterns, and reservation code examples.</p>
+      </header>
+
+<section id="spring-webflux-fundamentals">
+        <h2>Spring WebFlux Fundamentals</h2>
+        <p class="lead">Spring WebFlux is Spring's reactive web framework. It lets backend services handle HTTP requests using non-blocking I/O and reactive types such as <code>Mono</code> and <code>Flux</code>.</p>
+
+        <h3>What Spring WebFlux Is</h3>
+        <p>Spring WebFlux is an alternative to Spring MVC for building web APIs. Instead of tying one request to one blocking thread, WebFlux is designed around asynchronous, non-blocking request handling. Controller methods can return <code>Mono&lt;T&gt;</code> for one result or <code>Flux&lt;T&gt;</code> for many results.</p>
+        <pre><code>@RestController
+@RequestMapping("/api/reservations")
+public class ReservationWebFluxController {
+    private final ReservationService reservationService;
+
+    public ReservationWebFluxController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
+
+    @GetMapping("/{id}")
+    public Mono&lt;ReservationResponse&gt; getReservation(@PathVariable String id) {
+        return reservationService.findById(id);
+    }
+}</code></pre>
+        <p>Real-life analogy: Spring MVC is like assigning one crew member to one guest until the entire request is finished. WebFlux is like a small coordination team that starts work, waits for async responses, and keeps helping other guests instead of standing still.</p>
+
+        <h3>Spring MVC vs Spring WebFlux</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Topic</th>
+              <th>Spring MVC</th>
+              <th>Spring WebFlux</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Execution model</td>
+              <td>Servlet-based, usually one request per thread while work is active</td>
+              <td>Reactive, event-loop based, non-blocking request handling</td>
+            </tr>
+            <tr>
+              <td>Return types</td>
+              <td>Objects, <code>ResponseEntity</code>, <code>Callable</code>, async wrappers</td>
+              <td><code>Mono</code>, <code>Flux</code>, reactive <code>ResponseEntity</code></td>
+            </tr>
+            <tr>
+              <td>Common server</td>
+              <td>Tomcat, Jetty, Undertow</td>
+              <td>Netty by default in many Spring Boot WebFlux apps</td>
+            </tr>
+            <tr>
+              <td>Best fit</td>
+              <td>Traditional CRUD APIs, blocking stacks, servlet ecosystem</td>
+              <td>High-concurrency I/O, streaming, non-blocking clients and databases</td>
+            </tr>
+            <tr>
+              <td>Blocking tolerance</td>
+              <td>Blocking is expected, within thread-pool limits</td>
+              <td>Blocking event-loop threads is dangerous</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Spring MVC is not obsolete. It is still an excellent choice for many backend APIs, especially when the application uses blocking libraries such as JDBC. WebFlux is most valuable when the stack is non-blocking end to end or when streaming/high concurrency is central to the service.</p>
+
+        <h3>WebFlux Execution Model</h3>
+        <p>WebFlux does not create one thread per request. Instead, it uses a small number of event-loop threads. Each request builds a reactive pipeline, and threads are released while waiting for I/O.</p>
+        <pre><code>// Spring MVC mental model:
+Request -> Thread -> Block -> Response
+
+// Spring WebFlux mental model:
+Request -> Event loop -> Reactive pipeline -> Callback -> Response</code></pre>
+        <p>The key difference is what happens while the application waits for a database, payment provider, or another service. In a blocking model, the thread waits. In WebFlux, the event loop can keep handling other work while the asynchronous operation completes.</p>
+
+        <h3>Netty and the Event Loop</h3>
+        <p>Many WebFlux applications run on Reactor Netty by default. Netty uses a small number of event-loop threads, non-blocking sockets, and asynchronous callbacks to handle many connections. These threads are designed to stay free and react to events quickly: request received, bytes read, response ready, connection writable.</p>
+        <pre><code>Client request
+  -> Netty event loop receives request
+  -> WebFlux invokes controller
+  -> Controller returns Mono or Flux
+  -> Non-blocking work continues
+  -> Netty writes response when data is ready</code></pre>
+        <p><strong>Never block Netty event-loop threads.</strong> If one event-loop thread is blocked, every request depending on that thread can be delayed.</p>
+        <p>Event-loop threads are like a cruise operations desk with a few coordinators handling many radio calls. They should delegate slow work and keep moving. If one coordinator goes to physically search every cabin, the radio desk stops responding.</p>
+
+        <h3>Why Blocking Is Dangerous in WebFlux</h3>
+        <p>Blocking means a thread waits and does nothing useful. In WebFlux, blocking an event-loop thread can hurt many requests because those threads are few and shared.</p>
+        <pre><code>@GetMapping("/bad")
+public Mono&lt;String&gt; bad() {
+    return Mono.just(blockingDbCall()); // blocks event loop
+}</code></pre>
+        <p>This blocks the Netty thread, prevents other requests from being handled efficiently, and kills scalability under load.</p>
+        <pre><code>// Dangerous in WebFlux request handling:
+public Mono&lt;ReservationResponse&gt; getReservation(String id) {
+    Reservation reservation = blockingRepository.findById(id);
+    return Mono.just(mapper.toResponse(reservation));
+}</code></pre>
+        <p>This blocks before the <code>Mono</code> is even returned. Under load, this can cause thread starvation, latency spikes, timeouts, and a service that appears frozen.</p>
+        <pre><code>@GetMapping("/good")
+public Mono&lt;String&gt; good() {
+    return Mono.fromCallable(this::blockingDbCall)
+            .subscribeOn(Schedulers.boundedElastic());
+}</code></pre>
+        <p>This keeps the event loop free, isolates blocking work, and allows the system to scale more safely.</p>
+        <pre><code>// Safer if the blocking call cannot be replaced yet:
+public Mono&lt;ReservationResponse&gt; getReservation(String id) {
+    return Mono.fromCallable(() -> blockingRepository.findById(id))
+            .subscribeOn(Schedulers.boundedElastic())
+            .map(mapper::toResponse);
+}</code></pre>
+        <p>The better long-term option is to use non-blocking libraries when possible, such as WebClient for HTTP and reactive database drivers like R2DBC or reactive MongoDB.</p>
+
+        <h3>When to Use WebFlux</h3>
+        <p>WebFlux does not automatically mean faster raw execution. It is mainly about scalability and resource efficiency for I/O-heavy systems.</p>
+        <ul>
+          <li>Use WebFlux when the service makes many non-blocking remote calls and needs high concurrency.</li>
+          <li>Use WebFlux for streaming responses, server-sent events, WebSocket-style flows, and event-heavy systems.</li>
+          <li>Use WebFlux when the database/client stack is reactive end to end.</li>
+          <li>Use WebFlux when backpressure-aware processing matters.</li>
+          <li>Use WebFlux for microservices that spend significant time waiting on other services.</li>
+          <li>Do not choose WebFlux only because it sounds newer. If most dependencies are blocking, Spring MVC may be simpler and more appropriate.</li>
+        </ul>
+        <p class="answer">Do not use WebFlux when the application is mostly blocking, CPU-bound, or simple CRUD with low concurrency. In those cases, Spring MVC is often simpler and more appropriate.</p>
+
+        <h3>Basic Reactive Controllers</h3>
+        <p>A WebFlux controller should return the reactive pipeline. It should not call <code>block()</code> or manually call <code>subscribe()</code> to force execution.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>GET One</h3>
+            <pre><code>@GetMapping("/{id}")
+public Mono&lt;ResponseEntity&lt;ReservationResponse&gt;&gt; getById(@PathVariable String id) {
+    return reservationService.findById(id)
+            .map(ResponseEntity::ok)
+            .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>GET Many</h3>
+            <pre><code>@GetMapping
+public Flux&lt;ReservationResponse&gt; getAll() {
+    return reservationService.findAll();
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>POST</h3>
+            <pre><code>@PostMapping
+public Mono&lt;ResponseEntity&lt;ReservationResponse&gt;&gt; create(
+        @Valid @RequestBody CreateReservationRequest request) {
+    return reservationService.create(request)
+            .map(response -> ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(response));
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>DELETE</h3>
+            <pre><code>@DeleteMapping("/{id}")
+public Mono&lt;ResponseEntity&lt;Void&gt;&gt; delete(@PathVariable String id) {
+    return reservationService.delete(id)
+            .thenReturn(ResponseEntity.noContent().build());
+}</code></pre>
+          </article>
+        </div>
+
+        <h3>Annotation-Based Controllers</h3>
+        <p>Annotation-based controllers are the most common WebFlux style. They look similar to Spring MVC controllers, but return <code>Mono</code> or <code>Flux</code>.</p>
+        <pre><code>@RestController
+class UserController {
+
+    @GetMapping("/users/{id}")
+    public Mono&lt;User&gt; getUser(@PathVariable String id) {
+        return userService.findById(id);
+    }
+
+    @GetMapping("/users")
+    public Flux&lt;User&gt; getUsers() {
+        return userService.findAll();
+    }
+}</code></pre>
+
+        <h3>Functional Routing</h3>
+        <p>Functional routing is an advanced WebFlux style where routes are defined as functions instead of controller annotations. It is less common in many enterprise codebases, but it is worth recognizing.</p>
+        <pre><code>RouterFunction&lt;ServerResponse&gt; routes =
+        route(GET("/users/{id}"),
+                request -> ServerResponse.ok()
+                        .body(
+                                userService.findById(request.pathVariable("id")),
+                                User.class
+                        )
+        );</code></pre>
+
+        <h3>Payment System Example</h3>
+        <p>This WebFlux endpoint authorizes a payment without blocking the request thread. The controller returns the pipeline, and Spring subscribes.</p>
+        <pre><code>@PostMapping("/reservations/{id}/payments")
+public Mono&lt;ResponseEntity&lt;PaymentResponse&gt;&gt; pay(
+        @PathVariable String id,
+        @Valid @RequestBody PaymentRequest request) {
+    return paymentService.authorize(id, request)
+            .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
+            .onErrorResume(ReservationNotFoundException.class, error ->
+                    Mono.just(ResponseEntity.notFound().build()));
+}</code></pre>
+        <p>The service can compose repository calls, payment-provider calls, validation, and saving without blocking.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This endpoint streams boarding pass previews as they are produced. A <code>Flux</code> is a good fit because there may be many reservations for one sailing.</p>
+        <pre><code>@GetMapping(value = "/sailings/{id}/boarding-passes",
+        produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public Flux&lt;BoardingPassPreview&gt; streamBoardingPasses(@PathVariable String id) {
+    return boardingService.previewBoardingPasses(id);
+}</code></pre>
+        <p>Instead of waiting to build one giant response, the service can emit items as they become available.</p>
+
+        <h3>Controller Rules</h3>
+        <ul>
+          <li>Return <code>Mono</code> or <code>Flux</code> from controllers.</li>
+          <li>Do not call <code>block()</code> in request-handling code.</li>
+          <li>Do not manually call <code>subscribe()</code> in controllers or services.</li>
+          <li>Use <code>map</code> for synchronous DTO transformations.</li>
+          <li>Use <code>flatMap</code> when calling another reactive operation.</li>
+          <li>Use <code>switchIfEmpty</code> for not-found cases.</li>
+          <li>Use <code>onErrorResume</code> for controlled fallback or response mapping.</li>
+        </ul>
+
+        <h3>Reference Answer</h3>
+        <p class="answer">Spring WebFlux is Spring's reactive web framework for building asynchronous, non-blocking APIs with Reactor types such as <code>Mono</code> and <code>Flux</code>. It differs from Spring MVC because WebFlux is event-loop based and designed for non-blocking I/O, often using Reactor Netty, while MVC commonly uses a servlet thread-per-request model. WebFlux is a good fit for high-concurrency I/O, streaming, WebSockets, and reactive end-to-end stacks. Blocking is dangerous because event-loop threads are few and shared, so blocking one thread can delay many requests. If blocking code cannot be avoided, isolate it with <code>Mono.fromCallable(...).subscribeOn(Schedulers.boundedElastic())</code>.</p>
+      </section>
+
+<section id="webflux-error-handling">
+        <h2>Error Handling in Spring WebFlux</h2>
+        <p class="lead">Core question: how do you turn reactive failures into consistent HTTP responses without breaking the non-blocking pipeline?</p>
+
+        <h3>Mental Model</h3>
+        <p>In WebFlux, an error is a Reactor signal. A controller does not usually throw an exception directly to the caller after doing all the work. Instead, the controller returns a <code>Mono</code> or <code>Flux</code>, and an error may appear later while the pipeline is running.</p>
+        <pre><code>Request
+  -> Controller returns Mono
+  -> Service calls repository or WebClient
+  -> Pipeline emits value, completes empty, or emits error
+  -> WebFlux writes HTTP response</code></pre>
+        <p>That means WebFlux error handling must respect the reactive lifecycle. You handle errors inside the pipeline with Reactor operators, at the controller layer with exception handlers, or globally with WebFlux infrastructure.</p>
+
+        <h3>Three Places Errors Are Handled</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Tool</th>
+              <th>Best Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pipeline</td>
+              <td><code>onErrorResume</code>, <code>onErrorMap</code>, <code>doOnError</code></td>
+              <td>Translate dependency failures, fallback safely, add logging, or convert low-level exceptions into domain exceptions.</td>
+            </tr>
+            <tr>
+              <td>Controller</td>
+              <td><code>ResponseEntity</code>, <code>switchIfEmpty</code>, local <code>@ExceptionHandler</code></td>
+              <td>Return endpoint-specific HTTP statuses such as 404, 201, 204, or validation responses.</td>
+            </tr>
+            <tr>
+              <td>Global API</td>
+              <td><code>@RestControllerAdvice</code> or <code>ErrorWebExceptionHandler</code></td>
+              <td>Centralize consistent JSON error responses, stable error codes, safe messages, and trace IDs.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Empty Is Not the Same as Error</h3>
+        <p>A common WebFlux mistake is treating <code>Mono.empty()</code> like an exception. Empty means the pipeline completed without a value. Error means the pipeline failed. They are different signals and should be mapped intentionally.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Empty Result</h3>
+            <pre><code>repository.findById(id)
+        .switchIfEmpty(Mono.error(
+                new ReservationNotFoundException(id)
+        ));</code></pre>
+            <p>Use <code>switchIfEmpty</code> when the repository returns no reservation and the API should respond with 404.</p>
+          </article>
+
+          <article class="card">
+            <h3>Error Result</h3>
+            <pre><code>paymentClient.authorize(request)
+        .onErrorMap(WebClientResponseException.class, error ->
+                new PaymentProviderException(
+                        "Payment provider failed",
+                        error
+                ));</code></pre>
+            <p>Use <code>onErrorMap</code> when the pipeline failed and you want to translate a technical exception into a domain exception.</p>
+          </article>
+        </div>
+
+        <h3>Local Controller Mapping</h3>
+        <p>For simple endpoints, the controller can map expected cases directly. This keeps the response behavior close to the endpoint, but too much error logic in controllers becomes repetitive.</p>
+        <pre><code>@GetMapping("/{id}")
+public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; getReservation(
+        @PathVariable String id) {
+
+    return reservationService.getReservation(id)
+            .map(ResponseEntity::ok)
+            .onErrorResume(ReservationNotFoundException.class, error ->
+                    Mono.just(ResponseEntity.notFound().build()));
+}</code></pre>
+        <p>This is acceptable for a small example. In larger APIs, prefer the service to emit domain exceptions and a global handler to convert those exceptions into consistent HTTP responses.</p>
+
+        <h3>Service-Level Error Translation</h3>
+        <p>The service layer should know business meaning. It is a good place to translate empty repository results and dependency failures into domain exceptions.</p>
+        <pre><code>@Service
+public class CruiseReservationService {
+    private final CruiseReservationRepository repository;
+    private final PaymentClient paymentClient;
+
+    public CruiseReservationService(
+            CruiseReservationRepository repository,
+            PaymentClient paymentClient) {
+        this.repository = repository;
+        this.paymentClient = paymentClient;
+    }
+
+    public Mono&lt;CruiseReservationResponse&gt; getReservation(String id) {
+        return repository.findById(id)
+                .switchIfEmpty(Mono.error(
+                        new ReservationNotFoundException(id)
+                ))
+                .map(this::toResponse);
+    }
+
+    public Mono&lt;CruiseReservationResponse&gt; confirmPayment(
+            String reservationId,
+            PaymentRequest request) {
+
+        return repository.findById(reservationId)
+                .switchIfEmpty(Mono.error(
+                        new ReservationNotFoundException(reservationId)
+                ))
+                .flatMap(reservation ->
+                        paymentClient.authorize(reservation, request)
+                                .thenReturn(reservation)
+                )
+                .map(reservation -&gt; reservation.withStatus("CONFIRMED"))
+                .flatMap(repository::save)
+                .map(this::toResponse)
+                .onErrorMap(WebClientResponseException.class, error ->
+                        new PaymentProviderException(
+                                "Payment provider unavailable",
+                                error
+                        ));
+    }
+}</code></pre>
+        <p>Notice the operator choices: <code>switchIfEmpty</code> handles no reservation, <code>flatMap</code> calls another reactive dependency, <code>map</code> transforms data synchronously, and <code>onErrorMap</code> translates low-level HTTP client failures.</p>
+
+        <h3>Global Error Response Shape</h3>
+        <p>Production APIs should return consistent error JSON. Clients should not have to parse different structures from every endpoint.</p>
+        <pre><code>public record ApiErrorResponse(
+        String code,
+        String message,
+        String path,
+        String traceId
+) {}</code></pre>
+        <p>A stable error shape helps frontend clients, QA tests, API documentation, logs, alerts, and production support.</p>
+
+        <h3>Global Handler with RestControllerAdvice</h3>
+        <p>WebFlux supports <code>@RestControllerAdvice</code>. Handler methods can return normal objects, <code>ResponseEntity</code>, <code>Mono&lt;T&gt;</code>, or <code>Mono&lt;ResponseEntity&lt;T&gt;&gt;</code>.</p>
+        <pre><code>@RestControllerAdvice
+public class ApiExceptionHandler {
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public Mono&lt;ResponseEntity&lt;ApiErrorResponse&gt;&gt; handleNotFound(
+            ReservationNotFoundException error,
+            ServerWebExchange exchange) {
+
+        ApiErrorResponse body = new ApiErrorResponse(
+                "RESERVATION_NOT_FOUND",
+                error.getMessage(),
+                exchange.getRequest().getPath().value(),
+                traceId(exchange)
+        );
+
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(body));
+    }
+
+    @ExceptionHandler(PaymentProviderException.class)
+    public Mono&lt;ResponseEntity&lt;ApiErrorResponse&gt;&gt; handlePaymentProvider(
+            PaymentProviderException error,
+            ServerWebExchange exchange) {
+
+        ApiErrorResponse body = new ApiErrorResponse(
+                "PAYMENT_PROVIDER_UNAVAILABLE",
+                "Payment is temporarily unavailable",
+                exchange.getRequest().getPath().value(),
+                traceId(exchange)
+        );
+
+        return Mono.just(ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body));
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public Mono&lt;ResponseEntity&lt;ApiErrorResponse&gt;&gt; handleUnexpected(
+            Throwable error,
+            ServerWebExchange exchange) {
+
+        ApiErrorResponse body = new ApiErrorResponse(
+                "INTERNAL_ERROR",
+                "Unexpected server error",
+                exchange.getRequest().getPath().value(),
+                traceId(exchange)
+        );
+
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(body));
+    }
+
+    private String traceId(ServerWebExchange exchange) {
+        return exchange.getRequest()
+                .getHeaders()
+                .getFirst("X-Correlation-Id");
+    }
+}</code></pre>
+        <p>The global handler keeps controllers clean and avoids leaking internal details. The response can include a safe message and a trace or correlation ID that lets support engineers connect the client error to logs and traces.</p>
+
+        <h3>Validation Errors</h3>
+        <p>When a WebFlux controller uses <code>@Valid @RequestBody</code>, invalid input may result in <code>WebExchangeBindException</code>. Handle it globally so validation errors use the same API response style.</p>
+        <pre><code>@ExceptionHandler(WebExchangeBindException.class)
+public Mono&lt;ResponseEntity&lt;ApiErrorResponse&gt;&gt; handleValidation(
+        WebExchangeBindException error,
+        ServerWebExchange exchange) {
+
+    String message = error.getFieldErrors().stream()
+            .map(field -&gt; field.getField() + ": " + field.getDefaultMessage())
+            .findFirst()
+            .orElse("Request validation failed");
+
+    ApiErrorResponse body = new ApiErrorResponse(
+            "VALIDATION_FAILED",
+            message,
+            exchange.getRequest().getPath().value(),
+            traceId(exchange)
+    );
+
+    return Mono.just(ResponseEntity.badRequest().body(body));
+}</code></pre>
+        <p>For real APIs, you might return a list of field errors instead of only the first one. The important point is that validation failures are expected client errors, not server failures.</p>
+
+        <h3>WebClient Error Handling</h3>
+        <p><code>WebClient</code> is the common non-blocking HTTP client in WebFlux. It does not automatically know your business meaning, so translate dependency responses deliberately.</p>
+        <pre><code>public Mono&lt;PaymentAuthorization&gt; authorizePayment(
+        PaymentAuthorizationRequest request) {
+
+    return webClient.post()
+            .uri("/payments/authorizations")
+            .bodyValue(request)
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, response ->
+                    response.bodyToMono(String.class)
+                            .defaultIfEmpty("Payment request rejected")
+                            .map(PaymentRejectedException::new)
+            )
+            .onStatus(HttpStatusCode::is5xxServerError, response ->
+                    Mono.error(new PaymentProviderException(
+                            "Payment provider returned server error"
+                    ))
+            )
+            .bodyToMono(PaymentAuthorization.class)
+            .timeout(Duration.ofSeconds(2))
+            .retryWhen(Retry.backoff(2, Duration.ofMillis(200))
+                    .filter(this::isTransientFailure))
+            .onErrorMap(TimeoutException.class, error ->
+                    new PaymentProviderException(
+                            "Payment provider timed out",
+                            error
+                    ));
+}</code></pre>
+        <p>The sequence matters. First map HTTP statuses from the provider, then decode the body, then apply timeout and retry policy. Retries should be limited to transient failures and only used when the operation is safe to retry.</p>
+
+        <h3>doOnError Is Not Recovery</h3>
+        <p><code>doOnError</code> is for side effects such as logging or metrics. It does not recover the pipeline. The error still continues downstream.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Logging Only</h3>
+            <pre><code>return reservationService.getReservation(id)
+        .doOnError(error ->
+                log.warn("Reservation lookup failed: {}", id, error)
+        );</code></pre>
+            <p>The caller still receives the error because <code>doOnError</code> only observes the signal.</p>
+          </article>
+
+          <article class="card">
+            <h3>Actual Recovery</h3>
+            <pre><code>return reservationService.getReservation(id)
+        .onErrorResume(ReservationNotFoundException.class, error ->
+                Mono.just(defaultReservationResponse(id))
+        );</code></pre>
+            <p>This changes the outcome by replacing the error with another publisher.</p>
+          </article>
+        </div>
+
+        <h3>onErrorReturn vs onErrorResume vs onErrorMap</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Meaning</th>
+              <th>Example Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>onErrorReturn</code></td>
+              <td>Replace an error with a fixed value.</td>
+              <td>Return a static fallback flag or default display value.</td>
+            </tr>
+            <tr>
+              <td><code>onErrorResume</code></td>
+              <td>Replace an error with another reactive publisher.</td>
+              <td>Fallback to cache, return controlled response, or call a backup service.</td>
+            </tr>
+            <tr>
+              <td><code>onErrorMap</code></td>
+              <td>Convert one exception type into another exception type.</td>
+              <td>Translate <code>WebClientResponseException</code> into <code>PaymentProviderException</code>.</td>
+            </tr>
+            <tr>
+              <td><code>doOnError</code></td>
+              <td>Observe the error without changing it.</td>
+              <td>Log, increment a metric, or add diagnostic information.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Calling <code>block()</code> inside an error handler.</li>
+          <li>Using <code>doOnError</code> and expecting it to recover.</li>
+          <li>Returning a successful fallback for a payment or booking failure when the business action did not really complete.</li>
+          <li>Mapping every exception to HTTP 500 instead of separating validation, not found, conflict, dependency, and unexpected failures.</li>
+          <li>Leaking stack traces, SQL messages, hostnames, tokens, or provider response bodies to clients.</li>
+          <li>Retrying non-idempotent operations without an idempotency key.</li>
+          <li>Forgetting that errors inside <code>Flux</code> streams usually terminate the stream unless handled per item.</li>
+        </ul>
+
+        <h3>Flux Item-Level Error Handling</h3>
+        <p>In a <code>Flux</code>, one item can fail and terminate the whole stream if the error is not isolated. If the business rule allows skipping bad items, handle the error inside the per-item operation.</p>
+        <pre><code>public Flux&lt;BoardingPassPreview&gt; previewBoardingPasses(String sailingId) {
+    return reservationRepository.findBySailingId(sailingId)
+            .flatMap(reservation ->
+                    boardingPassClient.preview(reservation)
+                            .onErrorResume(error -> {
+                                log.warn(
+                                        "Skipping boarding pass preview for reservation {}",
+                                        reservation.id(),
+                                        error
+                                );
+                                return Mono.empty();
+                            })
+            );
+}</code></pre>
+        <p>This design says one failed preview should not stop every other reservation from being streamed. That is a business decision. For payments or state changes, silently skipping failures may be unsafe.</p>
+
+        <h3>Disney Cruise Reservation Example</h3>
+        <p>This example combines common WebFlux error handling decisions: 404 for a missing reservation, 400 for validation, 502 for payment provider failure, and 500 for unexpected failures.</p>
+        <pre><code>POST /api/reservations/{reservationId}/payments
+
+Possible outcomes:
+201 CREATED
+  Payment authorized and reservation confirmed.
+
+400 BAD REQUEST
+  Request body failed validation.
+
+404 NOT FOUND
+  Reservation id does not exist.
+
+409 CONFLICT
+  Reservation is already cancelled or already paid.
+
+502 BAD GATEWAY
+  Payment provider failed or timed out.
+
+500 INTERNAL SERVER ERROR
+  Unexpected service failure.</code></pre>
+        <p>The senior-level goal is not just catching exceptions. The goal is giving clients correct status codes, preserving business truth, keeping internal details private, and making failures easy to investigate in production.</p>
+
+        <h3>Testing WebFlux Errors</h3>
+        <p>Use <code>StepVerifier</code> for service pipelines and <code>WebTestClient</code> for HTTP behavior.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Service Error Test</h3>
+            <pre><code>@Test
+void getReservationShouldFailWhenMissing() {
+    when(repository.findById("missing-id"))
+            .thenReturn(Mono.empty());
+
+    StepVerifier.create(service.getReservation("missing-id"))
+            .expectErrorSatisfies(error -&gt; {
+                assertThat(error)
+                        .isInstanceOf(ReservationNotFoundException.class);
+                assertThat(error.getMessage())
+                        .isEqualTo("Reservation not found: missing-id");
+            })
+            .verify();
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>HTTP Error Test</h3>
+            <pre><code>@Test
+void getReservationShouldReturn404() {
+    when(service.getReservation("missing-id"))
+            .thenReturn(Mono.error(
+                    new ReservationNotFoundException("missing-id")
+            ));
+
+    webTestClient.get()
+            .uri("/api/reservations/missing-id")
+            .exchange()
+            .expectStatus().isNotFound()
+            .expectBody()
+            .jsonPath("$.code").isEqualTo("RESERVATION_NOT_FOUND")
+            .jsonPath("$.message")
+            .isEqualTo("Reservation not found: missing-id");
+}</code></pre>
+          </article>
+        </div>
+
+        <h3>Interview Reference Answer</h3>
+        <p class="answer">In Spring WebFlux, errors are Reactor signals, so I handle them without blocking and without manually subscribing. I use <code>switchIfEmpty</code> for empty results such as not found, <code>onErrorMap</code> to translate low-level dependency exceptions into domain exceptions, <code>onErrorResume</code> only when a real fallback or controlled response is correct, and <code>doOnError</code> for logging or metrics. For API consistency, I centralize response mapping with <code>@RestControllerAdvice</code> or a global WebFlux error handler, returning stable JSON with an error code, safe message, path, and trace ID. I separate validation errors, not-found errors, conflicts, dependency failures, and unexpected failures into appropriate HTTP statuses. For <code>WebClient</code>, I map provider 4xx and 5xx responses deliberately, configure timeouts, and retry only transient and safe operations.</p>
+      </section>
+
+<section id="reactive-architecture-patterns">
+        <h2>Reactive Architecture Patterns</h2>
+        <p class="lead">Core question: how do you design a WebFlux service so the whole request flow remains non-blocking, composable, observable, and reliable under load?</p>
+
+        <h3>Mental Model</h3>
+        <p>Reactive architecture is not just returning <code>Mono</code> from a controller. It means the request, service logic, database calls, HTTP clients, messaging, error handling, and tests are designed as a pipeline. Each step describes what should happen when data arrives, when no data exists, or when a failure occurs.</p>
+        <pre><code>HTTP request
+  -> validate input
+  -> load current state
+  -> call non-blocking dependencies
+  -> save result
+  -> publish event
+  -> return response
+
+Each step returns Mono or Flux.
+No step blocks the event loop.</code></pre>
+
+        <h3>Pattern 1: Thin Reactive Controller</h3>
+        <p>The controller should be boring. It accepts HTTP input, delegates to the service, and returns the reactive publisher. It should not call <code>block()</code>, call <code>subscribe()</code>, or hide business rules inside HTTP code.</p>
+        <pre><code>@RestController
+@RequestMapping("/api/reservations")
+public class CruiseReservationController {
+    private final CruiseReservationService service;
+
+    public CruiseReservationController(CruiseReservationService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; create(
+            @Valid @RequestBody CruiseReservationRequest request) {
+
+        return service.createReservation(request)
+                .map(response -&gt; ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(response));
+    }
+}</code></pre>
+        <p>The controller does not control execution. Spring WebFlux subscribes to the returned <code>Mono</code> and writes the HTTP response when the pipeline completes.</p>
+
+        <h3>Pattern 2: Service Pipeline as Business Workflow</h3>
+        <p>The service composes business steps. Use <code>map</code> for synchronous transformation and <code>flatMap</code> when the next step returns another <code>Mono</code> or <code>Flux</code>.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createReservation(
+        CruiseReservationRequest request) {
+
+    return validateSailingIsOpen(request)
+            .then(checkDuplicateReservation(request))
+            .then(authorizePayment(request))
+            .flatMap(payment -&gt; repository.save(toEntity(request, payment)))
+            .flatMap(saved -&gt; eventPublisher.publishReservationCreated(saved)
+                    .thenReturn(saved))
+            .map(this::toResponse);
+}</code></pre>
+        <p>This reads like a workflow, but every step stays asynchronous. The key architectural discipline is that helper methods also return reactive types instead of doing hidden blocking work.</p>
+
+        <h3>Pattern 3: Sequential Composition</h3>
+        <p>Use sequential composition when one step depends on the result of a previous step. For example, a payment authorization needs the reservation amount, and saving the reservation needs the payment result.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; confirmReservation(String id) {
+    return repository.findById(id)
+            .switchIfEmpty(Mono.error(new ReservationNotFoundException(id)))
+            .flatMap(reservation -&gt;
+                    pricingClient.price(reservation)
+                            .flatMap(price -&gt;
+                                    paymentClient.authorize(reservation, price)
+                            )
+                            .map(payment -&gt;
+                                    reservation.confirm(payment.authorizationId())
+                            )
+            )
+            .flatMap(repository::save)
+            .map(this::toResponse);
+}</code></pre>
+        <p>The nested shape is sometimes acceptable, but if it gets too deep, extract methods with meaningful names.</p>
+
+        <h3>Cleaner Sequential Composition</h3>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; confirmReservation(String id) {
+    return findReservation(id)
+            .flatMap(this::priceReservation)
+            .flatMap(this::authorizePayment)
+            .flatMap(this::saveConfirmedReservation)
+            .map(this::toResponse);
+}</code></pre>
+        <p>This version is easier to read because each method represents one business step. The important rule is that each method must preserve the reactive chain.</p>
+
+        <h3>Pattern 4: Fan-Out and Fan-In</h3>
+        <p>Reactive services often need to call multiple independent services and combine the results. Use <code>Mono.zip</code> when calls can run at the same time and all results are required.</p>
+        <pre><code>public Mono&lt;ReservationDetailsResponse&gt; getReservationDetails(String id) {
+    Mono&lt;CruiseReservation&gt; reservation = findReservation(id);
+    Mono&lt;GuestProfile&gt; guest = guestClient.findByReservationId(id);
+    Mono&lt;Itinerary&gt; itinerary = itineraryClient.findByReservationId(id);
+    Mono&lt;PaymentSummary&gt; payment = paymentClient.findSummary(id);
+
+    return Mono.zip(reservation, guest, itinerary, payment)
+            .map(tuple -&gt; new ReservationDetailsResponse(
+                    tuple.getT1().id(),
+                    tuple.getT2().fullName(),
+                    tuple.getT3().shipCode(),
+                    tuple.getT4().status()
+            ));
+}</code></pre>
+        <p>This pattern reduces latency when independent calls would otherwise happen one after another. The tradeoff is dependency pressure: under high traffic, fan-out multiplies downstream calls.</p>
+
+        <h3>Fan-Out Risk</h3>
+        <div class="callout warning">
+          <p><strong>Production risk:</strong> if one request calls four services, then 500 incoming requests can become 2,000 downstream calls. Reactive code makes concurrency easier, but it does not remove the need for timeouts, rate limits, bulkheads, retries, and circuit breakers.</p>
+        </div>
+
+        <h3>Pattern 5: Controlled Concurrency with Flux</h3>
+        <p>Use <code>flatMap</code> with a concurrency limit when processing many items. This protects downstream systems from being flooded.</p>
+        <pre><code>public Flux&lt;BoardingPassPreview&gt; previewBoardingPasses(String sailingId) {
+    return reservationRepository.findBySailingId(sailingId)
+            .flatMap(
+                    reservation -&gt; boardingPassClient.preview(reservation),
+                    20
+            );
+}</code></pre>
+        <p>The number <code>20</code> means at most twenty boarding pass preview calls are in flight at once. Without a limit, a large sailing could create too many concurrent dependency calls.</p>
+
+        <h3>flatMap vs concatMap</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Behavior</th>
+              <th>Use When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>flatMap</code></td>
+              <td>Runs inner publishers concurrently and may emit results out of order.</td>
+              <td>You want throughput and order does not matter.</td>
+            </tr>
+            <tr>
+              <td><code>flatMap(..., concurrency)</code></td>
+              <td>Runs concurrently with a maximum number of in-flight operations.</td>
+              <td>You need throughput but must protect downstream systems.</td>
+            </tr>
+            <tr>
+              <td><code>concatMap</code></td>
+              <td>Runs one inner publisher at a time and preserves order.</td>
+              <td>Order matters or side effects must happen sequentially.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Pattern 6: Reactive Gateway/Aggregator</h3>
+        <p>A common WebFlux use case is an aggregator API. The service calls several backend APIs and returns one response to the client.</p>
+        <pre><code>@GetMapping("/{id}/summary")
+public Mono&lt;ReservationSummary&gt; getSummary(@PathVariable String id) {
+    return summaryService.getReservationSummary(id);
+}</code></pre>
+        <pre><code>public Mono&lt;ReservationSummary&gt; getReservationSummary(String id) {
+    return Mono.zip(
+            reservationClient.getReservation(id),
+            guestClient.getGuestForReservation(id),
+            itineraryClient.getItinerary(id)
+    ).map(tuple -&gt; ReservationSummary.from(
+            tuple.getT1(),
+            tuple.getT2(),
+            tuple.getT3()
+    ));
+}</code></pre>
+        <p>This is a strong fit for WebFlux because the service spends most of its time waiting on remote I/O. The event-loop threads stay free while those requests are in progress.</p>
+
+        <h3>Pattern 7: Fallback to Cache</h3>
+        <p>A fallback is only safe when the response still tells the truth. For read-only summary data, falling back to a cached version may be acceptable. For payment, booking, or inventory state, fake success is dangerous.</p>
+        <pre><code>public Mono&lt;ReservationSummary&gt; getSummary(String id) {
+    return liveSummaryClient.getSummary(id)
+            .timeout(Duration.ofSeconds(2))
+            .onErrorResume(TimeoutException.class, error -&gt;
+                    cachedSummaryRepository.findByReservationId(id)
+            );
+}</code></pre>
+        <p>This says: try live data first, but if the live dependency times out, return a cached summary if one exists. The API should make stale data visible if that matters to the client.</p>
+
+        <h3>Pattern 8: Outbox with Reactive Persistence</h3>
+        <p>When a service saves state and publishes an event, it must avoid saving one without the other. The outbox pattern records the business change and an event record together, then a separate publisher sends the event.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createReservation(
+        CruiseReservationRequest request) {
+
+    CruiseReservationEntity reservation = toEntity(request);
+    OutboxEvent event = OutboxEvent.reservationCreated(reservation);
+
+    return transactionalOperator.transactional(
+            repository.save(reservation)
+                    .then(outboxRepository.save(event))
+                    .thenReturn(reservation)
+    )
+    .map(this::toResponse);
+}</code></pre>
+        <p>The exact transaction support depends on the database and driver. The architectural idea is stable: persist the state change and event intent together, then publish from the outbox with retry and idempotency.</p>
+
+        <h3>Pattern 9: Reactive Event Publisher</h3>
+        <p>Event publishing should also be part of the pipeline. Avoid manual <code>subscribe()</code> because it hides failures from the request flow and makes tests harder.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Bad</h3>
+            <pre><code>repository.save(reservation)
+        .doOnNext(saved -&gt;
+                eventPublisher.publish(saved).subscribe()
+        )
+        .map(this::toResponse);</code></pre>
+            <p>The publish failure is detached from the main pipeline and may be missed.</p>
+          </article>
+
+          <article class="card">
+            <h3>Better</h3>
+            <pre><code>repository.save(reservation)
+        .flatMap(saved -&gt;
+                eventPublisher.publish(saved)
+                        .thenReturn(saved)
+        )
+        .map(this::toResponse);</code></pre>
+            <p>The publish operation is part of the pipeline, so errors, retries, and tests can observe it.</p>
+          </article>
+        </div>
+
+        <h3>Pattern 10: Idempotent Reactive Command</h3>
+        <p>Retries happen in distributed systems. A reactive API still needs idempotency for operations that create side effects.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createReservation(
+        String idempotencyKey,
+        CruiseReservationRequest request) {
+
+    return idempotencyRepository.findByKey(idempotencyKey)
+            .flatMap(existing -&gt;
+                    repository.findById(existing.resourceId())
+            )
+            .switchIfEmpty(
+                    createNewReservation(idempotencyKey, request)
+            )
+            .map(this::toResponse);
+}</code></pre>
+        <p>This prevents duplicate reservations if the client retries after a timeout. In real systems, use conditional writes or unique constraints so two concurrent requests with the same key cannot both create records.</p>
+
+        <h3>Pattern 11: Boundary for Blocking Code</h3>
+        <p>If a legacy library is blocking, isolate it at the boundary and make that decision obvious. Do not let blocking calls hide inside methods that look reactive.</p>
+        <pre><code>public Mono&lt;LegacyCabinQuote&gt; quoteCabin(CabinQuoteRequest request) {
+    return Mono.fromCallable(() -&gt; legacyCabinClient.quote(request))
+            .subscribeOn(Schedulers.boundedElastic())
+            .timeout(Duration.ofSeconds(3));
+}</code></pre>
+        <p>This is a bridge pattern, not the ideal end state. The long-term goal is to replace blocking dependencies with non-blocking clients where practical.</p>
+
+        <h3>Pattern 12: Context Propagation</h3>
+        <p>Reactive code may move across threads. Do not rely only on <code>ThreadLocal</code> for request metadata. Reactor <code>Context</code> can carry values such as correlation IDs through the pipeline.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; getReservation(String id) {
+    return Mono.deferContextual(context -&gt; {
+        String correlationId = context.getOrDefault(
+                "correlationId",
+                "missing"
+        );
+
+        return repository.findById(id)
+                .doOnEach(signal -&gt;
+                        log.debug("correlationId={}", correlationId)
+                )
+                .switchIfEmpty(Mono.error(
+                        new ReservationNotFoundException(id)
+                ))
+                .map(this::toResponse);
+    });
+}</code></pre>
+        <p>In Spring applications, tracing libraries often manage this for you, but it is important to understand why context propagation matters in reactive systems.</p>
+
+        <h3>Architecture Decision Checklist</h3>
+        <ul>
+          <li>Are all major dependencies non-blocking, or are blocking calls isolated with <code>boundedElastic</code>?</li>
+          <li>Does each service method return a <code>Mono</code> or <code>Flux</code> instead of subscribing internally?</li>
+          <li>Are timeouts set for remote calls?</li>
+          <li>Are retries limited, delayed, and restricted to safe transient failures?</li>
+          <li>Is fan-out concurrency controlled?</li>
+          <li>Are errors translated into domain exceptions and stable API responses?</li>
+          <li>Are write operations idempotent?</li>
+          <li>Are correlation IDs, logs, metrics, and traces preserved across the pipeline?</li>
+          <li>Are tests using <code>StepVerifier</code> and <code>WebTestClient</code> instead of blocking the service code?</li>
+        </ul>
+
+        <h3>End-to-End Disney Cruise Example</h3>
+        <p>This flow creates a reservation, authorizes payment, saves state, writes an outbox event, and returns a response without blocking the WebFlux event loop.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; bookCruise(
+        String idempotencyKey,
+        CruiseReservationRequest request) {
+
+    return idempotencyRepository.findByKey(idempotencyKey)
+            .flatMap(existing -&gt;
+                    reservationRepository.findById(existing.resourceId())
+            )
+            .switchIfEmpty(
+                    validateRequest(request)
+                            .then(cabinClient.holdCabin(request))
+                            .flatMap(hold -&gt;
+                                    paymentClient.authorize(request, hold)
+                                            .map(payment -&gt;
+                                                    toReservation(request, hold, payment)
+                                            )
+                            )
+                            .flatMap(reservation -&gt;
+                                    transactionalOperator.transactional(
+                                            reservationRepository.save(reservation)
+                                                    .flatMap(saved -&gt;
+                                                            outboxRepository.save(
+                                                                    OutboxEvent.reservationCreated(saved)
+                                                            )
+                                                            .then(idempotencyRepository.save(
+                                                                    idempotencyKey,
+                                                                    saved.id()
+                                                            ))
+                                                            .thenReturn(saved)
+                                                    )
+                                    )
+                            )
+            )
+            .map(this::toResponse)
+            .timeout(Duration.ofSeconds(5))
+            .onErrorMap(WebClientResponseException.class, error -&gt;
+                    new DependencyFailureException(
+                            "Reservation dependency failed",
+                            error
+                    ));
+}</code></pre>
+        <p>This example shows the main reactive architecture idea: compose the business workflow as one pipeline, keep side effects visible, preserve correctness with idempotency and transaction boundaries, and translate dependency failures intentionally.</p>
+
+        <h3>Testing the Architecture</h3>
+        <p>A good test proves the pipeline behavior, not just that methods were called. Use <code>StepVerifier</code> to assert success, errors, and completion.</p>
+        <pre><code>@Test
+void bookCruiseShouldReturnExistingReservationForDuplicateKey() {
+    when(idempotencyRepository.findByKey("key-123"))
+            .thenReturn(Mono.just(new IdempotencyRecord(
+                    "key-123",
+                    "res-123"
+            )));
+    when(reservationRepository.findById("res-123"))
+            .thenReturn(Mono.just(existingReservation));
+
+    StepVerifier.create(service.bookCruise("key-123", request))
+            .assertNext(response -&gt;
+                    assertThat(response.id()).isEqualTo("res-123")
+            )
+            .verifyComplete();
+
+    verifyNoInteractions(cabinClient);
+    verifyNoInteractions(paymentClient);
+}</code></pre>
+        <p>The duplicate-key path should not hold another cabin or authorize another payment. That is the kind of behavior a senior engineer protects with tests.</p>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Returning <code>Mono</code> from the controller while the service secretly blocks.</li>
+          <li>Calling <code>subscribe()</code> inside services to publish events or run side effects.</li>
+          <li>Using unlimited <code>flatMap</code> against a slow dependency.</li>
+          <li>Assuming reactive code automatically improves performance without measuring bottlenecks.</li>
+          <li>Adding retries without idempotency, backoff, jitter, or timeout boundaries.</li>
+          <li>Using stale fallback data for operations that require strong correctness.</li>
+          <li>Losing correlation IDs when execution moves across threads.</li>
+        </ul>
+
+        <h3>Interview Reference Answer</h3>
+        <p class="answer">A reactive architecture is more than returning <code>Mono</code> or <code>Flux</code> from controllers. I design the full request path as a non-blocking pipeline: thin controllers, service methods that compose business steps, reactive repositories and WebClient calls, explicit timeout and retry policies, controlled concurrency for <code>Flux</code> processing, and centralized error translation. For independent remote calls, I may use <code>Mono.zip</code> to fan out and combine results, but I watch downstream pressure because concurrency can multiply quickly. For write operations, I design idempotency and transactional boundaries carefully, often using conditional writes or an outbox pattern. I avoid hidden <code>block()</code> and internal <code>subscribe()</code>, preserve correlation IDs, and test pipelines with <code>StepVerifier</code> and APIs with <code>WebTestClient</code>.</p>
+      </section>
+
+<section id="reactive-reservation-code">
+        <h2>Reactive Reservation Coding Example</h2>
+        <p class="lead">Current Disney Cruise reservation slice: WebFlux controller, reactive service, MongoDB reactive repository, DTO validation, domain error, and Reactor unit tests.</p>
+
+        <div class="qa">
+          <article class="card">
+            <h3>Current API Behavior</h3>
+            <ul>
+              <li><code>POST /api/v1/reservations</code> creates a reservation with status <code>PENDING</code>.</li>
+              <li><code>GET /api/v1/reservations/{id}</code> returns an existing reservation.</li>
+              <li>Missing reservations are converted from <code>Mono.empty()</code> into <code>ReservationNotFoundException</code>.</li>
+              <li>The service returns <code>Mono&lt;CruiseReservationResponse&gt;</code> and never calls <code>block()</code> or <code>subscribe()</code>.</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationController.java</h3>
+            <pre><code>package com.disney.app.disneycruise.controller;
+
+import com.disney.app.disneycruise.dto.CruiseReservationRequest;
+import com.disney.app.disneycruise.dto.CruiseReservationResponse;
+import com.disney.app.disneycruise.service.CruiseReservationService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping(&quot;/api/v1/reservations&quot;)
+public class CruiseReservationController {
+
+    private final CruiseReservationService service;
+
+    public CruiseReservationController(CruiseReservationService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; createReservation(
+            @Valid @RequestBody CruiseReservationRequest request
+    ) {
+        URI location = URI.create(&quot;/api/v1/reservations&quot;);
+        return service.createReservation(request)
+                .map(response -&gt; ResponseEntity.created(location).body(response));
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; getReservation(
+            @PathVariable String id
+    ) {
+        return service.getReservation(id)
+                .map(ResponseEntity::ok);
+    }
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationService.java</h3>
+            <pre><code>package com.disney.app.disneycruise.service;
+
+import com.disney.app.disneycruise.dto.CruiseReservationRequest;
+import com.disney.app.disneycruise.dto.CruiseReservationResponse;
+import com.disney.app.disneycruise.entity.CruiseReservationEntity;
+import com.disney.app.disneycruise.error.ReservationNotFoundException;
+import com.disney.app.disneycruise.repository.CruiseReservationRepository;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+
+@Service
+public class CruiseReservationService {
+
+    private final CruiseReservationRepository repository;
+
+    public CruiseReservationService(CruiseReservationRepository repository) {
+        this.repository = repository;
+    }
+
+    public Mono&lt;CruiseReservationResponse&gt; createReservation(
+            CruiseReservationRequest request
+    ) {
+        CruiseReservationEntity entity = new CruiseReservationEntity(
+                null,
+                request.guestId(),
+                request.shipCode(),
+                request.sailingDate(),
+                request.stateroomType(),
+                request.numberOfGuests(),
+                &quot;PENDING&quot;
+        );
+
+        return repository.save(entity)
+                .map(saved -&gt; new CruiseReservationResponse(
+                        saved.guestId(),
+                        saved.shipCode(),
+                        saved.sailingDate(),
+                        saved.status()));
+    }
+
+    public Mono&lt;CruiseReservationResponse&gt; getReservation(String id) {
+        return repository.findById(id)
+                .switchIfEmpty(Mono.error(new ReservationNotFoundException(id)))
+                .map(entity -&gt; new CruiseReservationResponse(
+                        entity.guestId(),
+                        entity.shipCode(),
+                        entity.sailingDate(),
+                        entity.status()));
+    }
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationRepository.java</h3>
+            <pre><code>package com.disney.app.disneycruise.repository;
+
+import com.disney.app.disneycruise.entity.CruiseReservationEntity;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CruiseReservationRepository
+        extends ReactiveCrudRepository&lt;CruiseReservationEntity, String&gt; {
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationEntity.java</h3>
+            <pre><code>package com.disney.app.disneycruise.entity;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.OffsetDateTime;
+
+@Document(&quot;cruise_reservations&quot;)
+public record CruiseReservationEntity(
+        @Id String id,
+        String guestId,
+        String shipCode,
+        OffsetDateTime sailingDate,
+        String stateroomType,
+        int numberOfGuests,
+        String status
+) {
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationRequest.java</h3>
+            <pre><code>package com.disney.app.disneycruise.dto;
+
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.OffsetDateTime;
+
+public record CruiseReservationRequest(
+
+        @NotBlank
+        String guestId,
+
+        @NotBlank
+        String shipCode,
+
+        @NotNull
+        @Future(message = &quot;Sailing Date must be in the future&quot;)
+        OffsetDateTime sailingDate,
+
+        @NotNull
+        String stateroomType,
+
+        @Min(1)
+        int numberOfGuests
+) {
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationResponse.java</h3>
+            <pre><code>package com.disney.app.disneycruise.dto;
+
+import java.time.OffsetDateTime;
+
+public record CruiseReservationResponse(
+
+        String guestId,
+        String shipCode,
+        OffsetDateTime sailingDate,
+        String reservationStatus
+) {
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>ReservationNotFoundException.java</h3>
+            <pre><code>package com.disney.app.disneycruise.error;
+
+public class ReservationNotFoundException extends RuntimeException {
+    public ReservationNotFoundException(String id) {
+        super(&quot;Reservation not found: &quot; + id);
+    }
+}</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>CruiseReservationServiceTest.java</h3>
+            <pre><code>package com.disney.app.disneycruise.service;
+
+import com.disney.app.disneycruise.dto.CruiseReservationRequest;
+import com.disney.app.disneycruise.dto.CruiseReservationResponse;
+import com.disney.app.disneycruise.entity.CruiseReservationEntity;
+import com.disney.app.disneycruise.error.ReservationNotFoundException;
+import com.disney.app.disneycruise.repository.CruiseReservationRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.time.OffsetDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class CruiseReservationServiceTest {
+
+    @Mock
+    private CruiseReservationRepository repository;
+
+    @InjectMocks
+    private CruiseReservationService service;
+
+    @Test
+    void createReservationShouldSaveReservationAndReturnResponse() {
+        OffsetDateTime sailingDate = OffsetDateTime.now().plusDays(30);
+
+        CruiseReservationEntity savedEntity = new CruiseReservationEntity(
+                &quot;res-123&quot;,
+                &quot;guest-123&quot;,
+                &quot;ship-123&quot;,
+                sailingDate,
+                &quot;type-123&quot;,
+                2,
+                &quot;PENDING&quot;
+        );
+
+        when(repository.save(any(CruiseReservationEntity.class)))
+                .thenReturn(Mono.just(savedEntity));
+
+        Mono&lt;CruiseReservationResponse&gt; result = service.createReservation(
+                new CruiseReservationRequest(
+                        &quot;guest-123&quot;,
+                        &quot;ship-123&quot;,
+                        sailingDate,
+                        &quot;type-123&quot;,
+                        2
+                )
+        );
+
+        StepVerifier.create(result)
+                .assertNext(response -&gt; {
+                    assertThat(response.guestId()).isEqualTo(&quot;guest-123&quot;);
+                    assertThat(response.reservationStatus()).isEqualTo(&quot;PENDING&quot;);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void createReservationShouldSavePendingReservationEntity() {
+        OffsetDateTime sailingDate = OffsetDateTime.now().plusDays(30);
+
+        CruiseReservationRequest request = new CruiseReservationRequest(
+                &quot;guest-123&quot;,
+                &quot;ship-123&quot;,
+                sailingDate,
+                &quot;BALCONY&quot;,
+                2
+        );
+
+        CruiseReservationEntity savedEntity = new CruiseReservationEntity(
+                &quot;res-123&quot;,
+                &quot;guest-123&quot;,
+                &quot;ship-123&quot;,
+                sailingDate,
+                &quot;BALCONY&quot;,
+                2,
+                &quot;PENDING&quot;
+        );
+
+        when(repository.save(any(CruiseReservationEntity.class)))
+                .thenReturn(Mono.just(savedEntity));
+
+        StepVerifier.create(service.createReservation(request))
+                .expectNextCount(1)
+                .verifyComplete();
+
+        ArgumentCaptor&lt;CruiseReservationEntity&gt; captor =
+                ArgumentCaptor.forClass(CruiseReservationEntity.class);
+
+        verify(repository).save(captor.capture());
+
+        CruiseReservationEntity entityToSave = captor.getValue();
+
+        assertThat(entityToSave.id()).isNull();
+        assertThat(entityToSave.guestId()).isEqualTo(&quot;guest-123&quot;);
+        assertThat(entityToSave.shipCode()).isEqualTo(&quot;ship-123&quot;);
+        assertThat(entityToSave.sailingDate()).isEqualTo(sailingDate);
+        assertThat(entityToSave.stateroomType()).isEqualTo(&quot;BALCONY&quot;);
+        assertThat(entityToSave.numberOfGuests()).isEqualTo(2);
+        assertThat(entityToSave.status()).isEqualTo(&quot;PENDING&quot;);
+    }
+
+    @Test
+    void getReservationByIdShouldReturnResponse() {
+        OffsetDateTime sailingDate = OffsetDateTime.now().plusDays(30);
+
+        CruiseReservationEntity savedEntity = new CruiseReservationEntity(
+                &quot;res-123&quot;,
+                &quot;guest-123&quot;,
+                &quot;ship-123&quot;,
+                sailingDate,
+                &quot;BALCONY&quot;,
+                2,
+                &quot;PENDING&quot;
+        );
+
+        when(repository.findById(&quot;res-123&quot;))
+                .thenReturn(Mono.just(savedEntity));
+
+        Mono&lt;CruiseReservationResponse&gt; reservation =
+                service.getReservation(&quot;res-123&quot;);
+
+        StepVerifier.create(reservation)
+                .assertNext(response -&gt; {
+                    assertThat(response.guestId()).isEqualTo(&quot;guest-123&quot;);
+                    assertThat(response.shipCode()).isEqualTo(&quot;ship-123&quot;);
+                    assertThat(response.sailingDate()).isEqualTo(sailingDate);
+                    assertThat(response.reservationStatus()).isEqualTo(&quot;PENDING&quot;);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void getReservationByIdShouldReturnErrorWhenReservationDoesNotExist() {
+        when(repository.findById(&quot;missing-id&quot;))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(service.getReservation(&quot;missing-id&quot;))
+                .expectErrorSatisfies(error -&gt; {
+                    assertThat(error)
+                            .isInstanceOf(ReservationNotFoundException.class);
+                    assertThat(error.getMessage())
+                            .isEqualTo(&quot;Reservation not found: missing-id&quot;);
+                })
+                .verify();
+
+        verify(repository).findById(&quot;missing-id&quot;);
+    }
+}</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

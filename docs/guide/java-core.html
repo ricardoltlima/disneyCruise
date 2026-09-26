@@ -1,0 +1,1396 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Java Core | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="#java-language-features">Java Language Features</a>
+            <a href="#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="#higher-order-functions">Higher-Order Functions</a>
+            <a href="#composability">Composability</a>
+            <a href="#functional-interfaces">Functional Interfaces</a>
+            <a href="#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Java Core</h2>
+        <p>Language features, functional foundations, higher-order functions, composability, functional interfaces, and streams.</p>
+      </header>
+
+<section id="java-language-features">
+        <h2>Java 16, Java 17, and Java 21 Features</h2>
+        <p class="lead">Modern Java adds concise data modeling, safer type handling, stronger domain modeling, better concurrency options, and cleaner syntax for everyday backend code.</p>
+
+        <h3>Java 16</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Records</h3>
+            <p>Records are compact immutable data carriers. Java generates the constructor, accessors, <code>equals</code>, <code>hashCode</code>, and <code>toString</code>.</p>
+            <pre><code>public record ReservationResponse(
+        Long id,
+        String guestName,
+        String status
+) {}</code></pre>
+            <p>Not all methods in a record are final. The record class itself is final, and the immutability comes from private final fields, no setters, and the canonical constructor initializing all fields.</p>
+            <p>Records are immutable because their fields are private final, they have no setters, and their state is fully initialized in the canonical constructor. This immutability is ideal for functional programming because it eliminates side effects, makes objects thread-safe, and ensures predictable behavior when passed through pipelines such as Stream or Reactor.</p>
+            <p>Use records for DTOs, API responses, commands, events, and value-style objects where identity and mutation are not the main concern.</p>
+          </article>
+
+          <article class="card">
+            <h3>Pattern Matching for instanceof</h3>
+            <p>Pattern matching removes the extra cast after an <code>instanceof</code> check and keeps type checks easier to read.</p>
+            <pre><code>if (event instanceof ReservationCreated created) {
+    return created.reservationId();
+}</code></pre>
+            <p>This is useful when handling events, exceptions, request payload variants, or generic domain objects.</p>
+          </article>
+        </div>
+
+        <h3>Java 17</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Sealed Classes and Interfaces</h3>
+            <p>Sealed types restrict which classes or records can implement or extend a type. They make domain models explicit and easier to reason about.</p>
+            <pre><code>public sealed interface PaymentEvent
+        permits PaymentAuthorized, PaymentDeclined {}
+
+public record PaymentAuthorized(String paymentId)
+        implements PaymentEvent {}
+
+public record PaymentDeclined(String paymentId, String reason)
+        implements PaymentEvent {}</code></pre>
+            <h3>How do records work with sealed interfaces?</h3>
+            <p>Records can implement sealed interfaces naturally because they are implicitly final, which satisfies the requirement of a sealed hierarchy. Since a sealed parent allows only subclasses that are final, sealed, or non-sealed, a record fits perfectly. The only rule is that the record must appear in the permits list of the sealed type. This makes records a great fit for modeling immutable domain events.</p>
+            <p>Use sealed hierarchies when the list of allowed variants is known, such as workflow states, commands, events, and result types.</p>
+          </article>
+
+          <article class="card">
+            <h3>Switch Expressions</h3>
+            <p>Switch expressions return values directly and avoid fall-through bugs from missing <code>break</code> statements.</p>
+            <pre><code>String message = switch (status) {
+    case "CONFIRMED" -> "Reservation is confirmed";
+    case "CANCELLED" -> "Reservation is cancelled";
+    case "PENDING" -> "Reservation is pending";
+    default -> "Unknown reservation status";
+};</code></pre>
+            <p>They are a good fit for mapping states, roles, event types, and simple decision tables.</p>
+          </article>
+
+          <article class="card">
+            <h3>Text Blocks</h3>
+            <p>Text blocks make multiline strings cleaner. They are helpful for SQL, JSON examples, logs, documentation snippets, and test fixtures.</p>
+            <pre><code>String json = """
+        {
+          "reservationId": "R123",
+          "status": "CONFIRMED"
+        }
+        """;</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Strong LTS Baseline</h3>
+            <p>Java 17 is a long-term support release and a common modern baseline for Spring Boot services. It combines records, sealed types, text blocks, switch expressions, and JVM/runtime improvements into a stable platform.</p>
+          </article>
+        </div>
+
+        <h3>Java 21</h3>
+        <div class="grid">
+          <article class="card">
+            <h3>Virtual Threads</h3>
+            <p>Virtual threads are lightweight JVM-managed threads. They make blocking-style code scale better when work spends most of its time waiting on I/O.</p>
+            <pre><code>try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    executor.submit(() -> reservationClient.fetchReservation(id));
+}</code></pre>
+            <p>They are useful for servlet-style services and blocking libraries. They do not remove the need for timeouts, connection pool limits, backpressure thinking, or careful resource management.</p>
+          </article>
+
+          <article class="card">
+            <h3>Pattern Matching for switch</h3>
+            <p>Switch can match by type, which works especially well with sealed hierarchies.</p>
+            <pre><code>String describe(PaymentEvent event) {
+    return switch (event) {
+        case PaymentAuthorized authorized ->
+                "Authorized: " + authorized.paymentId();
+        case PaymentDeclined declined ->
+                "Declined: " + declined.reason();
+    };
+}</code></pre>
+            <p>When all sealed variants are handled, the compiler can help detect missing cases.</p>
+          </article>
+
+          <article class="card">
+            <h3>Record Patterns</h3>
+            <p>Record patterns let code unpack record values directly during pattern matching.</p>
+            <pre><code>if (response instanceof ReservationResponse(Long id, String guest, String status)) {
+    return id + " - " + guest + " - " + status;
+}</code></pre>
+            <p>This is helpful when extracting values from small immutable data structures.</p>
+          </article>
+
+          <article class="card">
+            <h3>Sequenced Collections</h3>
+            <p>Sequenced collections provide a consistent API for collections with a defined encounter order, including first and last element access.</p>
+            <pre><code>SequencedCollection&lt;String&gt; steps = new ArrayList&lt;&gt;();
+steps.addFirst("validate");
+steps.addLast("publish event");</code></pre>
+            <p>This improves readability when order matters, such as workflow steps, ordered rules, or ordered response sections.</p>
+          </article>
+        </div>
+
+        <h3>Practical Backend Guidance</h3>
+        <ul>
+          <li>Use records for immutable DTOs and event payloads, but avoid them for persistence entities that require framework mutation or lazy loading.</li>
+          <li>Use sealed types to model a closed set of states, events, commands, or results.</li>
+          <li>Use switch expressions for clear value mapping and avoid mutation-heavy branching.</li>
+          <li>Use text blocks in tests and infrastructure code where multiline JSON, SQL, or configuration improves readability.</li>
+          <li>Use virtual threads for blocking I/O workloads where the stack supports them, but keep reactive pipelines non-blocking.</li>
+        </ul>
+      </section>
+
+<section id="functional-programming-foundations">
+        <h2>Functional Programming Foundations</h2>
+        <p class="lead">Functional programming is a style of writing code where data flows through small predictable operations. Instead of changing objects step by step, the code describes transformations from input to output.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a cruise boarding process. A reservation enters the process, then each station performs one clear job: validate documents, verify payment, assign boarding group, create a boarding pass. Each station should not secretly change another station's paperwork. It receives information, does its job, and hands forward a clear result.</p>
+        <pre><code>Reservation -> validate -> verify payment -> assign group -> boarding pass</code></pre>
+        <p>Functional programming tries to make code feel like that: small steps, clear inputs, clear outputs, and fewer hidden changes.</p>
+
+        <h3>Pure Functions</h3>
+        <p>A pure function always returns the same output for the same input and does not change anything outside itself. It does not update a database, mutate a list, write a file, call an API, log as part of business behavior, or depend on the current time unless the time is passed in as an input.</p>
+        <pre><code>public int calculateTotalInCents(List&lt;Payment&gt; payments) {
+    return payments.stream()
+            .filter(payment -> payment.status().equals("APPROVED"))
+            .mapToInt(Payment::amountInCents)
+            .sum();
+}</code></pre>
+        <p>This is pure if the same list always produces the same total and the method does not change the list or any external system.</p>
+        <pre><code>// Not pure: it changes external state.
+public int calculateTotalAndSaveAudit(List&lt;Payment&gt; payments) {
+    int total = calculateTotalInCents(payments);
+    auditRepository.save(new AuditRecord("TOTAL_CALCULATED", total));
+    return total;
+}</code></pre>
+        <p>Real-life analogy: pure function is like a calculator. If you type <code>10 + 20</code>, it returns <code>30</code> every time and does not change your bank account. An impure function is like a payment terminal: it may calculate, but it can also charge a card, print a receipt, and change real-world state.</p>
+
+        <h3>Why Pure Functions Help</h3>
+        <ul>
+          <li>They are easier to test because there is no hidden setup.</li>
+          <li>They are easier to debug because inputs explain outputs.</li>
+          <li>They are safer in concurrent code because they do not mutate shared state.</li>
+          <li>They fit naturally into Stream and Reactor pipelines.</li>
+          <li>They separate business calculations from side effects such as database writes and HTTP calls.</li>
+        </ul>
+
+        <h3>Immutability</h3>
+        <p>Immutability means an object's state does not change after it is created. Instead of editing the same object, code creates a new value with the desired change.</p>
+        <pre><code>public record Reservation(
+        String id,
+        String guestName,
+        String status,
+        int balanceInCents
+) {}
+
+public Reservation markPaid(Reservation reservation) {
+    return new Reservation(
+            reservation.id(),
+            reservation.guestName(),
+            "PAID",
+            0);
+}</code></pre>
+        <p>The original reservation remains unchanged. The method returns a new reservation representing the updated state.</p>
+        <pre><code>// Mutable style
+reservation.setStatus("PAID");
+reservation.setBalanceInCents(0);
+
+// Immutable style
+Reservation paidReservation = markPaid(reservation);</code></pre>
+        <p>Real-life analogy: changing a printed cruise itinerary with a pen can create confusion because people may hold different versions. Issuing a new itinerary with a new state is clearer: the old document existed, and the new document represents the updated truth.</p>
+
+        <h3>How do you avoid mutating lists in Java?</h3>
+        <p>Instead of modifying the original list, create a new one. In functional programming and reactive systems, immutability prevents side effects and makes data flows predictable.</p>
+        <pre><code>List&lt;String&gt; originalGuestIds = List.of("G1", "G2");
+
+List&lt;String&gt; updatedGuestIds = Stream.concat(
+        originalGuestIds.stream(),
+        Stream.of("G3"))
+        .toList();</code></pre>
+        <p><code>updatedGuestIds</code> contains the new value, but <code>originalGuestIds</code> is unchanged. This is crucial for thread safety and correctness in asynchronous pipelines.</p>
+        <pre><code>// Avoid this when shared state can be observed elsewhere.
+guestIds.add("G3");
+
+// Prefer this when you want predictable data flow.
+List&lt;String&gt; updatedGuestIds = Stream.concat(
+        guestIds.stream(),
+        Stream.of("G3"))
+        .toList();</code></pre>
+
+        <h3>Why Mutability Matters in Functional Programming and Reactor</h3>
+        <ol>
+          <li><strong>Mutability causes bugs in concurrent systems.</strong> Reactor uses non-blocking asynchronous execution. If multiple operations mutate shared data at the same time, the code can produce race conditions where the final result depends on timing instead of business rules.</li>
+          <li><strong>Pure functions require no side effects.</strong> Mutating an external list, updating a shared object, or changing state outside the function is a side effect. That makes the function harder to test and harder to reason about.</li>
+          <li><strong>Immutability creates safer, predictable data flow.</strong> If a value cannot change, every operator in a Stream or Reactor pipeline receives a stable value. The code becomes easier to understand because earlier steps cannot secretly change what later steps see.</li>
+          <li><strong>Reactive Streams do not expect mutation between operators.</strong> Modifying objects inside a pipeline breaks referential transparency. A pipeline is clearest when each step receives a value and returns a new value instead of mutating the existing one.</li>
+        </ol>
+        <h3>Why is immutability important in reactive programming?</h3>
+        <p>Immutability is essential in Reactor and WebFlux because reactive systems are asynchronous and often run work on multiple threads. When threads share mutable data, one thread can change a value while another thread is reading or processing it. That creates race conditions and unpredictable behavior.</p>
+        <ul>
+          <li><strong>Async code is safer with immutable values.</strong> If a value cannot change, it can move between threads without another operator secretly modifying it.</li>
+          <li><strong>Referential transparency is preserved.</strong> Pure functions and immutable data make it possible to replace an expression with its result without changing behavior.</li>
+          <li><strong>Non-blocking scheduling stays reliable.</strong> Reactor may shift work across schedulers and threads. Mutable shared state can break assumptions about ordering and visibility.</li>
+        </ul>
+        <p>By using immutable data, each value in a reactive pipeline is safe to share across threads and operators. This preserves referential transparency and makes the pipeline deterministic. That is what makes Reactor's non-blocking, concurrent execution model easier to trust.</p>
+        <pre><code>// Risky: mutates external shared state from inside the pipeline.
+List&lt;String&gt; approvedIds = new ArrayList&lt;&gt;();
+
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .forEach(payment -> approvedIds.add(payment.id()));
+
+// Safer: the pipeline produces the result directly.
+List&lt;String&gt; approvedIds = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();</code></pre>
+
+        <h3>Immutability in Payment Systems</h3>
+        <p>Payment systems benefit from immutability because historical facts should not be casually edited. A payment was authorized, declined, refunded, or settled. Instead of mutating the old event, systems usually add a new event.</p>
+        <pre><code>public sealed interface PaymentEvent
+        permits PaymentAuthorized, PaymentDeclined, PaymentRefunded {}
+
+public record PaymentAuthorized(String paymentId, int amountInCents)
+        implements PaymentEvent {}
+
+public record PaymentDeclined(String paymentId, String reason)
+        implements PaymentEvent {}
+
+public record PaymentRefunded(String paymentId, int amountInCents)
+        implements PaymentEvent {}</code></pre>
+        <p>This keeps the payment history understandable. A refund does not erase the original charge; it adds a new fact.</p>
+
+        <h3>Higher-Order Functions</h3>
+        <p>A higher-order function receives a function as an argument, returns a function, or both. In Java, this usually means receiving or returning a functional interface such as <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code>.</p>
+        <pre><code>public List&lt;Payment&gt; findPayments(
+        List&lt;Payment&gt; payments,
+        Predicate&lt;Payment&gt; rule
+) {
+    return payments.stream()
+            .filter(rule)
+            .toList();
+}</code></pre>
+        <p><code>findPayments</code> is higher-order because it receives a rule as a parameter. The caller decides what rule to use.</p>
+        <pre><code>List&lt;Payment&gt; declined = findPayments(payments,
+        payment -> payment.status().equals("DECLINED"));
+
+List&lt;Payment&gt; highValue = findPayments(payments,
+        payment -> payment.amountInCents() >= 1_000_00);</code></pre>
+        <p>Real-life analogy: the same security checkpoint can use different rules depending on the situation. One day it checks passports. Another day it checks boarding group. The checkpoint process is reusable because the rule can change.</p>
+
+        <h3>Returning Functions</h3>
+        <p>A method can also return a function. This is useful when code needs to build rules dynamically from configuration, user role, region, feature flag, or business context.</p>
+        <pre><code>public Predicate&lt;Payment&gt; paymentReviewRule(int highValueLimitInCents) {
+    return payment ->
+            payment.status().equals("DECLINED")
+                    || payment.amountInCents() >= highValueLimitInCents;
+}
+
+Predicate&lt;Payment&gt; reviewRule = paymentReviewRule(1_000_00);
+
+List&lt;Payment&gt; reviewQueue = payments.stream()
+        .filter(reviewRule)
+        .toList();</code></pre>
+        <p>The method creates a rule. The stream later applies that rule to every payment.</p>
+
+        <h3>Function Composition</h3>
+        <p>Function composition is the process of combining functions so that the output of one becomes the input of the next. In Java, this is done with methods such as <code>andThen()</code> and <code>compose()</code> on <code>Function</code>, and with composition methods such as <code>and()</code>, <code>or()</code>, and <code>negate()</code> on <code>Predicate</code>.</p>
+        <p>It allows code to build transformation pipelines from small, reusable pure functions. Each function handles one part of the work, and the output of one step becomes the input of the next step.</p>
+        <pre><code>Function&lt;String, String&gt; trim = String::trim;
+Function&lt;String, String&gt; uppercase = String::toUpperCase;
+Function&lt;String, String&gt; addPrefix = name -> "Guest: " + name;
+
+Function&lt;String, String&gt; formatGuestName =
+        trim.andThen(uppercase).andThen(addPrefix);
+
+String label = formatGuestName.apply("  Ana  ");</code></pre>
+        <p><code>andThen</code> reads left to right: trim, then uppercase, then add prefix. It is like an assembly line where each station performs a small step.</p>
+        <pre><code>Function&lt;Reservation, BoardingPass&gt; createPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+Function&lt;BoardingPass, BoardingPassEmail&gt; createEmail = pass ->
+        new BoardingPassEmail(pass.guestName(), "Your boarding pass is ready");
+
+Function&lt;Reservation, BoardingPassEmail&gt; createBoardingEmail =
+        createPass.andThen(createEmail);</code></pre>
+        <p>In reactive programming, composition is essential. Every operator in a Reactor pipeline, such as <code>map</code>, <code>filter</code>, and <code>flatMap</code>, is composing behavior into a larger data flow. This makes the logic declarative, easier to test, and avoids shared mutable state, which is crucial for asynchronous, non-blocking workflows.</p>
+
+        <h3>Declarative vs Imperative Thinking</h3>
+        <p>Imperative code focuses on how to do each step. Declarative code focuses on what result is wanted. Neither style is always wrong. The value of declarative code is that it often expresses business intent more clearly.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Imperative</h3>
+            <pre><code>List&lt;String&gt; approvedGuestNames = new ArrayList&lt;&gt;();
+
+for (Payment payment : payments) {
+    if (payment.status().equals("APPROVED")) {
+        String name = payment.guestName();
+        approvedGuestNames.add(name);
+    }
+}</code></pre>
+            <p>This says: create a list, loop over payments, check status, extract name, add to list.</p>
+          </article>
+
+          <article class="card">
+            <h3>Declarative</h3>
+            <pre><code>List&lt;String&gt; approvedGuestNames = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::guestName)
+        .toList();</code></pre>
+            <p>This says: from payments, keep approved ones, extract guest names, return a list.</p>
+          </article>
+        </div>
+        <p>Real-life analogy: imperative is like giving turn-by-turn driving directions. Declarative is like saying the destination. In code, declarative pipelines still execute step by step, but the source code emphasizes the outcome.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This example keeps the business rules separate from the pipeline, which makes the process easier to read and test.</p>
+        <pre><code>Predicate&lt;Reservation&gt; isConfirmed = reservation ->
+        reservation.status().equals("CONFIRMED");
+
+Predicate&lt;Reservation&gt; isPaid = reservation ->
+        reservation.balanceInCents() == 0;
+
+Function&lt;Reservation, BoardingPass&gt; toBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+List&lt;BoardingPass&gt; passes = reservations.stream()
+        .filter(isConfirmed.and(isPaid))
+        .map(toBoardingPass)
+        .toList();</code></pre>
+        <p>The pipeline reads like the business process: confirmed reservations, paid reservations, then boarding passes.</p>
+
+        <h3>Payment Example</h3>
+        <p>This example calculates approved revenue without changing payment objects or touching external systems.</p>
+        <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Function&lt;Payment, Integer&gt; amount = Payment::amountInCents;
+
+int approvedRevenue = payments.stream()
+        .filter(isApproved)
+        .map(amount)
+        .reduce(0, Integer::sum);</code></pre>
+        <p>The calculation is predictable: same payment list, same answer. Database writes, audit records, and notification sending should happen outside this pure calculation.</p>
+
+        <h3>Practical Guidance</h3>
+        <ul>
+          <li>Keep calculations pure when possible.</li>
+          <li>Use immutable data for DTOs, events, commands, and read models.</li>
+          <li>Pass rules and transformations as functional interfaces when it makes the workflow more reusable.</li>
+          <li>Compose small functions instead of writing one large method with many unrelated responsibilities.</li>
+          <li>Prefer declarative pipelines when they make business intent clearer.</li>
+          <li>Keep side effects at the edges: repositories, HTTP clients, messaging clients, logging, and monitoring.</li>
+          <li>Use names for important predicates and functions so the code explains the business rule.</li>
+        </ul>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Thinking functional programming means never using objects. Java functional programming still works with records, classes, services, and domain models.</li>
+          <li>Calling a function pure when it secretly reads time, random values, files, databases, or shared mutable state.</li>
+          <li>Mutating a list or object inside <code>map</code>, <code>filter</code>, or <code>forEach</code> and making the pipeline harder to reason about.</li>
+          <li>Using streams for everything, even when a simple loop would be clearer.</li>
+          <li>Mixing business calculation and side effects in the same method.</li>
+        </ul>
+      </section>
+
+<section id="higher-order-functions">
+        <h2>Higher-Order Functions</h2>
+        <p class="lead">A higher-order function is a function that receives another function as an argument, returns a function as its result, or both. In Java, this usually means a method receives or returns a functional interface such as <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code>.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a payment review desk. The desk always does the same general workflow: receive payments, apply a rule, and return the payments that need attention. What changes is the rule. One day the rule is declined payments. Another day it is payments over $1,000. The desk is reusable because the rule is passed in.</p>
+
+        <h3>Receiving a Function as an Argument</h3>
+        <p>This method is higher-order because it receives a <code>Predicate&lt;Payment&gt;</code>. The method does not hard-code the rule; the caller supplies the rule.</p>
+        <pre><code>public List&lt;Payment&gt; findPayments(
+        List&lt;Payment&gt; payments,
+        Predicate&lt;Payment&gt; rule
+) {
+    return payments.stream()
+            .filter(rule)
+            .toList();
+}
+
+List&lt;Payment&gt; declinedPayments = findPayments(payments,
+        payment -> payment.status().equals("DECLINED"));
+
+List&lt;Payment&gt; highValuePayments = findPayments(payments,
+        payment -> payment.amountInCents() >= 1_000_00);</code></pre>
+        <p>The same method supports different business questions because the behavior is passed in as data.</p>
+
+        <h3>Returning a Function</h3>
+        <p>A method can build and return a function. This is useful when a rule depends on configuration, region, product type, guest tier, or feature flags.</p>
+        <pre><code>public Predicate&lt;Payment&gt; createReviewRule(int highValueLimitInCents) {
+    return payment ->
+            payment.status().equals("DECLINED")
+                    || payment.amountInCents() >= highValueLimitInCents;
+}
+
+Predicate&lt;Payment&gt; standardReviewRule = createReviewRule(1_000_00);
+Predicate&lt;Payment&gt; vipReviewRule = createReviewRule(500_00);
+
+List&lt;Payment&gt; standardQueue = payments.stream()
+        .filter(standardReviewRule)
+        .toList();</code></pre>
+        <p>The method creates a rule once, and that rule can be reused in a stream, service method, validator, or test.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This higher-order method can find reservations based on any rule: ready to board, missing documents, unpaid, cancelled, or VIP.</p>
+        <pre><code>public List&lt;Reservation&gt; findReservations(
+        List&lt;Reservation&gt; reservations,
+        Predicate&lt;Reservation&gt; rule
+) {
+    return reservations.stream()
+            .filter(rule)
+            .toList();
+}
+
+Predicate&lt;Reservation&gt; readyToBoard = reservation ->
+        reservation.status().equals("CONFIRMED")
+                && reservation.balanceInCents() == 0
+                && reservation.hasRequiredDocuments();
+
+List&lt;Reservation&gt; boardingQueue =
+        findReservations(reservations, readyToBoard);</code></pre>
+        <p>Real-life analogy: the same crew member can use different checklists. One checklist is for boarding readiness. Another is for missing documents. The process is the same; the rule changes.</p>
+
+        <h3>Transforming with a Function Argument</h3>
+        <p>Higher-order functions are not only for filtering. They can also receive transformations.</p>
+        <pre><code>public List&lt;String&gt; createLabels(
+        List&lt;Payment&gt; payments,
+        Function&lt;Payment, String&gt; labelFunction
+) {
+    return payments.stream()
+            .map(labelFunction)
+            .toList();
+}
+
+List&lt;String&gt; receiptLabels = createLabels(payments,
+        payment -> payment.id() + " - $" + payment.amountInCents() / 100);
+
+List&lt;String&gt; reservationLabels = createLabels(payments,
+        payment -> payment.reservationId() + " - " + payment.guestName());</code></pre>
+        <p>The same method can create different outputs because the transformation is supplied from outside.</p>
+
+        <h3>Connection to Streams and Reactor</h3>
+        <p>Many common Java APIs are built from higher-order functions. <code>filter</code> receives a <code>Predicate</code>. <code>map</code> receives a <code>Function</code>. <code>forEach</code> receives a <code>Consumer</code>. Reactor follows the same idea with asynchronous data.</p>
+        <pre><code>// Stream: synchronous collection pipeline
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();
+
+// Reactor: asynchronous publisher pipeline
+paymentFlux
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id);</code></pre>
+        <p>Reactor and WebFlux also depend on higher-order functions. Each operator receives functions as inputs.</p>
+        <pre><code>flux.flatMap(this::callApi)
+        .map(this::transform)
+        .filter(this::isValid);</code></pre>
+        <p>The operators are higher-order because they receive behavior and compose it into a pipeline. This is why functional programming is so important for reactive systems.</p>
+
+        <h3>Why Higher-Order Functions Matter</h3>
+        <ul>
+          <li><strong>They allow composition.</strong> Code can build powerful pipelines by passing functions into other functions.</li>
+          <li><strong>They enable declarative, functional code.</strong> Instead of manually controlling every loop and temporary variable, the code describes behavior.</li>
+          <li><strong>They reduce boilerplate.</strong> Many workflows no longer need repetitive loops, nested <code>if</code> statements, or manual collection building.</li>
+          <li><strong>They make code more reusable.</strong> The same method can accept different functions to customize behavior for payments, reservations, guests, or events.</li>
+        </ul>
+
+        <h3>Practical Guidance</h3>
+        <ul>
+          <li>Use higher-order functions when the workflow is stable but the rule or transformation changes.</li>
+          <li>Name important rules with variables such as <code>readyToBoard</code> or <code>requiresManualReview</code>.</li>
+          <li>Keep passed functions small and focused.</li>
+          <li>Prefer pure functions for calculations and transformations.</li>
+          <li>Keep side effects such as saving, sending, and logging at clear boundaries.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">A higher-order function is a function that either takes another function as an argument or returns a function. In Java, this is common with Streams and Reactor, where operators like <code>map</code>, <code>filter</code>, and <code>flatMap</code> receive functions. Higher-order functions enable functional composition, reusability, and declarative programming.</p>
+      </section>
+
+<section id="composability">
+        <h2>Composability</h2>
+        <p class="lead">Composable means small, independent pieces can be combined to build bigger and more complex behavior without modifying the pieces themselves.</p>
+
+        <h3>Simple Definition</h3>
+        <p>Think LEGO blocks, not glue. If something is composable, you can plug it together with other things, each piece keeps doing one job, and you do not need to rewrite existing code to combine behavior.</p>
+        <ul>
+          <li>Each piece has a clear responsibility.</li>
+          <li>Each piece can be reused in different workflows.</li>
+          <li>Pieces can be added, removed, or reordered more easily.</li>
+          <li>The original pieces do not need to be modified every time the workflow changes.</li>
+        </ul>
+
+        <h3>Composable in Functional Programming</h3>
+        <p>Functions are composable when the output of one function can become the input of another function.</p>
+        <pre><code>Function&lt;Integer, Integer&gt; doubleIt = x -> x * 2;
+Function&lt;Integer, Integer&gt; addOne = x -> x + 1;
+
+Function&lt;Integer, Integer&gt; composed =
+        doubleIt.andThen(addOne);
+
+int result = composed.apply(10);</code></pre>
+        <p><code>doubleIt</code> is reusable. <code>addOne</code> is reusable. <code>composed</code> is built by combining them. That is composability.</p>
+        <p>Real-life analogy: a payment workflow may have separate steps for validating the request, calculating fees, authorizing the payment, and creating a receipt. Each step does one job, and the workflow combines them.</p>
+
+        <h3>Composable in Streams</h3>
+        <p>Stream pipelines are composable because each operator does one job and returns a new stream for the next operator.</p>
+        <pre><code>List&lt;Integer&gt; result = numbers.stream()
+        .filter(n -> n > 10)
+        .map(n -> n * 2)
+        .sorted()
+        .toList();</code></pre>
+        <p>Each operation can be added, removed, or reordered when the business rule changes. <code>filter</code> keeps matching data. <code>map</code> transforms it. <code>sorted</code> orders it. <code>toList</code> produces the final result.</p>
+        <pre><code>List&lt;PaymentSummary&gt; summaries = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .map(payment -> new PaymentSummary(
+                payment.id(),
+                payment.reservationId(),
+                payment.amountInCents()))
+        .toList();</code></pre>
+        <p>The payment pipeline reads as separate business steps: keep approved payments, order by amount, convert to summaries.</p>
+
+        <h3>Composable in Reactor</h3>
+        <p>Composability is especially important in Reactor. Each step receives input, returns a <code>Mono</code> or <code>Flux</code>, and can be chained without changing the previous steps.</p>
+        <pre><code>getUserId()
+        .flatMap(this::findUserById)
+        .filter(this::isActive)
+        .flatMap(this::sendNotification);</code></pre>
+        <p>This is why Reactor code scales well. The pipeline can grow from simple behavior into a larger asynchronous workflow while each operator remains focused.</p>
+        <pre><code>public Mono&lt;BoardingPass&gt; createBoardingPass(String reservationId) {
+    return reservationRepository.findById(reservationId)
+            .filter(this::isConfirmed)
+            .flatMap(this::verifyPayment)
+            .flatMap(this::verifyDocuments)
+            .map(this::toBoardingPass);
+}</code></pre>
+        <p>The Disney cruise workflow is composed from separate steps: find reservation, check confirmation, verify payment, verify documents, create boarding pass.</p>
+
+        <h3>What Is Not Composable</h3>
+        <p>Imperative code can become hard to compose when the logic is tangled, deeply nested, and full of side effects.</p>
+        <pre><code>User user = getUser();
+if (user != null) {
+    if (user.isActive()) {
+        save(user);
+        sendEmail(user);
+    }
+}</code></pre>
+        <p>This style can work, but it is harder to reuse steps, harder to reorder behavior, and easier to mix validation, persistence, and notification side effects in one place.</p>
+
+        <h3>Why Composability Matters in Reactive Systems</h3>
+        <p>Reactive systems are asynchronous, concurrent, and non-blocking. Composable code helps keep that complexity manageable.</p>
+        <ul>
+          <li>It avoids shared mutable state because each step can return a new value or publisher.</li>
+          <li>It is easier to reason about because each operator has a focused role.</li>
+          <li>It is easier to test because individual rules and transformations can be tested separately.</li>
+          <li>It is safer in asynchronous environments because behavior is expressed as a pipeline instead of scattered side effects.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">Composable means that small, independent pieces of logic can be combined together to build more complex behavior without modifying the original pieces. In functional and reactive programming, functions and operators are composable, which allows code to build declarative pipelines that are easy to extend, reuse, and reason about.</p>
+      </section>
+
+<section id="functional-interfaces">
+        <h2>Functional Interfaces</h2>
+        <p class="lead">A functional interface is an interface that contains exactly one abstract method. This enables Java to use lambda expressions and method references, because the compiler can unambiguously match a lambda to the single abstract method.</p>
+        <p>Functional interfaces often also contain default or static methods, which do not affect their functional nature. They let Java treat behavior as a value, so code can pass an action, rule, calculation, or transformation into another method.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a cruise terminal with different workers. One worker checks whether a guest can board. Another worker prints a boarding pass. Another sends a notification. A functional interface is like describing one job role: given this input, perform this one kind of work.</p>
+        <pre><code>@FunctionalInterface
+public interface BoardingRule {
+    boolean canBoard(Reservation reservation);
+}</code></pre>
+        <p>The interface has one abstract method, so Java can implement it with a lambda instead of a full class.</p>
+        <pre><code>BoardingRule isPaidAndConfirmed = reservation ->
+        reservation.isPaid() && reservation.status().equals("CONFIRMED");</code></pre>
+
+        <h3>Why Functional Interfaces Matter</h3>
+        <ul>
+          <li>They are the foundation of lambdas in Java.</li>
+          <li>They let methods receive behavior, not just data.</li>
+          <li>They power Stream operations such as <code>filter</code>, <code>map</code>, <code>flatMap</code>, and <code>forEach</code>.</li>
+          <li>They make business rules easier to compose and test.</li>
+          <li>They appear constantly in reactive programming, where pipelines receive small functions for transformation, validation, error handling, and side effects.</li>
+          <li>Without functional interfaces, Java's Stream API and Reactor would not be possible in their current declarative style.</li>
+        </ul>
+
+        <h3>Lambda Shape</h3>
+        <p>A lambda is a compact implementation of a functional interface. It has inputs on the left, an arrow, and behavior on the right.</p>
+        <pre><code>payment -> payment.status().equals("APPROVED")</code></pre>
+        <p>Real-life analogy: the left side is the item handed to a worker, and the right side is what the worker does with it.</p>
+        <pre><code>// Input: one payment
+// Work: check whether it is approved
+Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");</code></pre>
+
+        <h3>Main Built-In Functional Interfaces</h3>
+        <p>The main functional interfaces used by Streams and Reactor are:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Interface</th>
+              <th>Signature</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Function&lt;T, R&gt;</strong></td>
+              <td><code>T -&gt; R</code></td>
+              <td>transformations</td>
+            </tr>
+            <tr>
+              <td><strong>Predicate&lt;T&gt;</strong></td>
+              <td><code>T -&gt; boolean</code></td>
+              <td>filtering</td>
+            </tr>
+            <tr>
+              <td><strong>Consumer&lt;T&gt;</strong></td>
+              <td><code>T -&gt; void</code></td>
+              <td>performing actions</td>
+            </tr>
+            <tr>
+              <td><strong>Supplier&lt;T&gt;</strong></td>
+              <td><code>() -&gt; T</code></td>
+              <td>lazy creation</td>
+            </tr>
+            <tr>
+              <td><strong>UnaryOperator&lt;T&gt;</strong></td>
+              <td><code>T -&gt; T</code></td>
+              <td>transformations T to T</td>
+            </tr>
+            <tr>
+              <td><strong>BiFunction&lt;T, U, R&gt;</strong></td>
+              <td><code>(T, U) -&gt; R</code></td>
+              <td>merging, combining</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul>
+          <li><code>Predicate&lt;T&gt;</code> for filtering with <code>test</code>.</li>
+          <li><code>Function&lt;T, R&gt;</code> and <code>BiFunction&lt;T, U, R&gt;</code> for transformations with <code>apply</code>.</li>
+          <li><code>Consumer&lt;T&gt;</code> for side-effect actions with <code>accept</code>.</li>
+          <li><code>Supplier&lt;T&gt;</code> for lazy value generation with <code>get</code>.</li>
+          <li><code>UnaryOperator&lt;T&gt;</code> and <code>BinaryOperator&lt;T&gt;</code> for transformations where the input and output stay the same type.</li>
+        </ul>
+        <div class="grid">
+          <article class="card">
+            <h3>Predicate&lt;T&gt;</h3>
+            <p>A <code>Predicate</code> receives one value and returns <code>true</code> or <code>false</code>. It represents a rule or question.</p>
+            <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Predicate&lt;Reservation&gt; canBoard = reservation ->
+        reservation.isPaid() && !reservation.isCancelled();</code></pre>
+            <p>Used by <code>filter</code>. In plain English: should this item stay in the pipeline?</p>
+          </article>
+
+          <article class="card">
+            <h3>Function&lt;T, R&gt;</h3>
+            <p>A <code>Function</code> receives one value and returns another value. It represents a transformation.</p>
+            <pre><code>Function&lt;Payment, String&gt; toReceiptLine = payment ->
+        payment.id() + " - $" + payment.amountInCents() / 100;
+
+Function&lt;Reservation, BoardingPass&gt; toBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());</code></pre>
+            <p>Used by <code>map</code>. In plain English: turn this thing into another thing.</p>
+          </article>
+
+          <article class="card">
+            <h3>Consumer&lt;T&gt;</h3>
+            <p>A <code>Consumer</code> receives one value and returns nothing. It represents doing something with the value.</p>
+            <pre><code>Consumer&lt;Payment&gt; logPayment = payment ->
+        System.out.println("Processed payment " + payment.id());
+
+Consumer&lt;BoardingPass&gt; printPass = pass ->
+        printer.print(pass);</code></pre>
+            <p>Used by <code>forEach</code> and side-effect hooks. In plain English: take this item and do an action.</p>
+          </article>
+
+          <article class="card">
+            <h3>Supplier&lt;T&gt;</h3>
+            <p>A <code>Supplier</code> receives nothing and returns a value. It represents delayed creation.</p>
+            <pre><code>Supplier&lt;String&gt; idGenerator = () ->
+        UUID.randomUUID().toString();
+
+Supplier&lt;PaymentAudit&gt; auditFactory = () ->
+        new PaymentAudit(Instant.now(), "SYSTEM");</code></pre>
+            <p>In plain English: when someone asks, produce a value.</p>
+          </article>
+
+          <article class="card">
+            <h3>BiFunction&lt;T, U, R&gt;</h3>
+            <p>A <code>BiFunction</code> receives two values and returns one value.</p>
+            <pre><code>BiFunction&lt;Integer, Integer, Integer&gt; add = (left, right) ->
+        left + right;
+
+BiFunction&lt;Payment, Integer, PaymentSummary&gt; toSummary = (payment, fee) ->
+        new PaymentSummary(payment.id(), payment.amountInCents() + fee);</code></pre>
+            <p>Use it when a calculation needs two inputs, such as payment plus fee, reservation plus room assignment, or old state plus new event.</p>
+          </article>
+
+          <article class="card">
+            <h3>UnaryOperator and BinaryOperator</h3>
+            <p><code>UnaryOperator&lt;T&gt;</code> is a Function where input and output have the same type. <code>BinaryOperator&lt;T&gt;</code> is a BiFunction where both inputs and the output have the same type.</p>
+            <pre><code>UnaryOperator&lt;String&gt; normalizeName = name ->
+        name.trim().toUpperCase();
+
+BinaryOperator&lt;Integer&gt; addAmounts = Integer::sum;</code></pre>
+            <p>These are good for cleanup, normalization, and combining values of the same type.</p>
+          </article>
+        </div>
+
+        <h3>Method References</h3>
+        <p>A method reference is a shorter lambda when the lambda only calls an existing method.</p>
+        <pre><code>Function&lt;Payment, String&gt; getStatus = Payment::status;
+
+Consumer&lt;String&gt; print = System.out::println;
+
+List&lt;String&gt; statuses = payments.stream()
+        .map(Payment::status)
+        .distinct()
+        .toList();</code></pre>
+        <p><code>Payment::status</code> means: given a Payment, call its <code>status()</code> method. It is the same idea as <code>payment -> payment.status()</code>.</p>
+
+        <h3>Composition</h3>
+        <p>Composition means building bigger behavior from smaller behaviors. This is like a cruise check-in process made from small steps: normalize the guest name, verify payment, assign boarding group, and print the pass.</p>
+        <pre><code>Function&lt;String, String&gt; trim = String::trim;
+Function&lt;String, String&gt; uppercase = String::toUpperCase;
+
+Function&lt;String, String&gt; normalizeGuestName = trim.andThen(uppercase);
+
+String normalized = normalizeGuestName.apply("  Ana  ");</code></pre>
+        <p><code>andThen</code> runs the first function, then the second. <code>compose</code> runs the function passed into it first.</p>
+        <pre><code>Function&lt;Payment, Integer&gt; amount = Payment::amountInCents;
+Function&lt;Integer, String&gt; formatDollars = cents -> "$" + cents / 100;
+
+Function&lt;Payment, String&gt; paymentAmountLabel = amount.andThen(formatDollars);</code></pre>
+
+        <h3>Predicate Composition</h3>
+        <p>Predicates can be combined with <code>and</code>, <code>or</code>, and <code>negate</code>. This keeps business rules readable.</p>
+        <pre><code>Predicate&lt;Payment&gt; isApproved = payment ->
+        payment.status().equals("APPROVED");
+
+Predicate&lt;Payment&gt; isLarge = payment ->
+        payment.amountInCents() >= 500_00;
+
+Predicate&lt;Payment&gt; needsManualReview = isApproved.negate().or(isLarge);
+
+List&lt;Payment&gt; reviewQueue = payments.stream()
+        .filter(needsManualReview)
+        .toList();</code></pre>
+        <p>Plain analogy: a port security rule can say a guest needs review if their document is invalid OR their reservation needs special handling. Each rule stays separate, then the rules are combined.</p>
+
+        <h3>Custom Functional Interfaces</h3>
+        <p>Use built-in interfaces when their names are clear enough. Create a custom functional interface when the domain meaning matters.</p>
+        <pre><code>@FunctionalInterface
+public interface PaymentRule {
+    boolean passes(Payment payment);
+}
+
+PaymentRule approvedCardPayment = payment ->
+        payment.status().equals("APPROVED")
+                && payment.method().equals("CARD");</code></pre>
+        <p><code>Predicate&lt;Payment&gt;</code> works technically, but <code>PaymentRule</code> can communicate business meaning more clearly in important domain code.</p>
+
+        <h3>Pure Functions and Side Effects</h3>
+        <p>A pure function returns the same result for the same input and does not change outside state. Pure functions are easier to test, easier to reuse, and safer in asynchronous code.</p>
+        <pre><code>Function&lt;Payment, String&gt; pureReceiptLabel = payment ->
+        payment.id() + " - " + payment.status();
+
+Consumer&lt;Payment&gt; sideEffect = payment ->
+        auditRepository.save(payment);</code></pre>
+        <p>The first example only calculates a value. The second changes an external system. Side effects are sometimes necessary, but keep them at clear boundaries such as persistence, logging, messaging, or HTTP calls.</p>
+
+        <h3>Payment System Example</h3>
+        <p>This example builds a payment review pipeline from reusable functional interfaces.</p>
+        <pre><code>Predicate&lt;Payment&gt; isDeclined = payment ->
+        payment.status().equals("DECLINED");
+
+Predicate&lt;Payment&gt; isHighValue = payment ->
+        payment.amountInCents() >= 1_000_00;
+
+Function&lt;Payment, String&gt; toReviewMessage = payment ->
+        "Review " + payment.id()
+                + " for reservation " + payment.reservationId();
+
+List&lt;String&gt; reviewMessages = payments.stream()
+        .filter(isDeclined.or(isHighValue))
+        .map(toReviewMessage)
+        .toList();</code></pre>
+        <p>The predicates decide which payments matter. The function converts those payments into readable messages. The stream connects the rules into a full workflow.</p>
+
+        <h3>Disney Cruise Example</h3>
+        <p>This example uses functional interfaces to decide which reservations are ready for boarding.</p>
+        <pre><code>Predicate&lt;Reservation&gt; isConfirmed = reservation ->
+        reservation.status().equals("CONFIRMED");
+
+Predicate&lt;Reservation&gt; isPaid = Reservation::isPaid;
+
+Predicate&lt;Reservation&gt; hasRequiredDocuments = reservation ->
+        reservation.documents().contains("PASSPORT")
+                || reservation.documents().contains("BIRTH_CERTIFICATE");
+
+Function&lt;Reservation, BoardingPass&gt; createBoardingPass = reservation ->
+        new BoardingPass(reservation.id(), reservation.guestName());
+
+List&lt;BoardingPass&gt; boardingPasses = reservations.stream()
+        .filter(isConfirmed.and(isPaid).and(hasRequiredDocuments))
+        .map(createBoardingPass)
+        .toList();</code></pre>
+        <p>This reads like a real process: keep confirmed reservations, keep paid reservations, keep guests with documents, then create boarding passes.</p>
+
+        <h3>How This Connects to Streams and Reactor</h3>
+        <p>Stream and Reactor operators receive functional interfaces. Once this idea is clear, the APIs become easier to read.</p>
+        <pre><code>// Stream
+payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED")) // Predicate
+        .map(Payment::id)                                      // Function
+        .forEach(System.out::println);                         // Consumer
+
+// Reactor
+paymentMono
+        .filter(payment -> payment.status().equals("APPROVED")) // Predicate
+        .map(Payment::id)                                       // Function
+        .doOnNext(System.out::println);                         // Consumer-style callback</code></pre>
+        <p>The difference is the execution model. Stream is usually synchronous and collection-focused. Reactor is asynchronous, lazy, and built around publishers such as <code>Mono</code> and <code>Flux</code>. But both rely heavily on the same functional-interface idea.</p>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Thinking a functional interface means many methods. It must have exactly one abstract method.</li>
+          <li>Forgetting that default and static methods are allowed because they are not abstract methods.</li>
+          <li>Putting database writes, HTTP calls, or shared mutable state inside lambdas that should be simple transformations.</li>
+          <li>Using a custom interface when <code>Predicate</code>, <code>Function</code>, <code>Consumer</code>, or <code>Supplier</code> would be clearer.</li>
+          <li>Using <code>Consumer</code> when a <code>Function</code> is needed. A Consumer returns nothing; a Function returns a transformed value.</li>
+        </ul>
+      </section>
+
+<section id="java-streams">
+        <h2>Java Streams Deep Dive</h2>
+        <p class="lead">A Stream is a pipeline for processing data from a collection or another source. It lets code describe what should happen to the data: filter these items, transform them, sort them, group them, count them, or reduce them into a final answer.</p>
+
+        <h3>Mental Model</h3>
+        <p>Imagine a Disney cruise check-in line. Guests enter the line, staff remove invalid reservations, sort guests by boarding group, transform each reservation into a boarding pass, and finally collect the passes into a stack. A Java Stream works the same way: data moves through a sequence of steps until a terminal operation produces the result.</p>
+        <pre><code>List&lt;BoardingPass&gt; passes = reservations.stream()
+        .filter(Reservation::isPaid)
+        .filter(reservation -> !reservation.isCancelled())
+        .sorted(Comparator.comparing(Reservation::boardingGroup)
+                .thenComparing(Reservation::guestName))
+        .map(reservation -> new BoardingPass(
+                reservation.id(),
+                reservation.guestName(),
+                reservation.boardingGroup()))
+        .toList();</code></pre>
+        <p>The source is <code>reservations</code>. The intermediate operations are <code>filter</code>, <code>sorted</code>, and <code>map</code>. The terminal operation is <code>toList</code>.</p>
+
+        <h3>Stream Vocabulary</h3>
+        <ul>
+          <li><strong>Source:</strong> where data comes from, such as a <code>List</code>, <code>Set</code>, array, file, or generated sequence.</li>
+          <li><strong>Intermediate operation:</strong> returns another Stream and does not run by itself. Examples: <code>map</code>, <code>filter</code>, <code>sorted</code>, <code>distinct</code>.</li>
+          <li><strong>Terminal operation:</strong> starts the pipeline and produces a result or side effect. Examples: <code>toList</code>, <code>collect</code>, <code>count</code>, <code>sum</code>, <code>forEach</code>.</li>
+          <li><strong>Lazy execution:</strong> intermediate operations wait until a terminal operation is called.</li>
+          <li><strong>One-time use:</strong> a Stream cannot be reused after a terminal operation.</li>
+        </ul>
+
+        <h3>Example Data</h3>
+        <pre><code>public record Payment(
+        String id,
+        String reservationId,
+        String guestName,
+        String method,
+        String status,
+        int amountInCents
+) {}
+
+List&lt;Payment&gt; payments = List.of(
+        new Payment("P1", "R1", "Ana", "CARD", "APPROVED", 125_00),
+        new Payment("P2", "R2", "Luke", "GIFT_CARD", "DECLINED", 80_00),
+        new Payment("P3", "R1", "Ana", "CARD", "APPROVED", 50_00),
+        new Payment("P4", "R3", "Mia", "PAYPAL", "APPROVED", 300_00)
+);</code></pre>
+
+        <h3>map</h3>
+        <p><code>map</code> transforms each item into another value. If a payment is a row in a spreadsheet, <code>map</code> creates a new column from each row.</p>
+        <pre><code>List&lt;String&gt; guestNames = payments.stream()
+        .map(Payment::guestName)
+        .toList();
+
+List&lt;String&gt; labels = payments.stream()
+        .map(payment -> payment.id() + " - " + payment.status())
+        .toList();</code></pre>
+        <p>Use <code>map</code> when one input item becomes one output item. A payment becomes a guest name. A reservation becomes a response DTO. An entity becomes an API response.</p>
+
+        <h3>filter</h3>
+        <p><code>filter</code> keeps only items that pass a condition. In real life, it is like letting only guests with valid boarding documents continue through the line.</p>
+        <pre><code>List&lt;Payment&gt; approvedPayments = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .toList();
+
+List&lt;Payment&gt; largeApprovedPayments = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .filter(payment -> payment.amountInCents() >= 100_00)
+        .toList();</code></pre>
+        <p>Multiple filters are often more readable than one large condition because each rule has its own line.</p>
+
+        <h3>flatMap</h3>
+        <p><code>flatMap</code> is used when each item contains another collection or stream, and the final result should be one flat stream. It transforms and flattens at the same time.</p>
+        <pre><code>public record CruiseReservation(
+        String id,
+        String guestName,
+        List&lt;String&gt; excursionCodes
+) {}
+
+List&lt;CruiseReservation&gt; reservations = List.of(
+        new CruiseReservation("R1", "Ana", List.of("CASTAWAY-5K", "SPA")),
+        new CruiseReservation("R2", "Luke", List.of("SNORKELING"))
+);
+
+List&lt;String&gt; allExcursions = reservations.stream()
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .toList();</code></pre>
+        <p>Without <code>flatMap</code>, the result would be shaped like <code>Stream&lt;List&lt;String&gt;&gt;</code>. With <code>flatMap</code>, the result is shaped like <code>Stream&lt;String&gt;</code>.</p>
+        <pre><code>// map keeps the boxes:
+List&lt;List&lt;String&gt;&gt; excursionsByReservation = reservations.stream()
+        .map(CruiseReservation::excursionCodes)
+        .toList();
+
+// flatMap opens the boxes and puts all items in one line:
+List&lt;String&gt; flatExcursions = reservations.stream()
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .toList();</code></pre>
+
+        <h3>distinct</h3>
+        <p><code>distinct</code> removes duplicates using <code>equals</code> and <code>hashCode</code>. With records, Java generates those methods from the record components.</p>
+        <pre><code>List&lt;String&gt; uniqueGuestNames = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .toList();
+
+List&lt;String&gt; uniqueReservationIds = payments.stream()
+        .map(Payment::reservationId)
+        .distinct()
+        .toList();</code></pre>
+        <p>Use <code>distinct</code> when repeated values are not meaningful, such as unique guest names, reservation IDs, payment methods, or event IDs already seen.</p>
+
+        <h3>sorted</h3>
+        <p><code>sorted</code> orders stream elements. For simple values like strings and numbers, natural ordering often works directly.</p>
+        <pre><code>List&lt;String&gt; names = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .sorted()
+        .toList();</code></pre>
+        <p>For objects, use a <code>Comparator</code> to say which field should control the order.</p>
+        <pre><code>List&lt;Payment&gt; cheapestFirst = payments.stream()
+        .sorted(Comparator.comparingInt(Payment::amountInCents))
+        .toList();
+
+List&lt;Payment&gt; biggestFirst = payments.stream()
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .toList();</code></pre>
+
+        <h3>Comparator Main Methods</h3>
+        <ul>
+          <li><code>Comparator.comparing</code>: sort by an object field, such as name, status, method, or date.</li>
+          <li><code>Comparator.comparingInt</code>: sort by an <code>int</code> without boxing overhead.</li>
+          <li><code>Comparator.comparingLong</code>: sort by a <code>long</code>.</li>
+          <li><code>Comparator.comparingDouble</code>: sort by a <code>double</code>.</li>
+          <li><code>thenComparing</code>: add a tie-breaker when the first comparison is equal.</li>
+          <li><code>reversed</code>: reverse the whole comparator.</li>
+          <li><code>nullsFirst</code> and <code>nullsLast</code>: define where null values should appear.</li>
+          <li><code>naturalOrder</code> and <code>reverseOrder</code>: use normal ascending or descending order for comparable values.</li>
+        </ul>
+        <pre><code>List&lt;Payment&gt; ordered = payments.stream()
+        .sorted(Comparator
+                .comparing(Payment::status)
+                .thenComparing(Payment::guestName)
+                .thenComparingInt(Payment::amountInCents))
+        .toList();</code></pre>
+        <p>Real-life analogy: sorting luggage first by deck, then by room number, then by guest name. If two bags have the same deck, the room number breaks the tie. If the room is also the same, the guest name breaks the next tie.</p>
+        <pre><code>public record LuggageTag(
+        int deck,
+        int roomNumber,
+        String guestName
+) {}
+
+List&lt;LuggageTag&gt; deliveryOrder = tags.stream()
+        .sorted(Comparator
+                .comparingInt(LuggageTag::deck)
+                .thenComparingInt(LuggageTag::roomNumber)
+                .thenComparing(LuggageTag::guestName))
+        .toList();</code></pre>
+
+        <h3>limit and skip</h3>
+        <p><code>limit</code> keeps the first N items. <code>skip</code> ignores the first N items. Together, they are useful for pagination.</p>
+        <pre><code>int page = 2;
+int size = 10;
+
+List&lt;Payment&gt; secondPage = payments.stream()
+        .sorted(Comparator.comparing(Payment::id))
+        .skip((long) (page - 1) * size)
+        .limit(size)
+        .toList();</code></pre>
+
+        <h3>peek</h3>
+        <p><code>peek</code> lets code observe items passing through the pipeline. It is mainly useful for debugging. Avoid using it for business logic.</p>
+        <pre><code>List&lt;Payment&gt; approved = payments.stream()
+        .peek(payment -> System.out.println("Before filter: " + payment.id()))
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .peek(payment -> System.out.println("Approved: " + payment.id()))
+        .toList();</code></pre>
+
+        <h3>Terminal Operations</h3>
+        <p>Terminal operations start the stream. Without a terminal operation, the pipeline is just a description and nothing runs.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>toList</h3>
+            <p><code>toList</code> creates a list from the stream result. In modern Java, this list is unmodifiable.</p>
+            <pre><code>List&lt;String&gt; approvedIds = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::id)
+        .toList();</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>collect</h3>
+            <p><code>collect</code> uses a Collector to build a result such as a list, set, map, string, or grouped structure.</p>
+            <pre><code>Set&lt;String&gt; methods = payments.stream()
+        .map(Payment::method)
+        .collect(Collectors.toSet());</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>count</h3>
+            <p><code>count</code> returns how many items remain after filtering.</p>
+            <pre><code>long declinedCount = payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .count();</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>forEach</h3>
+            <p><code>forEach</code> performs an action for each item. It returns nothing, so it is usually for boundary actions such as logging or calling a void API.</p>
+            <pre><code>payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .forEach(payment -> System.out.println("Review payment " + payment.id()));</code></pre>
+          </article>
+        </div>
+
+        <h3>sum, average, min, and max</h3>
+        <p><code>sum</code> exists on primitive streams such as <code>IntStream</code>, <code>LongStream</code>, and <code>DoubleStream</code>. Convert with <code>mapToInt</code>, <code>mapToLong</code>, or <code>mapToDouble</code>.</p>
+        <pre><code>int approvedTotal = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .mapToInt(Payment::amountInCents)
+        .sum();
+
+double averagePayment = payments.stream()
+        .mapToInt(Payment::amountInCents)
+        .average()
+        .orElse(0);
+
+int biggestPayment = payments.stream()
+        .mapToInt(Payment::amountInCents)
+        .max()
+        .orElse(0);</code></pre>
+        <p>Real-life analogy: after filtering only completed purchases, <code>sum</code> is like adding every receipt total in the cash register at the end of the day.</p>
+
+        <h3>reduce</h3>
+        <p><code>reduce</code> combines many values into one value. Use it when there is no simpler operation like <code>sum</code>, <code>count</code>, or <code>Collectors.joining</code>.</p>
+        <pre><code>int total = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .map(Payment::amountInCents)
+        .reduce(0, Integer::sum);
+
+String paymentSummary = payments.stream()
+        .map(payment -> payment.id() + ":" + payment.status())
+        .reduce("", (left, right) -> left.isBlank() ? right : left + ", " + right);</code></pre>
+
+        <h3>findFirst, findAny, anyMatch, allMatch, noneMatch</h3>
+        <p>These operations answer questions without necessarily processing every item. They can stop early when the answer is known.</p>
+        <pre><code>Optional&lt;Payment&gt; firstDeclined = payments.stream()
+        .filter(payment -> payment.status().equals("DECLINED"))
+        .findFirst();
+
+boolean hasDeclinedPayment = payments.stream()
+        .anyMatch(payment -> payment.status().equals("DECLINED"));
+
+boolean allApproved = payments.stream()
+        .allMatch(payment -> payment.status().equals("APPROVED"));
+
+boolean noNegativeAmounts = payments.stream()
+        .noneMatch(payment -> payment.amountInCents() < 0);</code></pre>
+        <p><code>anyMatch</code> is like asking whether at least one guest in line needs assistance. <code>allMatch</code> asks whether every guest has a valid ticket. <code>noneMatch</code> asks whether nobody is missing required documents.</p>
+
+        <h3>Collectors</h3>
+        <p><code>Collectors</code> are reusable recipes for turning a stream into a final structure.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>toList, toSet, toMap</h3>
+            <pre><code>List&lt;Payment&gt; approvedList = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .collect(Collectors.toList());
+
+Set&lt;String&gt; paymentMethods = payments.stream()
+        .map(Payment::method)
+        .collect(Collectors.toSet());
+
+Map&lt;String, Payment&gt; paymentById = payments.stream()
+        .collect(Collectors.toMap(
+                Payment::id,
+                payment -> payment));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>toMap With Duplicate Keys</h3>
+            <p>If keys can repeat, provide a merge function. This example keeps the larger payment per reservation.</p>
+            <pre><code>Map&lt;String, Payment&gt; largestPaymentByReservation = payments.stream()
+        .collect(Collectors.toMap(
+                Payment::reservationId,
+                payment -> payment,
+                (left, right) -> left.amountInCents() >= right.amountInCents()
+                        ? left
+                        : right));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>groupingBy</h3>
+            <p><code>groupingBy</code> creates buckets. It is like sorting cruise passengers into lines by boarding group.</p>
+            <pre><code>Map&lt;String, List&lt;Payment&gt;&gt; paymentsByStatus = payments.stream()
+        .collect(Collectors.groupingBy(Payment::status));
+
+Map&lt;String, List&lt;Payment&gt;&gt; paymentsByReservation = payments.stream()
+        .collect(Collectors.groupingBy(Payment::reservationId));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>partitioningBy</h3>
+            <p><code>partitioningBy</code> splits items into exactly two groups: true and false.</p>
+            <pre><code>Map&lt;Boolean, List&lt;Payment&gt;&gt; expensiveOrNot = payments.stream()
+        .collect(Collectors.partitioningBy(
+                payment -> payment.amountInCents() >= 100_00));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>joining</h3>
+            <p><code>joining</code> combines strings.</p>
+            <pre><code>String guestList = payments.stream()
+        .map(Payment::guestName)
+        .distinct()
+        .sorted()
+        .collect(Collectors.joining(", "));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>mapping and counting</h3>
+            <p>Collectors can be nested. This counts payments per status.</p>
+            <pre><code>Map&lt;String, Long&gt; countByStatus = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::status,
+                Collectors.counting()));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>summing and averaging</h3>
+            <pre><code>Map&lt;String, Integer&gt; totalByStatus = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::status,
+                Collectors.summingInt(Payment::amountInCents)));
+
+Map&lt;String, Double&gt; averageByMethod = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::method,
+                Collectors.averagingInt(Payment::amountInCents)));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>maxBy and minBy</h3>
+            <pre><code>Map&lt;String, Optional&lt;Payment&gt;&gt; largestByMethod = payments.stream()
+        .collect(Collectors.groupingBy(
+                Payment::method,
+                Collectors.maxBy(
+                        Comparator.comparingInt(Payment::amountInCents))));</code></pre>
+          </article>
+        </div>
+
+        <h3>toList vs Collectors.toList</h3>
+        <ul>
+          <li><code>stream().toList()</code> is concise and returns an unmodifiable list.</li>
+          <li><code>collect(Collectors.toList())</code> returns a mutable list in common JDK implementations, but the interface does not strongly promise the exact list type.</li>
+          <li>Use <code>toCollection(ArrayList::new)</code> when you specifically need a mutable <code>ArrayList</code>.</li>
+        </ul>
+        <pre><code>List&lt;String&gt; unmodifiable = payments.stream()
+        .map(Payment::id)
+        .toList();
+
+List&lt;String&gt; mutable = payments.stream()
+        .map(Payment::id)
+        .collect(Collectors.toCollection(ArrayList::new));
+
+mutable.add("manual-adjustment");</code></pre>
+
+        <h3>End-to-End Payment Example</h3>
+        <p>This pipeline creates a simple operations view: approved card payments, ordered by largest amount first, converted into display rows.</p>
+        <pre><code>public record PaymentRow(
+        String paymentId,
+        String reservationId,
+        String guestName,
+        String amount
+) {}
+
+List&lt;PaymentRow&gt; dashboardRows = payments.stream()
+        .filter(payment -> payment.status().equals("APPROVED"))
+        .filter(payment -> payment.method().equals("CARD"))
+        .sorted(Comparator.comparingInt(Payment::amountInCents).reversed())
+        .map(payment -> new PaymentRow(
+                payment.id(),
+                payment.reservationId(),
+                payment.guestName(),
+                "$" + payment.amountInCents() / 100))
+        .toList();</code></pre>
+
+        <h3>End-to-End Cruise Example</h3>
+        <p>This pipeline finds all unique excursion codes selected by paid reservations, sorted alphabetically.</p>
+        <pre><code>List&lt;String&gt; excursionCatalogInUse = reservations.stream()
+        .filter(reservation -> paidReservationIds.contains(reservation.id()))
+        .flatMap(reservation -> reservation.excursionCodes().stream())
+        .distinct()
+        .sorted()
+        .toList();</code></pre>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Using <code>map</code> when the function returns a collection and the result should be flattened. Use <code>flatMap</code>.</li>
+          <li>Expecting intermediate operations to run without a terminal operation.</li>
+          <li>Reusing a stream after <code>toList</code>, <code>collect</code>, <code>count</code>, or another terminal operation.</li>
+          <li>Using <code>forEach</code> to build lists manually instead of <code>map</code>, <code>filter</code>, and <code>toList</code>.</li>
+          <li>Using <code>sorted</code> on large datasets that should be sorted by the database with proper indexes.</li>
+          <li>Using parallel streams for I/O-heavy work without understanding thread pools, blocking calls, and ordering.</li>
+        </ul>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

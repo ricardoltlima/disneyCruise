@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reliability | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="#reliability">Reliability Roadmap</a>
+            <a href="#idempotency">Idempotency</a>
+            <a href="#timeouts-retries">Timeouts and Retries</a>
+            <a href="#circuit-breakers">Circuit Breakers</a>
+            <a href="#error-observability">Errors and Observability</a>
+            <a href="#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Reliability</h2>
+        <p>Reliability roadmap, idempotency, retries, circuit breakers, observability, and sync versus async design.</p>
+      </header>
+
+<section id="reliability">
+        <h2>Reliability Roadmap</h2>
+        <p class="lead">A mature backend call is not just one service calling another. It includes validation, security, timeouts, safe retries, error handling, observability, and sometimes asynchronous processing.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Topics We Will Deep Dive</h3>
+            <ul>
+              <li>Idempotency and duplicate prevention.</li>
+              <li>Timeouts and cascading failure prevention.</li>
+              <li>Retries, exponential backoff, and jitter.</li>
+              <li>Circuit breakers with closed, open, and half-open states.</li>
+              <li>Error handling and dependency error translation.</li>
+              <li>Fallback behavior and degraded responses.</li>
+              <li>Authentication and authorization.</li>
+              <li>Observability with logs, metrics, traces, and correlation IDs.</li>
+              <li>Synchronous vs asynchronous communication.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Senior-Level Service Call</h3>
+            <pre><code>Service A
+  - validates request
+  - checks authentication and authorization
+  - starts or propagates trace
+  - calls Service B with a timeout
+  - retries only when safe
+  - uses circuit breaker behavior
+  - handles errors consistently
+  - maybe falls back or queues work
+  - logs with trace ID
+  - emits metrics
+  - returns a stable response</code></pre>
+          </article>
+        </div>
+      </section>
+
+<section id="idempotency">
+        <h2>Idempotency</h2>
+        <p class="lead">Core question: how do you prevent duplicate side effects when a request or event is retried?</p>
+
+        <h3>Definition</h3>
+        <p>Idempotency means making the same operation once or multiple times has the same final effect. The first call may change state, but repeated calls should not create additional side effects.</p>
+        <pre><code>DELETE /api/reservations/123
+
+First call:  CONFIRMED -> CANCELLED
+Second call: still CANCELLED</code></pre>
+
+        <h3>Why Retries Are Dangerous</h3>
+        <p>Distributed systems retry after timeouts, dropped connections, gateway issues, service restarts, and slow downstream dependencies. The client may not know whether the server failed before processing or processed successfully but failed to return a response.</p>
+        <div class="warning callout">
+          <p><strong>Risk:</strong> retrying a non-idempotent operation can create duplicate payments, duplicate reservations, duplicate inventory holds, duplicate loyalty points, or duplicate notifications.</p>
+        </div>
+
+        <h3>HTTP Method Nuance</h3>
+        <p><code>GET</code>, <code>PUT</code>, and <code>DELETE</code> are usually designed to be idempotent. <code>POST</code> is often non-idempotent because it commonly creates a new resource or triggers a side effect. The method alone does not guarantee safety; the implementation determines the real behavior.</p>
+        <pre><code>PUT /api/counter/increment</code></pre>
+        <p>This is a bad design because every call increments again, even though it uses <code>PUT</code>.</p>
+
+        <h3>Idempotency Key</h3>
+        <p>An idempotency key is a unique value, usually generated by the client, that identifies one intended operation. If the same key is received again for the same request, the server returns the stored result instead of executing the side effect again.</p>
+        <pre><code>POST /api/payments
+Idempotency-Key: 7b9f9a3e-2e4d-4d40-9b97-9177e742ef31</code></pre>
+        <p>The server commonly stores the idempotency key, request hash, processing status, response body, and creation time. If the same key is reused with a different request body, the server should reject it, commonly with <code>409 Conflict</code> or <code>400 Bad Request</code>.</p>
+
+        <h3>Unique Constraints and Conditional Writes</h3>
+        <p>A database unique constraint is stronger than a check in application code because it protects against concurrent requests. Two threads can both check for existing data at the same time and both think it does not exist. A unique constraint or conditional write is the final guard.</p>
+        <pre><code>CREATE UNIQUE INDEX unique_reservation_deposit
+ON payments (reservation_id, payment_type);</code></pre>
+        <p>In DynamoDB, the equivalent idea is a conditional write, such as putting an item only if the idempotency key does not already exist.</p>
+
+        <h3>Robust Processing Flow</h3>
+        <ol>
+          <li>Request arrives with an idempotency key.</li>
+          <li>Server tries to insert an idempotency record with status <code>IN_PROGRESS</code>.</li>
+          <li>If insert succeeds, this request owns processing.</li>
+          <li>If insert fails because the key already exists, load the existing record.</li>
+          <li>If existing record is <code>COMPLETED</code>, return the stored response.</li>
+          <li>If existing record is <code>IN_PROGRESS</code>, return <code>202 Accepted</code>, <code>409 Conflict</code>, or wait briefly depending on API design.</li>
+          <li>After business processing succeeds, store the response and mark the idempotency record <code>COMPLETED</code>.</li>
+        </ol>
+
+        <h3>Event Consumers</h3>
+        <p>Kafka, Kinesis, RabbitMQ, and Lambda-based consumers often operate with at-least-once delivery. That means the same event may be delivered more than once. Consumers should be idempotent by tracking event IDs, using unique constraints, using conditional writes, or making state transitions safe to repeat.</p>
+        <pre><code>{
+  "eventId": "evt-123",
+  "type": "ReservationCreated",
+  "reservationId": "R123"
+}</code></pre>
+      </section>
+
+<section id="timeouts-retries">
+        <h2>Timeouts and Retries</h2>
+        <p class="lead">Core question: how do you prevent a slow or unhealthy dependency from taking down your service?</p>
+
+        <h3>Timeouts</h3>
+        <p>A timeout is a limit on how long your service is willing to wait for a dependency. It prevents unbounded waiting and protects threads, memory, connection pools, and request latency.</p>
+        <div class="warning callout">
+          <p><strong>Cascading failure:</strong> if Payment Service becomes slow and Reservation Service waits forever, Reservation Service threads can become stuck, queues grow, latency rises, and callers of Reservation Service may also start failing.</p>
+        </div>
+
+        <h3>Connection Timeout vs Read Timeout</h3>
+        <ul>
+          <li><strong>Connection timeout:</strong> how long the client waits to establish a connection to the dependency.</li>
+          <li><strong>Read timeout:</strong> how long the client waits for the dependency to send a response after the connection is established.</li>
+        </ul>
+        <pre><code>Connection timeout: 500ms
+Read timeout:       2s</code></pre>
+
+        <h3>Request Deadline</h3>
+        <p>Timeouts should fit inside the overall request budget. If the client or gateway will give up after three seconds, a downstream timeout of ten seconds is not useful. Downstream timeouts should align with the caller's deadline and leave room for error handling.</p>
+
+        <h3>Retries</h3>
+        <p>A retry means trying an operation again after a failure. Retries help with temporary failures, but they can make outages worse if they add traffic to a service that is already unhealthy.</p>
+        <ul>
+          <li>Good retry candidates: temporary timeouts, connection resets, <code>503</code>, <code>504</code>, and sometimes <code>429</code> while respecting <code>Retry-After</code>.</li>
+          <li>Bad retry candidates: <code>400</code>, <code>401</code>, <code>403</code>, <code>404</code>, validation errors, and business-rule failures.</li>
+        </ul>
+
+        <h3>Retry Safety</h3>
+        <p>Before retrying, check whether the operation is safe. Reads are usually safe. Operations with side effects, such as payments, reservations, refunds, or inventory holds, need idempotency protection such as an idempotency key, unique constraint, or conditional write.</p>
+
+        <h3>Retry Storms</h3>
+        <p>A retry storm happens when many callers retry at the same time against a dependency that is already overloaded. The retry traffic increases pressure and can delay recovery.</p>
+
+        <h3>Exponential Backoff and Jitter</h3>
+        <p>Exponential backoff waits longer between each retry, such as <code>100ms</code>, <code>200ms</code>, and <code>400ms</code>. Jitter adds randomness to those waits so many clients do not retry at exactly the same time.</p>
+        <pre><code>Without jitter:
+1000 clients retry at 100ms, then 200ms, then 400ms
+
+With jitter:
+some retry at 85ms, some at 117ms, some at 263ms</code></pre>
+
+        <h3>Practical Policy</h3>
+        <p>A practical retry policy should limit attempts, use exponential backoff with jitter, respect the request deadline, retry only transient failures, and only retry operations that are safe to repeat.</p>
+      </section>
+
+<section id="circuit-breakers">
+        <h2>Circuit Breakers</h2>
+        <p class="lead">Core question: how do you stop repeated calls to a failing dependency, and how do you decide whether degraded behavior is safe?</p>
+
+        <h3>Problem</h3>
+        <p>When a dependency is slow or unavailable, repeated calls and retries can consume threads, connections, CPU, memory, and network capacity. A circuit breaker protects the caller and gives the dependency time to recover.</p>
+
+        <h3>States</h3>
+        <ul>
+          <li><strong>Closed:</strong> normal state. Calls are allowed, and the breaker records successes, failures, and slow calls.</li>
+          <li><strong>Open:</strong> failure state. Calls are blocked immediately, so the service fails fast or uses a safe fallback.</li>
+          <li><strong>Half-open:</strong> recovery test state. A small number of trial calls are allowed. If they succeed, the breaker closes. If they fail, it opens again.</li>
+        </ul>
+        <pre><code>CLOSED -> OPEN -> HALF_OPEN -> CLOSED
+                   or
+                   HALF_OPEN -> OPEN</code></pre>
+
+        <h3>Fail Fast</h3>
+        <p>Fail fast means the service does not wait for a call that is likely to fail. When the circuit is open, the call is blocked immediately and returns a controlled failure or safe fallback. This keeps latency bounded and releases resources quickly.</p>
+
+        <h3>Circuit Breaker vs Retry</h3>
+        <p>Retries try again because a failure may be temporary. Circuit breakers stop trying temporarily because the dependency appears unhealthy. A common reliability pattern is timeout, limited retry, circuit breaker, then controlled failure or safe fallback.</p>
+
+        <h3>Fallback Behavior</h3>
+        <p>A fallback is an alternative response when the normal dependency call fails. Fallbacks are useful only when they are truthful and safe.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Safer Fallbacks</h3>
+            <ul>
+              <li>Return popular cruise activities when recommendations are unavailable.</li>
+              <li>Return cached non-critical content if freshness is acceptable.</li>
+              <li>Queue a confirmation email for retry later.</li>
+              <li>Accept a request as pending with <code>202 Accepted</code> when asynchronous processing is appropriate.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Dangerous Fallbacks</h3>
+            <ul>
+              <li>Assume payment succeeded when Payment Service is unavailable.</li>
+              <li>Assume inventory is available when Inventory Service is unavailable.</li>
+              <li>Allow a request when authorization cannot be verified.</li>
+              <li>Return stale pricing as if it were guaranteed current pricing.</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3>Configuration Concepts</h3>
+        <p>Circuit breakers are usually configured with a failure threshold, slow-call threshold, sliding window, minimum number of calls, wait duration in open state, and permitted test calls in half-open state.</p>
+        <pre><code>slidingWindowSize: 20
+minimumNumberOfCalls: 10
+failureRateThreshold: 50%
+waitDurationInOpenState: 30s
+permittedNumberOfCallsInHalfOpenState: 3</code></pre>
+
+        <h3>Observability</h3>
+        <p>Circuit breaker state should be visible in metrics and logs. Useful signals include circuit state, failure rate, slow call rate, blocked calls, fallback count, dependency latency, trace ID, dependency name, and failure reason.</p>
+      </section>
+
+<section id="error-observability">
+        <h2>Error Handling and Observability</h2>
+        <p class="lead">Core question: how do you return useful errors to clients while giving engineers enough data to debug production issues?</p>
+
+        <h3>Good API Errors</h3>
+        <p>A good API error response should be clear for the client, safe for security, stable for integrations, useful for debugging, and consistent across endpoints.</p>
+        <pre><code>{
+  "code": "PAYMENT_SERVICE_UNAVAILABLE",
+  "message": "Payment service is temporarily unavailable",
+  "traceId": "7f4a91c3"
+}</code></pre>
+
+        <h3>Business Errors vs Technical Errors</h3>
+        <ul>
+          <li><strong>Business errors:</strong> expected domain outcomes, such as payment declined, reservation not found, cabin unavailable, duplicate request, or reservation cannot be cancelled.</li>
+          <li><strong>Technical errors:</strong> bugs, infrastructure failures, or dependency failures, such as timeouts, connection failures, database outages, null pointer exceptions, or Kafka publish failures.</li>
+        </ul>
+        <p>Business and client errors usually map to <code>4xx</code>. Unexpected server and dependency failures usually map to <code>5xx</code>.</p>
+
+        <h3>Stable Error Codes</h3>
+        <p>Clients should not parse human-readable messages. They should rely on stable error codes like <code>RESERVATION_NOT_FOUND</code>, <code>VALIDATION_ERROR</code>, or <code>PAYMENT_SERVICE_UNAVAILABLE</code>. Messages can change; codes should remain stable.</p>
+
+        <h3>Do Not Leak Internals</h3>
+        <p>API responses should not expose stack traces, SQL queries, table names, internal hostnames, internal service URLs, raw library exceptions, secrets, or tokens. Keep internal details in logs and traces, linked by trace ID.</p>
+
+        <h3>Spring Exception Handling</h3>
+        <p><code>@RestControllerAdvice</code> centralizes exception handling, keeps controllers clean, maps exceptions to appropriate status codes, and returns consistent error bodies.</p>
+        <pre><code>@RestControllerAdvice
+public class ApiExceptionHandler {
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity&lt;ApiError&gt; handleNotFound(ReservationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiError(
+                        "RESERVATION_NOT_FOUND",
+                        "Reservation was not found",
+                        getTraceId()
+                ));
+    }
+}</code></pre>
+
+        <h3>Logs, Metrics, Traces</h3>
+        <ul>
+          <li><strong>Logs:</strong> tell what happened in a specific execution path.</li>
+          <li><strong>Metrics:</strong> show health and trends over time, such as latency, error rate, throughput, memory, consumer lag, or dependency failures.</li>
+          <li><strong>Traces:</strong> show where time was spent across services in a distributed request.</li>
+        </ul>
+
+        <h3>Useful Log Fields</h3>
+        <p>Structured logs should include fields such as timestamp, level, service, operation, trace ID, span ID, safe business identifiers, dependency name, status code, duration, error code, and exception class.</p>
+        <pre><code>{
+  "level": "ERROR",
+  "service": "reservation-service",
+  "operation": "createReservation",
+  "traceId": "abc-123",
+  "reservationId": "R123",
+  "dependency": "payment-service",
+  "durationMs": 2050,
+  "errorCode": "PAYMENT_SERVICE_TIMEOUT",
+  "exception": "ReadTimeoutException"
+}</code></pre>
+
+        <h3>Latency Investigation</h3>
+        <ol>
+          <li>Check dashboards for p95/p99 latency, error rate, throughput, and affected endpoints.</li>
+          <li>Check dependency metrics for payment, inventory, database, queues, streams, and external APIs.</li>
+          <li>Inspect traces for slow requests and identify the slow span.</li>
+          <li>Search logs by trace ID.</li>
+          <li>Check recent deploys or configuration changes.</li>
+          <li>Check resource saturation: CPU, memory, thread pools, database pools, and connection pools.</li>
+          <li>Choose mitigation: rollback, scale, open circuit, disable feature, queue work, or increase capacity.</li>
+        </ol>
+      </section>
+
+<section id="sync-async">
+        <h2>Synchronous vs Asynchronous Communication</h2>
+        <p class="lead">Core question: how do you decide whether one service should call another directly or publish an event for later processing?</p>
+
+        <h3>Synchronous Communication</h3>
+        <p>Synchronous communication means the caller waits for the callee to respond before continuing. REST and gRPC calls are common examples.</p>
+        <pre><code>Client
+  -> Reservation Service
+  -> Payment Service
+  -> Reservation Service
+  -> Client response</code></pre>
+        <p>Synchronous calls are useful when the caller needs an immediate answer, such as whether payment was authorized, whether a reservation exists, or whether a user is allowed to access a resource.</p>
+
+        <h3>Synchronous Tradeoffs</h3>
+        <ul>
+          <li><strong>Benefits:</strong> simple request/response model, easier to reason about, immediate result, natural fit for user-facing reads and validations.</li>
+          <li><strong>Risks:</strong> tighter coupling, dependency latency affects caller latency, failures can cascade, and every dependency needs timeouts, retries, circuit breakers, and observability.</li>
+        </ul>
+
+        <h3>Asynchronous Communication</h3>
+        <p>Asynchronous communication means the caller publishes a message or event and does not wait for the downstream work to complete inside the same request. Kafka, RabbitMQ, Kinesis, SQS, SNS, and Lambda triggers are common examples.</p>
+        <pre><code>Reservation Service
+  -> publishes ReservationCreated event
+  -> returns response
+
+Other consumers later:
+  -> Email Service sends confirmation
+  -> Loyalty Service awards points
+  -> Analytics Service records activity</code></pre>
+
+        <h3>Asynchronous Tradeoffs</h3>
+        <ul>
+          <li><strong>Benefits:</strong> decouples services, absorbs traffic spikes, improves resilience, supports replay, and lets non-critical work happen in the background.</li>
+          <li><strong>Risks:</strong> eventual consistency, duplicate messages, ordering issues, harder debugging, schema evolution, and more complex failure handling.</li>
+        </ul>
+
+        <h3>When To Use Synchronous</h3>
+        <ul>
+          <li>The user or caller needs an immediate answer.</li>
+          <li>The next step depends on the result.</li>
+          <li>The operation is a read or direct validation.</li>
+          <li>The workflow cannot honestly continue without the dependency response.</li>
+        </ul>
+        <p>Example: a reservation service may need a synchronous payment authorization before confirming a booking.</p>
+
+        <h3>When To Use Asynchronous</h3>
+        <ul>
+          <li>The work can happen later.</li>
+          <li>The caller does not need the final result immediately.</li>
+          <li>The system needs to absorb high-volume events.</li>
+          <li>Multiple consumers need to react to the same event.</li>
+          <li>The system benefits from replay, buffering, or decoupling.</li>
+        </ul>
+        <p>Example: after a reservation is confirmed, sending emails, updating analytics, awarding loyalty points, or syncing downstream reporting can happen asynchronously.</p>
+
+        <h3>Eventual Consistency</h3>
+        <p>Asynchronous systems are often eventually consistent. One service may update immediately while another service catches up later. This is acceptable when the business can tolerate short delays, but it must be visible in product behavior and support workflows.</p>
+
+        <h3>Senior Design Rule</h3>
+        <p>Use synchronous communication when correctness or user experience requires an immediate answer. Use asynchronous communication when work can be decoupled, retried, replayed, or processed in the background. Do not make everything synchronous by default, and do not make everything event-driven if the user needs a clear immediate result.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>Choose synchronous communication when the caller needs the result immediately or the next step cannot proceed without it.</li>
+          <li>Choose asynchronous communication when the work can happen later, the user does not need the final result immediately, or multiple consumers need to react to the same event.</li>
+          <li>Eventual consistency means different parts of the system may temporarily show different states, but they should converge after background processing completes.</li>
+          <li>Async consumers need idempotency because messages may be retried or delivered more than once.</li>
+          <li>A Travel-platform synchronous example is buying or confirming cruise tickets after checking payment and availability. A Travel-platform asynchronous example is sending notifications or park news updates after an event is published.</li>
+        </ul>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

@@ -1,0 +1,1938 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reactive Java | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="#reactive-kafka">Reactive Kafka</a>
+            <a href="#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Reactive Java</h2>
+        <p>Project Reactor fundamentals, deeper Reactor patterns, reactive Kafka, and reactive MongoDB.</p>
+      </header>
+
+<section id="project-reactor-fundamentals">
+        <h2>Project Reactor Fundamentals</h2>
+        <p class="lead">Project Reactor is a reactive programming library for Java. It lets backend code describe asynchronous data pipelines using <code>Mono</code> and <code>Flux</code>, instead of blocking a thread while waiting for work to finish.</p>
+
+        <h3>What Reactive Programming Is</h3>
+        <p>Reactive programming is a style where code reacts to data as it becomes available. Instead of saying "call this method, wait here, then continue", the code builds a pipeline that says "when a value arrives, transform it, validate it, maybe call another service, handle errors, and return the final result."</p>
+        <p>Reactive programming is about asynchronous execution, non-blocking processing, event-driven data flows, and backpressure-aware streams.</p>
+        <pre><code>// Pulling data in a blocking style:
+User user = repository.findById(id);
+
+// Describing non-blocking data that will arrive later:
+Mono&lt;User&gt; userMono = repository.findById(id);</code></pre>
+        <p>Nothing happens until someone subscribes. In WebFlux, the framework subscribes for you when it handles the HTTP request.</p>
+        <p>Real-life analogy: a restaurant does not make one waiter stand frozen while the kitchen prepares food. The waiter takes the order, the kitchen works, and the waiter can handle other tables until the food is ready. Reactive systems follow the same idea: do not block threads while waiting for databases, APIs, queues, or files.</p>
+        <pre><code>Mono&lt;ReservationResponse&gt; response = reservationRepository.findById(id)
+        .filter(reservation -> reservation.status().equals("CONFIRMED"))
+        .flatMap(paymentService::loadPayment)
+        .map(payment -> new ReservationResponse(id, payment.status()));</code></pre>
+        <p>The code describes the work. It does not immediately execute the work just because the pipeline was created.</p>
+
+        <h3>Mono vs Flux</h3>
+        <p>This distinction is very important: <code>Mono</code> is for zero or one value, and <code>Flux</code> is for zero to many values.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Mono&lt;T&gt;</h3>
+            <p>A <code>Mono</code> represents zero or one value. It is similar to <code>Optional&lt;T&gt;</code>, but asynchronous. Use it when the operation returns one thing, or possibly nothing.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation =
+        reservationRepository.findById("R123");
+
+Mono&lt;PaymentReceipt&gt; receipt =
+        paymentService.authorize(paymentRequest);
+
+Mono&lt;User&gt; userMono =
+        Mono.just(new User("1"));</code></pre>
+            <p>Examples: find by ID, make an HTTP request returning one object, authorize one payment, save one record, fetch one profile, return one HTTP response, or complete an operation with no value using <code>Mono&lt;Void&gt;</code>.</p>
+          </article>
+
+          <article class="card">
+            <h3>Flux&lt;T&gt;</h3>
+            <p>A <code>Flux</code> represents zero to N values. It is an asynchronous stream of elements. Use it when the operation can emit multiple items.</p>
+            <pre><code>Flux&lt;Reservation&gt; reservations =
+        reservationRepository.findByGuestId("G123");
+
+Flux&lt;PaymentEvent&gt; events =
+        paymentEventConsumer.receive();
+
+Flux&lt;User&gt; usersFlux =
+        Flux.just(user1, user2, user3);</code></pre>
+            <p>Examples: list users, list reservations, stream payment events, consume a Kafka topic, process Kinesis records, handle WebSocket messages, return multiple search results, or send server-sent events.</p>
+          </article>
+        </div>
+        <p>Plain rule: use <code>Mono</code> for one answer and <code>Flux</code> for many answers. A single cruise reservation lookup is <code>Mono</code>. A stream of all reservations for a sailing is <code>Flux</code>.</p>
+        <p><code>Mono</code> represents an asynchronous stream that emits zero or one element, while <code>Flux</code> represents an asynchronous stream that can emit zero to many elements. <code>Mono</code> is typically used for operations like finding a user by ID or saving an entity, where only one result is expected. <code>Flux</code> is used for streams of data such as fetching all users, consuming messages from Kafka, or handling continuous event streams. Both represent reactive pipelines that emit data and then complete.</p>
+
+        <h3>Mono Creation Methods</h3>
+        <p><strong>Short version:</strong></p>
+        <ul>
+          <li><code>Mono.fromSupplier(...)</code>: for synchronous code that returns a value.</li>
+          <li><code>Mono.fromCallable(...)</code>: for synchronous code that returns a value and may throw checked exceptions.</li>
+          <li><code>Mono.fromFuture(...)</code>: for async code that already gives you a <code>CompletableFuture</code>.</li>
+          <li><code>Mono.defer(...)</code>: for delaying creation of another <code>Mono</code> until subscription time.</li>
+        </ul>
+
+        <h3>Mono.fromSupplier</h3>
+        <p>Use this when you have a simple synchronous function:</p>
+        <pre><code>Mono&lt;LocalDateTime&gt; now = Mono.fromSupplier(LocalDateTime::now);</code></pre>
+        <p>This runs when someone subscribes:</p>
+        <pre><code>now.subscribe(System.out::println); // current time
+now.subscribe(System.out::println); // fresh current time</code></pre>
+        <p>Equivalent bad version:</p>
+        <pre><code>Mono&lt;LocalDateTime&gt; now = Mono.just(LocalDateTime.now());</code></pre>
+        <p>That captures the time immediately.</p>
+        <p>In your code, this could replace:</p>
+        <pre><code>Mono.just(request)
+        .map(mapper::toCruiseEntity)</code></pre>
+        <p>with:</p>
+        <pre><code>Mono.fromSupplier(() -> mapper.toCruiseEntity(request))</code></pre>
+        <p>So <code>saveCruise</code> could start like this:</p>
+        <pre><code>return Mono.fromSupplier(() -> mapper.toCruiseEntity(request))
+        .flatMap(repository::save)
+        .map(mapper::toCruiseResponse);</code></pre>
+        <p>That is slightly cleaner because the pipeline starts with the actual work: create an entity from the request.</p>
+
+        <h3>Mono.fromCallable</h3>
+        <p>Use this when the synchronous function may throw, especially checked exceptions:</p>
+        <pre><code>Mono&lt;String&gt; fileContent = Mono.fromCallable(() ->
+        Files.readString(Path.of("cruise.json"))
+);</code></pre>
+        <p><code>Files.readString(...)</code> can throw <code>IOException</code>, which is checked. <code>fromCallable</code> handles that and converts the exception into a Reactor error signal.</p>
+        <p>Difference from <code>fromSupplier</code>:</p>
+        <ul>
+          <li><code>Supplier&lt;T&gt;</code> cannot throw checked exceptions.</li>
+          <li><code>Callable&lt;T&gt;</code> can throw checked exceptions.</li>
+        </ul>
+        <p>In the current <code>CruiseService</code>, you probably do not need <code>fromCallable</code>. Mapper calls do not throw checked exceptions, and the repository is already reactive.</p>
+        <p>You could technically write:</p>
+        <pre><code>Mono.fromCallable(() -> mapper.toCruiseEntity(request))</code></pre>
+        <p>but <code>fromSupplier</code> is more accurate unless checked exceptions are involved.</p>
+
+        <h3>Mono.fromFuture</h3>
+        <p>Use this when some API gives you a <code>CompletableFuture</code>.</p>
+        <p>Example:</p>
+        <pre><code>CompletableFuture&lt;CruiseEntity&gt; future = someAsyncClient.saveCruise(entity);
+
+Mono&lt;CruiseEntity&gt; mono = Mono.fromFuture(future);</code></pre>
+        <p>This bridges Java future-based async code into Reactor.</p>
+        <p>Example use case:</p>
+        <pre><code>return Mono.fromSupplier(() -> mapper.toCruiseEntity(request))
+        .flatMap(entity -> Mono.fromFuture(externalPricingClient.enrichPrice(entity)))
+        .flatMap(repository::save)
+        .map(mapper::toCruiseResponse);</code></pre>
+        <p>In the current service, you do not need <code>fromFuture</code> because <code>repository.save(...)</code> already returns a <code>Mono</code>. If you wrapped it in <code>fromFuture</code>, that would be wrong unless the repository returned <code>CompletableFuture</code>.</p>
+
+        <h3>Mono.defer</h3>
+        <p>Use this when you want to delay the creation of a <code>Mono</code> itself.</p>
+        <p>Example:</p>
+        <pre><code>Mono&lt;CruiseEntity&gt; mono = Mono.defer(() -> repository.save(entity));</code></pre>
+        <p>That means <code>repository.save(entity)</code> is not even called until subscription time.</p>
+        <p>This is different from:</p>
+        <pre><code>Mono&lt;CruiseEntity&gt; mono = repository.save(entity);</code></pre>
+        <p>Usually Spring reactive repositories are already lazy, so this is often fine. But <code>defer</code> is useful when the method call itself should be delayed, or when you need fresh state per subscription.</p>
+        <p>Example:</p>
+        <pre><code>Mono&lt;String&gt; token = Mono.defer(() -> {
+    String currentToken = tokenProvider.getCurrentToken();
+    return authClient.validate(currentToken);
+});</code></pre>
+
+        <h3>Recommendation for CruiseService</h3>
+        <p>Use <code>Mono.defer</code> if you want the logging and mapper work to happen only at subscription time. Use <code>Mono.fromSupplier</code> for the mapper step if you want to be explicit that mapping is synchronous work inside the reactive pipeline. You do not need <code>fromCallable</code> or <code>fromFuture</code> here right now.</p>
+
+        <h3>Main Reason to Change from Mono.just to Mono.fromSupplier</h3>
+        <p>The main reason is when you want the value to be created at subscription time instead of pipeline creation time.</p>
+        <p>This:</p>
+        <pre><code>Mono.just(LocalDateTime.now())</code></pre>
+        <p>runs <code>LocalDateTime.now()</code> immediately and stores that value.</p>
+        <p>This:</p>
+        <pre><code>Mono.fromSupplier(LocalDateTime::now)</code></pre>
+        <p>stores the function and calls it later, every time someone subscribes.</p>
+        <p>So:</p>
+        <pre><code>Mono&lt;LocalDateTime&gt; justMono = Mono.just(LocalDateTime.now());
+Mono&lt;LocalDateTime&gt; supplierMono = Mono.fromSupplier(LocalDateTime::now);</code></pre>
+        <p>If you subscribe 5 seconds later:</p>
+        <ul>
+          <li><code>justMono</code>: old timestamp from when the <code>Mono</code> was created.</li>
+          <li><code>supplierMono</code>: fresh timestamp from subscription time.</li>
+        </ul>
+        <p>In your service, changing this:</p>
+        <pre><code>Mono.just(request)
+        .map(mapper::toCruiseEntity)</code></pre>
+        <p>to this:</p>
+        <pre><code>Mono.fromSupplier(() -> mapper.toCruiseEntity(request))</code></pre>
+        <p>means the mapper call itself is clearly modeled as a deferred synchronous operation.</p>
+        <p>But in your current code, <code>mapper.toCruiseEntity(request)</code> is already inside <code>.map(...)</code>, so it already runs at subscription time. The benefit is not huge there.</p>
+        <p>The stronger reason would be avoiding this kind of mistake:</p>
+        <pre><code>Mono.just(mapper.toCruiseEntity(request))</code></pre>
+        <p>That calls the mapper immediately.</p>
+        <p>Better:</p>
+        <pre><code>Mono.fromSupplier(() -> mapper.toCruiseEntity(request))</code></pre>
+        <p>That calls the mapper on subscription.</p>
+        <p>Rule:</p>
+        <ul>
+          <li>Use <code>Mono.just(value)</code> when the value already exists.</li>
+          <li>Use <code>Mono.fromSupplier(() -> createValue())</code> when creating the value involves code you want to run later, lazily, inside the reactive flow.</li>
+        </ul>
+
+        <h3>Lazy Execution</h3>
+        <p>Reactor pipelines are lazy. Creating a <code>Mono</code> or <code>Flux</code> usually describes work, but the work does not start until something subscribes.</p>
+        <p>Project Reactor is considered lazy because a reactive pipeline is not executed until a <code>Subscriber</code> subscribes to a <code>Publisher</code>. Defining a <code>Mono</code> or <code>Flux</code> only describes how data should flow, but no work is done upfront.</p>
+        <p>When a subscriber subscribes, it also signals demand, which allows Reactor to control the flow of data through backpressure. This laziness avoids unnecessary computation, gives the subscriber control over consumption, and is essential for building efficient, non-blocking systems.</p>
+        <pre><code>Mono&lt;String&gt; guestName = Mono.fromCallable(() -> {
+    System.out.println("Loading guest");
+    return "Ana";
+});
+
+// Nothing printed yet.
+
+guestName.subscribe(System.out::println);
+// Now "Loading guest" runs, then "Ana" is printed.</code></pre>
+        <p>In Spring WebFlux controllers, you normally do not call <code>subscribe()</code> yourself. You return the <code>Mono</code> or <code>Flux</code>, and Spring subscribes as part of handling the HTTP request.</p>
+        <pre><code>@GetMapping("/reservations/{id}")
+public Mono&lt;ReservationResponse&gt; getReservation(@PathVariable String id) {
+    return reservationService.getReservation(id);
+}</code></pre>
+
+        <h3>Most Important Reactor Operators</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>map</code></td>
+              <td>Transform data</td>
+            </tr>
+            <tr>
+              <td><code>filter</code></td>
+              <td>Keep matching data</td>
+            </tr>
+            <tr>
+              <td><code>flatMap</code></td>
+              <td>Async composition</td>
+            </tr>
+            <tr>
+              <td><code>defaultIfEmpty</code></td>
+              <td>Fallback value</td>
+            </tr>
+            <tr>
+              <td><code>switchIfEmpty</code></td>
+              <td>Alternate publisher</td>
+            </tr>
+            <tr>
+              <td><code>doOnNext</code></td>
+              <td>Side effects, such as logging</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="grid">
+          <article class="card">
+            <h3>map</h3>
+            <p>Use <code>map</code> for synchronous one-to-one transformations.</p>
+            <pre><code>Mono&lt;ReservationResponse&gt; response =
+        reservationMono.map(reservation ->
+                new ReservationResponse(
+                        reservation.id(),
+                        reservation.guestName(),
+                        reservation.status()));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>flatMap</h3>
+            <p>Use <code>flatMap</code> when the next step returns another <code>Mono</code> or <code>Flux</code>, usually an asynchronous operation.</p>
+            <pre><code>Mono&lt;PaymentReceipt&gt; receipt =
+        reservationMono.flatMap(reservation ->
+                paymentService.authorize(reservation.id()));</code></pre>
+            <p>If the function returns <code>Mono&lt;PaymentReceipt&gt;</code>, <code>flatMap</code> keeps the result as <code>Mono&lt;PaymentReceipt&gt;</code> instead of creating <code>Mono&lt;Mono&lt;PaymentReceipt&gt;&gt;</code>.</p>
+            <p><code>flatMap</code> is used when composing asynchronous operations. If the mapping function returns another reactive type like <code>Mono</code> or <code>Flux</code>, using <code>map</code> would result in a nested publisher such as <code>Mono&lt;Mono&lt;T&gt;&gt;</code>. <code>flatMap</code> flattens this structure and keeps the pipeline as a single reactive stream, allowing the pipeline to continue correctly.</p>
+          </article>
+
+          <article class="card">
+            <h3>filter</h3>
+            <p>Use <code>filter</code> to keep only values that pass a rule. If a <code>Mono</code> value does not pass, it becomes empty.</p>
+            <pre><code>Mono&lt;Reservation&gt; activeReservation =
+        reservationMono.filter(reservation ->
+                !reservation.status().equals("CANCELLED"));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>switchIfEmpty</h3>
+            <p>Use <code>switchIfEmpty</code> when no value was emitted. It is common for 404-style behavior.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation = repository.findById(id)
+        .switchIfEmpty(Mono.error(
+                new ReservationNotFoundException(id)));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorResume</h3>
+            <p>Use <code>onErrorResume</code> to recover from an error with another publisher.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = paymentClient.getStatus(paymentId)
+        .onErrorResume(TimeoutException.class, error ->
+                Mono.just(PaymentStatus.UNKNOWN));</code></pre>
+            <p>Use fallbacks only when they are truthful. Do not pretend a payment succeeded if the payment provider failed.</p>
+          </article>
+
+          <article class="card">
+            <h3>onErrorMap</h3>
+            <p>Use <code>onErrorMap</code> to translate one exception into another.</p>
+            <pre><code>Mono&lt;PaymentReceipt&gt; receipt = paymentClient.authorize(request)
+        .onErrorMap(WebClientException.class, error ->
+                new PaymentProviderException("Payment provider failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>doOnNext and doOnError</h3>
+            <p>Use <code>doOnNext</code> and <code>doOnError</code> for observation such as logging or metrics. Avoid putting core business changes there.</p>
+            <pre><code>Mono&lt;Reservation&gt; reservation = repository.findById(id)
+        .doOnNext(value -> log.info("Loaded reservation {}", value.id()))
+        .doOnError(error -> log.warn("Reservation load failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>then and thenReturn</h3>
+            <p>Use <code>then</code> when you care that one operation completes before another starts, but you do not need the previous value.</p>
+            <pre><code>Mono&lt;Void&gt; result = repository.deleteById(id)
+        .then(auditService.recordDeletion(id));
+
+Mono&lt;ResponseEntity&lt;Void&gt;&gt; deleted = repository.deleteById(id)
+        .thenReturn(ResponseEntity.noContent().build());</code></pre>
+          </article>
+        </div>
+
+        <h3>Cold Publishers</h3>
+        <p>A cold publisher starts producing data for each subscriber. Each subscriber gets its own execution of the pipeline.</p>
+        <ul>
+          <li>It starts emitting when a subscriber subscribes.</li>
+          <li>Each subscriber gets the full sequence.</li>
+          <li>Each subscriber usually triggers a separate execution of the source.</li>
+        </ul>
+        <pre><code>Flux&lt;Integer&gt; cold = Flux.range(1, 3);</code></pre>
+        <pre><code>Flux&lt;Integer&gt; coldNumbers = Flux.range(1, 3)
+        .doOnNext(number -> System.out.println("Producing " + number));
+
+coldNumbers.subscribe(number -> System.out.println("A: " + number));
+coldNumbers.subscribe(number -> System.out.println("B: " + number));</code></pre>
+        <p>Each subscriber receives <code>1, 2, 3</code>. Real-life analogy: a recorded training video starts from the beginning for every person who presses play.</p>
+
+        <h3>Hot Publishers</h3>
+        <p>A hot publisher is a reactive stream that produces data independently of subscribers. It emits data whether or not anyone is listening, and new subscribers may miss previously emitted values.</p>
+        <ul>
+          <li>It emits continuously or independently of individual subscribers.</li>
+          <li>Subscribers share the same stream.</li>
+          <li>Subscribers may miss data if they arrive late.</li>
+        </ul>
+        <p>Think of it like live radio. If you tune in late, you do not hear what was already broadcast.</p>
+
+        <h3>Common Examples of Hot Publishers</h3>
+        <ul>
+          <li><strong>Kafka topic:</strong> messages are produced whether consumers are connected or not.</li>
+          <li><strong>WebSocket messages:</strong> clients only receive messages after connecting.</li>
+          <li><strong>Mouse or UI events:</strong> events happen regardless of listeners.</li>
+          <li><strong>Shared interval streams:</strong> <code>Flux.interval()</code> can become hot when shared.</li>
+        </ul>
+        <pre><code>Flux&lt;Long&gt; hotTicks = Flux.interval(Duration.ofSeconds(1))
+        .share();
+
+hotTicks.subscribe(tick -> System.out.println("First: " + tick));
+
+// A later subscriber sees only future ticks.
+hotTicks.subscribe(tick -> System.out.println("Second: " + tick));</code></pre>
+        <p>Real-life analogy: a live show on the ship keeps going whether or not someone is in the theater. If a guest walks in halfway through, they do not see the beginning.</p>
+
+        <h3>Simple Hot Publisher Example</h3>
+        <pre><code>Flux&lt;Long&gt; hot = Flux.interval(Duration.ofSeconds(1))
+        .share();
+
+hot.subscribe(v -> System.out.println("Subscriber 1: " + v));
+
+Thread.sleep(3000);
+
+hot.subscribe(v -> System.out.println("Subscriber 2: " + v));</code></pre>
+        <pre><code>Subscriber 1: 0
+Subscriber 1: 1
+Subscriber 1: 2
+Subscriber 2: 3   // missed 0, 1, 2</code></pre>
+        <p class="answer">A hot publisher emits data independently of subscribers. It produces values continuously, and subscribers only receive items emitted after they subscribe. Examples include Kafka topics, WebSocket streams, UI events, and shared <code>Flux.interval()</code> streams.</p>
+
+        <h3>Thinking in Reactive Pipelines</h3>
+        <p>Imperative code often says: get a value, store it in a variable, check it, call something else, mutate another variable, return. Reactive code says: when the value arrives, apply this chain of operations.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Imperative Shape</h3>
+            <pre><code>Reservation reservation = repository.findById(id);
+
+if (reservation == null) {
+    throw new ReservationNotFoundException(id);
+}
+
+Payment payment = paymentClient.load(reservation.paymentId());
+
+return mapper.toResponse(reservation, payment);</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>Reactive Shape</h3>
+            <pre><code>return repository.findById(id)
+        .switchIfEmpty(Mono.error(
+                new ReservationNotFoundException(id)))
+        .flatMap(reservation ->
+                paymentClient.load(reservation.paymentId())
+                        .map(payment ->
+                                mapper.toResponse(reservation, payment)));</code></pre>
+          </article>
+        </div>
+        <p>The reactive version keeps the work inside the pipeline. It does not call <code>block()</code>, does not manually subscribe, and does not rely on mutable temporary state.</p>
+
+        <h3>End-to-End Payment Example</h3>
+        <p>This flow loads a reservation, validates that it can be paid, authorizes payment, saves the receipt, and returns a response.</p>
+        <pre><code>public Mono&lt;PaymentResponse&gt; payReservation(String reservationId, PaymentRequest request) {
+    return reservationRepository.findById(reservationId)
+            .switchIfEmpty(Mono.error(
+                    new ReservationNotFoundException(reservationId)))
+            .filter(reservation -> reservation.status().equals("PENDING_PAYMENT"))
+            .switchIfEmpty(Mono.error(
+                    new InvalidReservationStateException(reservationId)))
+            .flatMap(reservation ->
+                    paymentClient.authorize(request)
+                            .flatMap(receipt -> paymentRepository.save(receipt))
+                            .map(savedReceipt -> new PaymentResponse(
+                                    reservation.id(),
+                                    savedReceipt.id(),
+                                    savedReceipt.status())));
+}</code></pre>
+
+        <h3>End-to-End Disney Cruise Example</h3>
+        <p>This flow finds all confirmed reservations for a sailing, loads their payment status, keeps paid reservations, and creates boarding pass previews.</p>
+        <pre><code>public Flux&lt;BoardingPassPreview&gt; previewBoardingPasses(String sailingId) {
+    return reservationRepository.findBySailingId(sailingId)
+            .filter(reservation -> reservation.status().equals("CONFIRMED"))
+            .flatMap(reservation ->
+                    paymentClient.getStatus(reservation.paymentId())
+                            .filter(status -> status.equals(PaymentStatus.PAID))
+                            .map(status -> new BoardingPassPreview(
+                                    reservation.id(),
+                                    reservation.guestName(),
+                                    reservation.boardingGroup())));
+}</code></pre>
+
+        <h3>Practical Rules</h3>
+        <ul>
+          <li>Use <code>Mono</code> for zero or one value.</li>
+          <li>Use <code>Flux</code> for zero to many values.</li>
+          <li>Use <code>map</code> for synchronous transformations.</li>
+          <li>Use <code>flatMap</code> for asynchronous composition.</li>
+          <li>Use <code>switchIfEmpty</code> for missing values.</li>
+          <li>Use <code>onErrorResume</code> for recovery and <code>onErrorMap</code> for translation.</li>
+          <li>Do not call <code>block()</code> inside WebFlux request handling.</li>
+          <li>Do not call <code>subscribe()</code> inside controllers or services just to make work happen.</li>
+          <li>Keep data immutable and avoid shared mutable state inside pipelines.</li>
+        </ul>
+
+        <h3>Reference Definition</h3>
+        <p class="answer">Reactive programming is a way to build asynchronous, non-blocking data flows. In Project Reactor, <code>Mono</code> represents zero or one value, while <code>Flux</code> represents zero to many values. Reactor pipelines are lazy, so the work starts on subscription. Operators like <code>map</code>, <code>filter</code>, and <code>flatMap</code> compose small functions into a larger pipeline, allowing services to handle asynchronous work without blocking threads.</p>
+      </section>
+
+<section id="reactor-deep-dive">
+        <h2>Reactor Deep Dive</h2>
+        <p class="lead">Once the basic <code>Mono</code>, <code>Flux</code>, and operator model is clear, the next step is understanding execution: which thread runs the work, where blocking work belongs, how errors flow, how context travels, and how backpressure protects systems.</p>
+
+        <h3>How Reactor Uses Threads</h3>
+        <p>Reactor does not create threads unless the pipeline reaches an asynchronous boundary or code explicitly uses a <code>Scheduler</code>. By default, Reactor runs on the caller thread. There is no magic thread pool unless one is specified.</p>
+        <pre><code>Mono.just("A")
+        .map(value -> {
+            System.out.println(Thread.currentThread().getName());
+            return value;
+        })
+        .subscribe();</code></pre>
+        <pre><code>main</code></pre>
+        <p>If this code is subscribed from the main thread, the simple synchronous work runs on the main thread. In WebFlux, request handling usually starts on an event-loop thread. That event-loop thread must not be blocked.</p>
+        <p>Real-life analogy: a cruise check-in employee can handle many guests efficiently if nobody makes them stand still waiting for a slow printer. If one guest blocks the employee for a long time, the whole line suffers. Event-loop threads are like those employees: keep them free and fast.</p>
+
+        <h3>Why Threading Is Hard in Reactive Systems</h3>
+        <p>Reactive systems are asynchronous, non-blocking, and concurrent. Problems happen when blocking code runs on non-blocking threads, when thread pools are exhausted, or when multiple threads share mutable state. Schedulers help by isolating different kinds of work onto thread pools designed for that purpose.</p>
+        <ul>
+          <li>Blocking code on event-loop threads can create latency spikes.</li>
+          <li>Too many blocking calls can exhaust available threads.</li>
+          <li>Shared mutable state can create race conditions when work moves across threads.</li>
+          <li>Wrong scheduler choices can make a reactive service slower or less stable than imperative code.</li>
+        </ul>
+
+        <h3>Mono.fromCallable</h3>
+        <p><code>Mono.fromCallable(...)</code> means: create a <code>Mono</code> that will run this <code>Callable</code> later, then emit its result or emit an error signal if it throws.</p>
+        <p>A <code>Callable&lt;T&gt;</code> is similar to a <code>Supplier&lt;T&gt;</code>, but it is allowed to throw checked exceptions. That makes <code>fromCallable</code> useful when adapting imperative code into a reactive pipeline.</p>
+        <p>Reactive programming is non-blocking, but real systems still contain blocking code: JDBC, blocking REST clients, file I/O, legacy libraries, and calls such as <code>Thread.sleep(...)</code>. These must be integrated without breaking the reactive system. That is where <code>fromCallable</code> is useful.</p>
+        <ul>
+          <li>Blocking database calls such as JDBC.</li>
+          <li>Reading files.</li>
+          <li>Calling legacy libraries.</li>
+          <li>Any operation that returns a value and may throw.</li>
+        </ul>
+        <h3>Common Beginner Mistake</h3>
+        <p>This looks innocent, but it is wrong when <code>blockingCall()</code> blocks:</p>
+        <pre><code>Mono&lt;String&gt; mono =
+        Mono.just(blockingCall());</code></pre>
+        <p><code>blockingCall()</code> is executed immediately, before any scheduler, before any subscription, and before any backpressure can apply. That can block the caller thread, the Netty event loop, or the whole application under load.</p>
+        <p><strong>Key rule:</strong> never put blocking code inside <code>Mono.just()</code>. Use <code>Mono.just(value)</code> only when the value already exists.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Mono.just(value)</code></td>
+              <td>I already have the value.</td>
+            </tr>
+            <tr>
+              <td><code>Mono.fromCallable(fn)</code></td>
+              <td>Call this later to get the value.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono&lt;String&gt; mono = Mono.fromCallable(() -> {
+    // This can block and can throw.
+    return blockingCallThatReturnsString();
+});</code></pre>
+        <p>With <code>fromCallable</code>, you are not calling the method yet. You are describing how to call it later. Reactor will call it only on subscription and capture exceptions as error signals.</p>
+        <p><code>fromCallable</code> is lazy. Nothing runs until someone subscribes.</p>
+        <pre><code>Mono&lt;String&gt; mono = Mono.fromCallable(() -> {
+    System.out.println("Calling...");
+    Thread.sleep(1000);
+    return "data";
+});
+
+// At this moment nothing is printed, blocked, or executed.
+
+mono.subscribe();</code></pre>
+        <p><code>fromCallable</code> describes blocking work. <code>subscribeOn</code> decides where it runs. The safe pattern for unavoidable blocking code is:</p>
+        <pre><code>Mono.fromCallable(() -> blockingCall())
+        .subscribeOn(Schedulers.boundedElastic());</code></pre>
+        <p>This runs the blocking call on a scheduler designed for blocking work, without tying up reactive event-loop threads.</p>
+        <pre><code>Mono.fromCallable(() -> {
+    throw new RuntimeException("boom");
+})
+.onErrorReturn("fallback");</code></pre>
+        <p>If the callable throws, Reactor turns the exception into an error signal. That error can then be handled with operators such as <code>onErrorReturn</code>, <code>onErrorResume</code>, or <code>onErrorMap</code>.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .map(this::cpuTransform)
+        .subscribe();</code></pre>
+        <p>Meaning: the blocking database call runs on <code>boundedElastic</code>, CPU work runs on <code>parallel</code>, and the pipeline keeps blocking work separated from reactive threads.</p>
+        <p class="answer"><code>fromCallable</code> defers blocking work until subscription and converts exceptions into reactive error signals. It should be paired with <code>subscribeOn(Schedulers.boundedElastic())</code> to safely integrate blocking code into Reactor.</p>
+
+        <h3>subscribeOn vs publishOn</h3>
+        <p><code>subscribeOn</code> controls where subscription and source-side work starts. <code>publishOn</code> changes the execution context for downstream operators after that point in the pipeline.</p>
+        <p>Classic rule: <code>subscribeOn</code> decides where the source runs; <code>publishOn</code> decides where downstream operators run.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>subscribeOn</h3>
+            <p>Use <code>subscribeOn</code> near a blocking or expensive source to move that source work onto the right scheduler.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = Mono.fromCallable(() ->
+        legacyPaymentClient.getStatus(paymentId))
+        .subscribeOn(Schedulers.boundedElastic());</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>publishOn</h3>
+            <p>Use <code>publishOn</code> when downstream processing should continue on another scheduler.</p>
+            <pre><code>Flux&lt;PaymentEvent&gt; processed = paymentEvents
+        .publishOn(Schedulers.parallel())
+        .map(this::calculateRiskScore);</code></pre>
+          </article>
+        </div>
+        <pre><code>Mono.fromCallable(this::blockingCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .map(this::cpuTask)
+        .subscribe();</code></pre>
+        <p>In this example, the blocking source runs on <code>boundedElastic</code>. After <code>publishOn</code>, the CPU-oriented mapping runs on <code>parallel</code>.</p>
+        <pre><code>Mono.fromCallable(() -> {
+    System.out.println("source thread = " + Thread.currentThread().getName());
+    return "data";
+})
+.subscribeOn(Schedulers.boundedElastic())
+.publishOn(Schedulers.parallel())
+.map(value -> {
+    System.out.println("map thread = " + Thread.currentThread().getName());
+    return value.toUpperCase();
+})
+.subscribe();</code></pre>
+        <p>The source thread prints something like <code>boundedElastic-...</code>. The map thread prints something like <code>parallel-...</code>. That is the clean separation: source work on one scheduler, downstream CPU work on another.</p>
+        <p>Where <code>publishOn</code> appears matters. Only operators after <code>publishOn</code> move to the new scheduler.</p>
+        <pre><code>Mono.just("x")
+        .map(value -> {
+            // Runs on the current thread.
+            return value;
+        })
+        .publishOn(Schedulers.parallel())
+        .map(value -> {
+            // Runs on a parallel thread.
+            return value;
+        });</code></pre>
+
+        <h3>What Happens Without publishOn</h3>
+        <p>If a pipeline uses <code>subscribeOn(Schedulers.boundedElastic())</code> but never uses <code>publishOn</code>, the downstream operators continue on <code>boundedElastic</code>.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic())
+        .map(this::cpuTransform)
+        .subscribe();</code></pre>
+        <p>This means the blocking database call runs on <code>boundedElastic</code>, and <code>cpuTransform</code> also runs on <code>boundedElastic</code>. There is one scheduler and no handoff.</p>
+        <p>This is not wrong. It is safe because <code>boundedElastic</code> is allowed to block, and small CPU work can run there too. It may be suboptimal if the CPU work is heavy.</p>
+        <pre><code>Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic()) // I/O
+        .publishOn(Schedulers.parallel())         // switch
+        .map(this::cpuTransform)                  // CPU
+        .subscribe();</code></pre>
+        <p>Add <code>publishOn(Schedulers.parallel())</code> when you want thread responsibility separation: <code>boundedElastic</code> for blocking I/O and <code>parallel</code> for CPU-heavy computation.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Without publishOn</th>
+              <th>With publishOn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Correctness</td>
+              <td>Safe</td>
+              <td>Safe</td>
+            </tr>
+            <tr>
+              <td>Blocking safety</td>
+              <td>Safe</td>
+              <td>Safe</td>
+            </tr>
+            <tr>
+              <td>CPU efficiency</td>
+              <td>Potentially suboptimal</td>
+              <td>Better for heavy CPU work</td>
+            </tr>
+            <tr>
+              <td>Thread separation</td>
+              <td>No</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Clarity of intent</td>
+              <td>Less explicit</td>
+              <td>Clearer</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Common trap:</strong> you do not always need <code>publishOn</code> after <code>subscribeOn(boundedElastic)</code>. It is only needed when you want to switch execution to a different scheduler. Without it, downstream operators continue on the same scheduler.</p>
+        <ul>
+          <li>Use <code>publishOn</code> when CPU-heavy transformations follow blocking I/O.</li>
+          <li>Use <code>publishOn</code> when clear separation of responsibilities improves readability and performance under load.</li>
+          <li>Skip <code>publishOn</code> when the pipeline is short, CPU work is minimal, thread separation is unnecessary, and simplicity is preferred.</li>
+        </ul>
+        <p class="answer"><code>subscribeOn</code> chooses where execution starts. <code>publishOn</code> is optional and only needed to change threads downstream. Missing <code>publishOn</code> means there is no thread switch; nothing breaks because of that alone.</p>
+
+        <h3>Choosing the Right Scheduler</h3>
+        <p>Schedulers define where work runs. Think of them as thread pools with specific purposes.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Scheduler</th>
+              <th>Best For</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Schedulers.boundedElastic()</code></td>
+              <td>Blocking I/O or legacy blocking APIs; grows as needed within limits</td>
+              <td><code>Mono.fromCallable(this::blockingCall).subscribeOn(Schedulers.boundedElastic())</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.parallel()</code></td>
+              <td>CPU-bound work; fixed-size pool, usually based on CPU cores</td>
+              <td><code>.publishOn(Schedulers.parallel()).map(this::cpuHeavyTask)</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.single()</code></td>
+              <td>Ordered execution on one shared worker</td>
+              <td><code>.publishOn(Schedulers.single())</code></td>
+            </tr>
+            <tr>
+              <td><code>Schedulers.immediate()</code></td>
+              <td>Current thread; mostly useful for simple cases and tests</td>
+              <td>No scheduling boundary</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>public Mono&lt;Reservation&gt; loadFromBlockingLegacySystem(String id) {
+    return Mono.fromCallable(() -> legacyReservationClient.findById(id))
+            .subscribeOn(Schedulers.boundedElastic());
+}</code></pre>
+        <p>Use <code>boundedElastic</code> for unavoidable blocking work. If the whole stack is already non-blocking, such as WebClient plus R2DBC, do not add schedulers just because the code is reactive. Never run blocking work on <code>parallel</code>; it is meant for CPU work, not waiting on I/O.</p>
+
+        <h3>Why Blocking Is Dangerous</h3>
+        <p>Reactive threads are few, shared, and optimized for asynchronous work. Blocking them with database calls, blocking REST clients, <code>Thread.sleep()</code>, or file I/O can cause thread starvation, latency spikes, and eventually system instability. Blocking code must be isolated on <code>Schedulers.boundedElastic()</code> when it cannot be avoided.</p>
+        <pre><code>// Correct for unavoidable blocking I/O:
+Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.boundedElastic());
+
+// Wrong idea: parallel is for CPU work, not blocking I/O.
+Mono.fromCallable(this::blockingDbCall)
+        .subscribeOn(Schedulers.parallel());</code></pre>
+
+        <h3>Error Handling in Reactive Pipelines</h3>
+        <p>In Reactor, errors are signals in the pipeline. An error is terminal unless the pipeline handles it and switches to another value or publisher.</p>
+        <p>Unlike normal imperative code, errors are not thrown down the stack in the usual <code>try/catch</code> style. A reactive stream communicates with three signal types:</p>
+        <ul>
+          <li><code>onNext(value)</code>: emits a value.</li>
+          <li><code>onComplete()</code>: completes successfully.</li>
+          <li><code>onError(error)</code>: fails and terminates the stream.</li>
+        </ul>
+        <p>Once a stream emits <code>onError</code>, it is done unless an operator recovers by returning a fallback value or fallback publisher.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>onErrorReturn</code></td>
+              <td>Fallback value</td>
+            </tr>
+            <tr>
+              <td><code>onErrorResume</code></td>
+              <td>Fallback publisher</td>
+            </tr>
+            <tr>
+              <td><code>doOnError</code></td>
+              <td>Side effects such as logging or metrics</td>
+            </tr>
+            <tr>
+              <td><code>retry</code></td>
+              <td>Retry immediately</td>
+            </tr>
+            <tr>
+              <td><code>retryWhen</code></td>
+              <td>Retry with a strategy, such as delay or backoff</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retry(3)
+        .onErrorResume(error -> Mono.just("fallback"));</code></pre>
+        <div class="grid">
+          <article class="card">
+            <h3>onErrorReturn</h3>
+            <p>Return a fixed fallback value. Use this when the fallback is constant and the exception details do not matter.</p>
+            <pre><code>Mono&lt;String&gt; status = paymentClient.status(id)
+        .onErrorReturn("UNKNOWN");</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorReturn("fallback");</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorResume</h3>
+            <p>Recover with another reactive operation. This is the most common recovery operator because the fallback can depend on the error or call another async source.</p>
+            <pre><code>Mono&lt;PaymentStatus&gt; status = paymentClient.status(id)
+        .onErrorResume(TimeoutException.class, error ->
+                paymentCache.lastKnownStatus(id));</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorResume(error -> Mono.just("fallback"));
+
+Mono&lt;String&gt; pathSpecific = Mono.fromCallable(this::callApi)
+        .onErrorResume(TimeoutException.class, error ->
+                Mono.just("timeout-fallback"))
+        .onErrorResume(error ->
+                Mono.just("generic-fallback"));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>onErrorMap</h3>
+            <p>Translate a low-level error into a domain exception. Use this when the service should expose consistent error types or hide low-level implementation details.</p>
+            <pre><code>Mono&lt;Receipt&gt; receipt = paymentClient.authorize(request)
+        .onErrorMap(WebClientException.class, error ->
+                new PaymentProviderException("Authorization failed", error));</code></pre>
+            <pre><code>Mono&lt;String&gt; result = Mono.fromCallable(this::callApi)
+        .onErrorMap(error ->
+                new MyServiceException("API failed", error));</code></pre>
+          </article>
+
+          <article class="card">
+            <h3>doOnError</h3>
+            <p>Observe an error without recovering from it. Use it for side effects only, such as logging and metrics.</p>
+            <pre><code>Mono&lt;Receipt&gt; receipt = paymentClient.authorize(request)
+        .doOnError(error ->
+                log.warn("Payment authorization failed", error));</code></pre>
+            <pre><code>mono.doOnError(error ->
+        log.error("failed", error));</code></pre>
+          </article>
+        </div>
+        <h3>onErrorResume vs onErrorReturn</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operator</th>
+              <th>Behavior</th>
+              <th>Use When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>onErrorReturn("fallback")</code></td>
+              <td>Always returns the same fallback value.</td>
+              <td>The fallback is simple, static, and does not need exception details.</td>
+            </tr>
+            <tr>
+              <td><code>onErrorResume(error -> ...)</code></td>
+              <td>Chooses a dynamic fallback based on the exception.</td>
+              <td>The fallback depends on exception type, or recovery needs another async operation.</td>
+            </tr>
+          </tbody>
+        </table>
+        <pre><code>Mono.fromCallable(this::risky)
+        .retry(2)
+        .onErrorResume(error -> {
+            if (error instanceof TimeoutException) {
+                return Mono.just("timeout-fallback");
+            }
+            return Mono.error(new RuntimeException("wrapped", error));
+        });</code></pre>
+        <p>This is a common real-world pattern: retry transient failures first, use a fallback for known recoverable cases, and wrap or propagate unexpected failures.</p>
+        <h3>Retry</h3>
+        <p><code>retry(n)</code> retries a fixed number of times immediately. The total attempts are the original attempt plus the retries.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retry(2); // total attempts = 1 original + 2 retries = 3</code></pre>
+        <p>If the operation keeps failing after retries, the stream emits <code>onError</code>.</p>
+        <p><code>retryWhen(...)</code> retries with a strategy, such as delay, exponential backoff, or filtering which exceptions are retryable.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .retryWhen(Retry.backoff(2, Duration.ofMillis(200)));
+
+Mono.fromCallable(this::callApi)
+        .retryWhen(
+                Retry.backoff(2, Duration.ofMillis(200))
+                        .filter(error -> error instanceof TimeoutException)
+        );</code></pre>
+        <h3>Production-Style Error Pattern</h3>
+        <p>A common structure is: do the risky call, log if an error happens, retry if appropriate, and fall back if it still fails.</p>
+        <pre><code>Mono.fromCallable(this::callApi)
+        .doOnError(error -> log.warn("API call failed", error))
+        .retryWhen(Retry.backoff(2, Duration.ofMillis(200)))
+        .onErrorResume(error -> Mono.just("fallback"));</code></pre>
+        <h3>Error Operator Ordering</h3>
+        <p>Ordering matters. <code>retry</code> must come before <code>onErrorReturn</code> or <code>onErrorResume</code>, because once the error is recovered, there is no error left to retry.</p>
+        <pre><code>// Correct: retry first, then recover.
+Mono.fromCallable(this::callApi)
+        .retry(2)
+        .onErrorReturn("fallback");
+
+// Wrong: retry will not happen because the error is already handled.
+Mono.fromCallable(this::callApi)
+        .onErrorReturn("fallback")
+        .retry(2);</code></pre>
+        <h3>Error Handling Mental Model</h3>
+        <ul>
+          <li><code>doOnError</code>: log the crash.</li>
+          <li><code>onErrorReturn</code>: if it crashes, use this default value.</li>
+          <li><code>onErrorResume</code>: if it crashes, take another route.</li>
+          <li><code>retry</code>: try again.</li>
+          <li><code>onErrorMap</code>: rename or wrap the crash.</li>
+        </ul>
+        <p>Be careful with blanket error mapping. If code creates a <code>ReservationNotFoundException</code> with <code>switchIfEmpty</code>, a later broad <code>onErrorMap</code> can accidentally convert that 404-style error into a 500-style error.</p>
+        <pre><code>return repository.findById(id)
+        .switchIfEmpty(Mono.error(new ReservationNotFoundException(id)))
+        .onErrorMap(DatabaseException.class, error ->
+                new ReservationDataAccessException(error));</code></pre>
+        <p>This maps only database errors and preserves the not-found error.</p>
+
+        <h3>Reactor Context</h3>
+        <p>Reactor Context is an immutable per-subscriber key/value store that travels with the reactive chain. It is useful for metadata such as correlation IDs, trace IDs, tenant IDs, auth tokens, or request-scoped values that should not be passed manually through every method argument.</p>
+        <pre><code>Mono&lt;String&gt; result = Mono.deferContextual(context ->
+        Mono.just("traceId=" + context.get("traceId")))
+        .contextWrite(Context.of("traceId", "abc-123"));</code></pre>
+        <pre><code>Mono.just("data")
+        .contextWrite(context -> context.put("traceId", "123"))
+        .flatMap(value ->
+                Mono.deferContextual(context ->
+                        Mono.just(context.get("traceId"))));</code></pre>
+        <p>Real-life analogy: a guest wristband travels with the guest through the ship. Each station can read the wristband to know the guest's package, room, or permissions without asking them to carry separate paperwork for every activity.</p>
+        <pre><code>public Mono&lt;PaymentReceipt&gt; authorize(PaymentRequest request) {
+    return Mono.deferContextual(context -> {
+        String correlationId = context.getOrDefault("correlationId", "missing");
+        return paymentClient.authorize(request)
+                .doOnNext(receipt ->
+                        log.info("correlationId={} payment={}", correlationId, receipt.id()));
+    });
+}</code></pre>
+        <p>Reactor Context is not <code>ThreadLocal</code>. It follows the reactive subscription, not a specific Java thread. Do not use Reactor Context as a replacement for domain parameters. If a value is part of the business operation, pass it normally. Use Context for cross-cutting metadata.</p>
+
+        <h3>Backpressure</h3>
+        <p>Backpressure means the consumer can control how fast the producer emits data. It is not buffering forever and it is not crashing when the consumer is slow. It is controlled flow.</p>
+        <p>Real-life analogy: imagine a factory and a delivery truck. The factory is the producer, and the truck is the consumer. Without backpressure, the factory keeps producing boxes as fast as possible even if trucks are slow and storage is limited. The warehouse fills up, boxes fall, and the system crashes. With backpressure, the truck says, "I can take 10 boxes at a time." The factory produces 10 and waits for the next request.</p>
+        <p>The Reactive Streams contract is simple: the subscriber requests <code>n</code> items, the publisher emits at most <code>n</code> items, and the subscriber requests more when it is ready. This is built in; most application code does not manually implement demand management.</p>
+        <pre><code>Flux.range(1, 1_000)
+        .doOnRequest(n -> System.out.println("Requested " + n))
+        .subscribe(new BaseSubscriber&lt;&gt;() {
+            @Override
+            protected void hookOnSubscribe(Subscription subscription) {
+                request(10);
+            }
+
+            @Override
+            protected void hookOnNext(Integer value) {
+                System.out.println(value);
+                request(1);
+            }
+        });</code></pre>
+        <h3>What Happens by Default</h3>
+        <p>For many Reactor sources and operators, backpressure is handled automatically. Reactor requests data in controlled batches instead of pulling everything into memory at once.</p>
+        <pre><code>Flux.range(1, 1_000_000)
+        .subscribe(value -> slowConsumer(value));</code></pre>
+        <p>Behind the scenes, Reactor does not need to load all one million values into memory at the same time. Demand moves through the pipeline so memory stays safer.</p>
+
+        <h3>When Backpressure Becomes Visible</h3>
+        <p>You usually notice backpressure when the producer is much faster than the consumer, the consumer is slow, or the source is push-based, such as Kafka, WebSockets, sockets, UI events, or intervals.</p>
+        <pre><code>Flux.interval(Duration.ofMillis(10)) // fast producer
+        .doOnNext(value -> Thread.sleep(100)) // slow consumer
+        .subscribe();</code></pre>
+        <p>The producer emits every 10 ms, but the consumer takes 100 ms per item. Without demand control or an overflow strategy, memory can grow, latency can spike, and the process can fail with <code>OutOfMemoryError</code>.</p>
+
+        <h3>When Backpressure Is Not Enough</h3>
+        <p>Some sources cannot always be slowed down by the subscriber. Message brokers, sockets, UI events, and externally pushed streams may keep producing. In those cases, Reactor needs an explicit strategy: buffer, drop, keep latest, or fail.</p>
+        <p>Important clarification: backpressure is not buffering by default. Backpressure is demand signaling. Buffering is one possible reaction when demand is exceeded.</p>
+        <p>In real services, backpressure matters when processing event streams, WebSocket traffic, file streams, Kafka/Kinesis-like data, or any producer that can be faster than the consumer.</p>
+        <pre><code>Flux.range(1, 100)
+        .onBackpressureBuffer()
+        .subscribe();</code></pre>
+        <p>Without backpressure or a clear overflow strategy, fast producers can create memory pressure, <code>OutOfMemoryError</code>, high latency, and system instability.</p>
+        <h3>Backpressure Strategies</h3>
+        <ul>
+          <li><code>onBackpressureBuffer</code>: store extra items until the consumer catches up. Risk: memory growth if the consumer stays too slow.</li>
+          <li><code>onBackpressureDrop</code>: drop items that cannot be handled. Useful for metrics, UI events, and lossy streams.</li>
+          <li><code>onBackpressureLatest</code>: keep only the most recent item. Useful for dashboards and real-time status updates.</li>
+          <li><code>onBackpressureError</code>: fail fast when demand is exceeded. Useful when losing data is unacceptable and buffering would be dangerous.</li>
+          <li><code>limitRate</code>: request data upstream in smaller batches.</li>
+        </ul>
+        <pre><code>Flux&lt;PaymentEvent&gt; events = paymentEvents
+        .onBackpressureBuffer(1_000)
+        .limitRate(100)
+        .flatMap(this::processPaymentEvent, 20);</code></pre>
+        <p>The <code>flatMap</code> concurrency limit protects downstream systems by allowing only a fixed number of payment events to process at the same time.</p>
+        <p>Reactor is safer than plain async code because demand is explicit, flow is controlled, and overload behavior can be designed. In many non-reactive async systems, producers push blindly and queues grow without bounds.</p>
+        <p class="answer">Backpressure is a mechanism that allows a reactive consumer to signal demand to a producer, ensuring that data is emitted only as fast as it can be processed. This prevents overwhelming consumers and avoids memory and stability issues in asynchronous systems.</p>
+
+        <h3>Big Picture</h3>
+        <p>Reactive programming is about composing asynchronous tasks, controlling threads explicitly, avoiding blocking, handling backpressure, and handling failures declaratively. The goal is not to make code look fancy. The goal is to keep services responsive when they are waiting on databases, payment providers, event streams, and other remote systems.</p>
+
+        <h3>Reference Answer</h3>
+        <p class="answer">Reactor does not create a new thread for every operation. Work runs on the subscribing thread until an asynchronous boundary or scheduler changes it. I use <code>boundedElastic</code> for unavoidable blocking I/O, <code>parallel</code> for CPU-bound work, and avoid blocking event-loop threads in WebFlux. Errors are terminal signals unless handled with operators such as <code>onErrorResume</code> or <code>onErrorMap</code>. Reactor Context carries cross-cutting metadata like trace IDs through the pipeline. Backpressure lets subscribers control demand so fast producers do not overwhelm slower consumers, which is critical for reliable reactive and event-driven systems.</p>
+      </section>
+
+<section id="reactive-kafka">
+        <h2>Reactive Kafka</h2>
+        <p class="lead">Core question: how do you use Kafka from a reactive Spring application while preserving ordering, backpressure, retries, observability, and correct offset handling?</p>
+
+        <h3>Mental Model</h3>
+        <p>Kafka is a distributed event log. Producers append records to topics. Topics are split into partitions. Consumers read records from partitions and track progress with offsets. Reactive Kafka connects this model to Reactor, so producing and consuming records can be represented with <code>Mono</code> and <code>Flux</code>.</p>
+        <pre><code>Producer
+  -> Topic
+  -> Partition 0: offset 0, 1, 2, 3
+  -> Partition 1: offset 0, 1, 2, 3
+  -> Consumer group
+  -> Reactive processing pipeline</code></pre>
+        <p>The important shift is that records flow through a reactive stream. The consumer can process records asynchronously, limit concurrency, acknowledge offsets after successful work, and apply backpressure instead of blindly pulling unlimited messages into memory.</p>
+
+        <h3>Kafka Concepts You Must Know</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>Meaning</th>
+              <th>Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Topic</td>
+              <td>Named stream of records, such as <code>reservation-created</code>.</td>
+              <td>Defines the business event channel.</td>
+            </tr>
+            <tr>
+              <td>Partition</td>
+              <td>Ordered log within a topic.</td>
+              <td>Kafka ordering is guaranteed inside a partition, not across the whole topic.</td>
+            </tr>
+            <tr>
+              <td>Key</td>
+              <td>Value used to choose the partition.</td>
+              <td>Use stable business keys when ordering matters, such as <code>reservationId</code>.</td>
+            </tr>
+            <tr>
+              <td>Offset</td>
+              <td>Record position inside a partition.</td>
+              <td>Consumers commit offsets to record progress.</td>
+            </tr>
+            <tr>
+              <td>Consumer group</td>
+              <td>Set of consumers sharing work for a topic.</td>
+              <td>Each partition is handled by one consumer in the group at a time.</td>
+            </tr>
+            <tr>
+              <td>Rebalance</td>
+              <td>Partition assignment changes between consumers.</td>
+              <td>Consumers must handle shutdown, in-flight work, and offset commits carefully.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Why Reactive Kafka</h3>
+        <p>Reactive Kafka is useful when Kafka processing is part of a non-blocking system. For example, a WebFlux service may consume reservation events, call reactive HTTP clients, write to reactive MongoDB, and publish new events without blocking worker threads.</p>
+        <ul>
+          <li>It fits naturally with <code>Flux</code> because Kafka topics are streams of many records.</li>
+          <li>It lets processing compose with reactive repositories and <code>WebClient</code>.</li>
+          <li>It supports controlled concurrency and backpressure-aware processing.</li>
+          <li>It avoids manual thread management when the rest of the stack is reactive.</li>
+          <li>It keeps side effects, acknowledgments, retries, and publishing in one observable pipeline.</li>
+        </ul>
+
+        <h3>Reactor Kafka Building Blocks</h3>
+        <p>The common library is Reactor Kafka. Its main types are <code>KafkaReceiver</code> for consuming and <code>KafkaSender</code> for producing. A receiver exposes records as a <code>Flux</code>. A sender sends records from a reactive publisher.</p>
+        <pre><code>KafkaReceiver&lt;String, ReservationCreatedEvent&gt;
+KafkaSender&lt;String, ReservationConfirmedEvent&gt;
+
+ReceiverRecord&lt;K, V&gt; includes:
+  key
+  value
+  topic
+  partition
+  offset
+  receiverOffset for acknowledgment</code></pre>
+
+        <h3>Producer Configuration</h3>
+        <p>A reactive producer still uses normal Kafka producer properties: bootstrap servers, serializers, acknowledgments, retries, idempotence, and delivery timeout. Reactor wraps the send operation in a reactive API.</p>
+        <pre><code>@Configuration
+public class ReactiveKafkaProducerConfig {
+
+    @Bean
+    KafkaSender&lt;String, ReservationCreatedEvent&gt; reservationCreatedSender(
+            KafkaProperties kafkaProperties) {
+
+        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                kafkaProperties.getBootstrapServers());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class);
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+
+        SenderOptions&lt;String, ReservationCreatedEvent&gt; options =
+                SenderOptions.create(props);
+
+        return KafkaSender.create(options);
+    }
+}</code></pre>
+        <p><code>acks=all</code> and idempotent producer settings help improve durability and prevent duplicate sends caused by producer retries. They do not replace consumer idempotency.</p>
+
+        <h3>Reactive Producer Example</h3>
+        <p>Publishing should return a <code>Mono</code> so the caller can compose it into the larger workflow. Do not hide publishing behind an internal <code>subscribe()</code>.</p>
+        <pre><code>@Component
+public class ReservationEventPublisher {
+    private final KafkaSender&lt;String, ReservationCreatedEvent&gt; sender;
+
+    public ReservationEventPublisher(
+            KafkaSender&lt;String, ReservationCreatedEvent&gt; sender) {
+        this.sender = sender;
+    }
+
+    public Mono&lt;Void&gt; publishReservationCreated(
+            ReservationCreatedEvent event) {
+
+        SenderRecord&lt;String, ReservationCreatedEvent, String&gt; record =
+                SenderRecord.create(
+                        "reservation-created",
+                        null,
+                        null,
+                        event.reservationId(),
+                        event,
+                        event.eventId()
+                );
+
+        return sender.send(Mono.just(record))
+                .single()
+                .doOnNext(result -&gt;
+                        log.info(
+                                "Published reservation event id={} topic={} partition={} offset={}",
+                                result.correlationMetadata(),
+                                result.recordMetadata().topic(),
+                                result.recordMetadata().partition(),
+                                result.recordMetadata().offset()
+                        )
+                )
+                .then();
+    }
+}</code></pre>
+        <p>The Kafka key is <code>reservationId</code>, so events for the same reservation go to the same partition and keep their relative order.</p>
+
+        <h3>Consumer Configuration</h3>
+        <p>For consumers, one of the most important choices is offset commit strategy. In production business workflows, prefer acknowledging after processing succeeds. That avoids marking records complete before the side effect actually happened.</p>
+        <pre><code>@Configuration
+public class ReactiveKafkaConsumerConfig {
+
+    @Bean
+    KafkaReceiver&lt;String, ReservationCreatedEvent&gt; reservationCreatedReceiver(
+            KafkaProperties kafkaProperties) {
+
+        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                kafkaProperties.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,
+                "reservation-notification-service");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        ReceiverOptions&lt;String, ReservationCreatedEvent&gt; options =
+                ReceiverOptions.&lt;String, ReservationCreatedEvent&gt;create(props)
+                        .subscription(List.of("reservation-created"));
+
+        return KafkaReceiver.create(options);
+    }
+}</code></pre>
+        <p>Disabling auto-commit keeps control in the reactive pipeline. The consumer acknowledges only when processing has completed successfully.</p>
+
+        <h3>Reactive Consumer Example</h3>
+        <p>A reactive consumer typically starts a long-running subscription when the application starts. The stream receives Kafka records, processes each record, and acknowledges the offset after success.</p>
+        <pre><code>@Component
+public class ReservationCreatedConsumer {
+    private final KafkaReceiver&lt;String, ReservationCreatedEvent&gt; receiver;
+    private final NotificationService notificationService;
+
+    public ReservationCreatedConsumer(
+            KafkaReceiver&lt;String, ReservationCreatedEvent&gt; receiver,
+            NotificationService notificationService) {
+        this.receiver = receiver;
+        this.notificationService = notificationService;
+    }
+
+    @PostConstruct
+    void start() {
+        receiver.receive()
+                .flatMap(this::handleRecord, 16)
+                .doOnError(error -&gt;
+                        log.error("Reservation consumer stopped", error)
+                )
+                .retryWhen(Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1)))
+                .subscribe();
+    }
+
+    private Mono&lt;Void&gt; handleRecord(
+            ReceiverRecord&lt;String, ReservationCreatedEvent&gt; record) {
+
+        ReservationCreatedEvent event = record.value();
+
+        return notificationService.sendReservationCreatedEmail(event)
+                .then(Mono.fromRunnable(() -&gt;
+                        record.receiverOffset().acknowledge()
+                ));
+    }
+}</code></pre>
+        <p>This is one place where <code>subscribe()</code> is normal: the application is intentionally starting a background Kafka listener. The mistake is calling <code>subscribe()</code> inside request/response business methods to hide side effects.</p>
+
+        <h3>Offset Acknowledgment Rule</h3>
+        <div class="callout">
+          <p><strong>Rule:</strong> acknowledge the Kafka offset only after all required side effects for that record have completed successfully. If the app crashes before acknowledgment, Kafka can redeliver the record and the consumer must be idempotent.</p>
+        </div>
+
+        <h3>At-Least-Once Delivery</h3>
+        <p>Most Kafka business consumers should be designed for at-least-once delivery. A record can be processed more than once if processing succeeds but the app crashes before committing the offset, or if a rebalance happens during in-flight work.</p>
+        <pre><code>Record received
+  -> send email succeeds
+  -> app crashes before offset commit
+  -> record is delivered again
+  -> email could be sent twice unless consumer is idempotent</code></pre>
+        <p>Because of this, idempotency is not optional. It is part of the consumer design.</p>
+
+        <h3>Idempotent Consumer Pattern</h3>
+        <p>Use a stable event ID or business key to record that a message has already been processed. Conditional writes or unique constraints are the safest way to prevent duplicates under concurrency.</p>
+        <pre><code>private Mono&lt;Void&gt; handleRecord(
+        ReceiverRecord&lt;String, ReservationCreatedEvent&gt; record) {
+
+    ReservationCreatedEvent event = record.value();
+
+    return processedEventRepository.markProcessing(event.eventId())
+            .flatMap(marked -&gt;
+                    notificationService.sendReservationCreatedEmail(event)
+                            .then(processedEventRepository.markComplete(event.eventId()))
+            )
+            .onErrorResume(DuplicateEventException.class, duplicate -&gt;
+                    Mono.empty()
+            )
+            .then(Mono.fromRunnable(() -&gt;
+                    record.receiverOffset().acknowledge()
+            ));
+}</code></pre>
+        <p>If the event was already processed, the consumer skips the side effect and acknowledges the offset. For payment, loyalty points, inventory, and notifications, this pattern prevents duplicate business actions.</p>
+
+        <h3>Ordering and Partition Keys</h3>
+        <p>Kafka preserves order only within a partition. If all events for one reservation must be processed in order, use <code>reservationId</code> as the key. If you use a random key, events for the same reservation can land on different partitions and be processed out of order.</p>
+        <pre><code>Good key for reservation lifecycle:
+  reservationId = "res-123"
+
+Events stay ordered:
+  ReservationCreated
+  PaymentAuthorized
+  ReservationConfirmed
+  BoardingPassIssued</code></pre>
+        <p>Do not use low-cardinality keys like <code>eventType</code> for high-volume topics. That can overload one partition because many records share the same key.</p>
+
+        <h3>Concurrency Without Breaking Ordering</h3>
+        <p>Plain <code>flatMap</code> across all records can process messages concurrently and complete them out of order. If ordering matters per partition, group or process partition streams carefully.</p>
+        <pre><code>receiver.receive()
+        .groupBy(record -&gt; record.receiverOffset().topicPartition())
+        .flatMap(partitionFlux -&gt;
+                partitionFlux.concatMap(this::handleRecord)
+        );</code></pre>
+        <p>This allows partitions to process in parallel, but records within each partition process sequentially. Use this when ordering is more important than maximum throughput.</p>
+
+        <h3>Backpressure</h3>
+        <p>Reactive Kafka can apply demand through the reactive chain, but Kafka consumers still fetch records in batches. You still need sensible limits: max poll records, flatMap concurrency, bounded queues, timeouts, and downstream protection.</p>
+        <pre><code>receiver.receive()
+        .flatMap(record -&gt;
+                process(record)
+                        .timeout(Duration.ofSeconds(3)),
+                32
+        );</code></pre>
+        <p>The concurrency number controls how many records are actively being processed. This is one of the most practical safety controls in a reactive Kafka consumer.</p>
+
+        <h3>Retries</h3>
+        <p>Retries should match the failure. A short network timeout from an email service may be retryable. A malformed event is not retryable. A failed payment side effect may require careful idempotency before retrying.</p>
+        <pre><code>private Mono&lt;Void&gt; processWithRetry(
+        ReceiverRecord&lt;String, ReservationCreatedEvent&gt; record) {
+
+    return process(record)
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(250))
+                    .filter(this::isTransientFailure))
+            .then(Mono.fromRunnable(() -&gt;
+                    record.receiverOffset().acknowledge()
+            ));
+}</code></pre>
+        <p>Do not retry forever inside one record handler unless that is an explicit operational decision. Infinite retries can block a partition and cause consumer lag to grow.</p>
+
+        <h3>Dead Letter Topic Pattern</h3>
+        <p>When a record cannot be processed after retries, publish it to a dead letter topic with error details, then acknowledge the original offset. This prevents one poison message from blocking the partition forever.</p>
+        <pre><code>private Mono&lt;Void&gt; handleRecord(
+        ReceiverRecord&lt;String, ReservationCreatedEvent&gt; record) {
+
+    return process(record)
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(250))
+                    .filter(this::isTransientFailure))
+            .onErrorResume(error -&gt;
+                    deadLetterPublisher.publish(record, error)
+            )
+            .then(Mono.fromRunnable(() -&gt;
+                    record.receiverOffset().acknowledge()
+            ));
+}</code></pre>
+        <p>The dead letter event should include the original topic, partition, offset, key, event ID, error type, safe error message, and timestamp. Do not include secrets or sensitive payload fields unless the topic is protected for that data.</p>
+
+        <h3>Poison Message Strategy</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Failure</th>
+              <th>Example</th>
+              <th>Strategy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Transient dependency failure</td>
+              <td>Email service timeout</td>
+              <td>Retry with backoff, then DLQ if still failing.</td>
+            </tr>
+            <tr>
+              <td>Bad payload</td>
+              <td>Missing required reservation ID</td>
+              <td>Do not retry. Publish to DLQ and alert.</td>
+            </tr>
+            <tr>
+              <td>Duplicate event</td>
+              <td>Same <code>eventId</code> already processed</td>
+              <td>Skip side effect and acknowledge.</td>
+            </tr>
+            <tr>
+              <td>Ordering conflict</td>
+              <td>Payment event arrives before reservation created event</td>
+              <td>Hold, retry later, or route to repair workflow depending on business rules.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Reactive Kafka with WebFlux</h3>
+        <p>In a WebFlux API, Kafka publishing should be part of the request pipeline when the response depends on publishing. If publishing is best-effort, be explicit about that design and use an outbox instead of hiding the send.</p>
+        <pre><code>@PostMapping
+public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; create(
+        @Valid @RequestBody CruiseReservationRequest request) {
+
+    return reservationService.createReservation(request)
+            .flatMap(response -&gt;
+                    eventPublisher.publishReservationCreated(
+                            ReservationCreatedEvent.from(response)
+                    )
+                    .thenReturn(response)
+            )
+            .map(response -&gt;
+                    ResponseEntity.status(HttpStatus.CREATED).body(response)
+            );
+}</code></pre>
+        <p>This means the API will fail if the event cannot be published. That may be correct for some workflows. For higher reliability, the service often saves an outbox row in the same transaction as the reservation and returns after the database commit.</p>
+
+        <h3>Outbox Is Often Better Than Direct Publish</h3>
+        <p>Direct publishing from a request can create a consistency problem: the database save can succeed and Kafka publish can fail, or Kafka publish can succeed and the database transaction can fail. The outbox pattern reduces that risk.</p>
+        <pre><code>Request pipeline:
+  1. Validate request
+  2. Save reservation and outbox event in one transaction
+  3. Return response
+
+Background publisher:
+  1. Read unpublished outbox events
+  2. Publish to Kafka
+  3. Mark outbox event as published</code></pre>
+        <p>Reactive Kafka works well for the background publisher because unpublished events are a stream of work.</p>
+
+        <h3>Reactive Outbox Publisher</h3>
+        <pre><code>@Component
+public class OutboxKafkaPublisher {
+    private final OutboxRepository outboxRepository;
+    private final ReservationEventPublisher eventPublisher;
+
+    public Flux&lt;OutboxEvent&gt; publishPendingEvents() {
+        return outboxRepository.findPending()
+                .flatMap(event -&gt;
+                        eventPublisher.publish(event)
+                                .then(outboxRepository.markPublished(event.id()))
+                                .thenReturn(event),
+                        10
+                );
+    }
+}</code></pre>
+        <p>The concurrency limit protects Kafka and the database. If ordering is required by aggregate, use keys carefully and consider partition-aware processing.</p>
+
+        <h3>Observability</h3>
+        <p>Reactive Kafka systems need visibility into both Kafka and the reactive processing pipeline.</p>
+        <ul>
+          <li>Consumer lag by group, topic, and partition.</li>
+          <li>Records processed per second.</li>
+          <li>Processing latency and end-to-end event age.</li>
+          <li>Retry count and DLQ count.</li>
+          <li>Partition assignment and rebalance events.</li>
+          <li>Dependency latency for calls made during processing.</li>
+          <li>Error rate by exception type and event type.</li>
+          <li>Correlation IDs, event IDs, topic, partition, offset, and consumer group in logs.</li>
+        </ul>
+        <pre><code>log.info(
+        "Processed eventId={} topic={} partition={} offset={} reservationId={}",
+        event.eventId(),
+        record.topic(),
+        record.partition(),
+        record.offset(),
+        event.reservationId()
+);</code></pre>
+
+        <h3>Testing Reactive Kafka Logic</h3>
+        <p>Keep business processing testable by putting the record handling logic in a method that returns <code>Mono&lt;Void&gt;</code>. Then use <code>StepVerifier</code> to test success, retryable failure, duplicate events, and DLQ behavior.</p>
+        <pre><code>@Test
+void handleRecordShouldSendEmailAndAcknowledgeOffset() {
+    ReceiverRecord&lt;String, ReservationCreatedEvent&gt; record =
+            testRecord("res-123", reservationCreatedEvent);
+
+    when(notificationService.sendReservationCreatedEmail(reservationCreatedEvent))
+            .thenReturn(Mono.empty());
+
+    StepVerifier.create(consumer.handleRecord(record))
+            .verifyComplete();
+
+    verify(notificationService)
+            .sendReservationCreatedEmail(reservationCreatedEvent);
+    assertThat(record.receiverOffset().isAcknowledged()).isTrue();
+}</code></pre>
+        <p>For full integration tests, use an embedded Kafka broker or Testcontainers Kafka, but unit tests should still verify the pipeline decisions without needing a broker.</p>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Acknowledging offsets before processing finishes.</li>
+          <li>Assuming Kafka gives global ordering across all partitions.</li>
+          <li>Using low-cardinality keys that create hot partitions.</li>
+          <li>Processing with unlimited <code>flatMap</code> and overwhelming downstream services.</li>
+          <li>Retrying poison messages forever and blocking a partition.</li>
+          <li>Publishing events with hidden internal <code>subscribe()</code> calls.</li>
+          <li>Forgetting idempotency because Kafka can redeliver records.</li>
+          <li>Logging payloads that contain sensitive guest, payment, or identity data.</li>
+        </ul>
+
+        <h3>Disney Cruise Example</h3>
+        <p>A reservation service publishes <code>ReservationCreated</code>. A notification service consumes it, sends a confirmation email, and publishes <code>ReservationNotificationSent</code>. A loyalty service consumes the same original event and prepares points. Each consumer uses the same <code>reservationId</code> key for ordering and an <code>eventId</code> for idempotency.</p>
+        <pre><code>reservation-created topic:
+  key = reservationId
+  value = {
+    eventId,
+    reservationId,
+    guestId,
+    shipCode,
+    sailingDate,
+    createdAt
+  }
+
+notification-service consumer:
+  1. Check eventId was not processed
+  2. Send email
+  3. Mark eventId processed
+  4. Acknowledge offset
+
+loyalty-service consumer:
+  1. Check eventId was not processed
+  2. Prepare pending loyalty points
+  3. Mark eventId processed
+  4. Acknowledge offset</code></pre>
+
+        <h3>Interview Reference Answer</h3>
+        <p class="answer">Reactive Kafka means using Kafka through Reactor types so consuming and producing records can be composed with non-blocking service logic. Kafka topics are split into partitions, ordering is guaranteed only within a partition, and consumers track progress with offsets. In a reactive consumer, I process records as a <code>Flux</code>, control concurrency with operators like <code>flatMap(..., concurrency)</code>, preserve partition order with <code>concatMap</code> when needed, and acknowledge offsets only after processing succeeds. I design consumers for at-least-once delivery, so handlers must be idempotent using event IDs, conditional writes, or unique constraints. For failures, I retry only transient errors with backoff, send poison messages to a dead letter topic, and include topic, partition, offset, event ID, and correlation ID in logs and metrics. In WebFlux services, I avoid hidden <code>subscribe()</code> calls for publishing and often prefer an outbox pattern when database state and Kafka events must stay consistent.</p>
+      </section>
+
+<section id="reactive-mongodb">
+        <h2>Reactive MongoDB</h2>
+        <p class="lead">Core question: how do you use MongoDB in a WebFlux service without blocking, while keeping queries efficient, writes correct, and pipelines testable?</p>
+
+        <h3>Mental Model</h3>
+        <p>Reactive MongoDB means using the non-blocking MongoDB driver through Spring Data reactive APIs. Repository methods return <code>Mono</code> for zero-or-one results and <code>Flux</code> for many results. The database call does not block the WebFlux event-loop thread while waiting for network I/O.</p>
+        <pre><code>WebFlux controller
+  -> service returns Mono or Flux
+  -> ReactiveMongoRepository or ReactiveMongoTemplate
+  -> MongoDB reactive driver
+  -> MongoDB server
+  -> response signal flows back through the pipeline</code></pre>
+        <p>The architectural goal is an end-to-end reactive chain: HTTP request, service logic, MongoDB call, error handling, and response writing all compose without <code>block()</code>.</p>
+
+        <h3>Spring Data Reactive MongoDB Types</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Purpose</th>
+              <th>When To Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ReactiveMongoRepository</code></td>
+              <td>Repository abstraction with common CRUD methods.</td>
+              <td>Most standard document access patterns.</td>
+            </tr>
+            <tr>
+              <td><code>ReactiveMongoTemplate</code></td>
+              <td>Lower-level API for custom queries, updates, aggregations, and fine control.</td>
+              <td>Complex query/update behavior that does not fit repository method names.</td>
+            </tr>
+            <tr>
+              <td><code>Mono&lt;T&gt;</code></td>
+              <td>Zero or one document/result.</td>
+              <td>Find by ID, save one document, update one document, delete result.</td>
+            </tr>
+            <tr>
+              <td><code>Flux&lt;T&gt;</code></td>
+              <td>Many documents/results.</td>
+              <td>Search, list, stream query results, process many reservations.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Document Model</h3>
+        <p>MongoDB stores documents, not relational rows. In Spring Data, a document class usually maps to one MongoDB collection.</p>
+        <pre><code>@Document(collection = "cruise_reservations")
+public class CruiseReservationEntity {
+    @Id
+    private String id;
+
+    @Indexed
+    private String guestId;
+
+    @Indexed
+    private String shipCode;
+
+    private OffsetDateTime sailingDate;
+    private String cabinType;
+    private int guestCount;
+    private String reservationStatus;
+
+    // constructors, getters, and domain methods
+}</code></pre>
+        <p>Use indexes for fields that appear in important queries. Without the right index, MongoDB may scan too many documents and the reactive pipeline will still be slow.</p>
+
+        <h3>Reactive Repository</h3>
+        <p>A reactive repository looks similar to a normal Spring Data repository, but every operation returns a reactive type.</p>
+        <pre><code>public interface CruiseReservationRepository
+        extends ReactiveMongoRepository&lt;CruiseReservationEntity, String&gt; {
+
+    Flux&lt;CruiseReservationEntity&gt; findByGuestId(String guestId);
+
+    Flux&lt;CruiseReservationEntity&gt; findByShipCodeAndSailingDateBetween(
+            String shipCode,
+            OffsetDateTime start,
+            OffsetDateTime end
+    );
+
+    Mono&lt;Boolean&gt; existsByGuestIdAndShipCodeAndSailingDate(
+            String guestId,
+            String shipCode,
+            OffsetDateTime sailingDate
+    );
+}</code></pre>
+        <p>The method names declare queries. Spring Data creates the reactive query implementation at runtime.</p>
+
+        <h3>Service Pattern</h3>
+        <p>The service should compose repository calls with Reactor operators. It should not unwrap the value with <code>block()</code>.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; getReservation(String id) {
+    return repository.findById(id)
+            .switchIfEmpty(Mono.error(
+                    new ReservationNotFoundException(id)
+            ))
+            .map(this::toResponse);
+}</code></pre>
+        <p><code>findById</code> returns <code>Mono.empty()</code> when no document exists. Use <code>switchIfEmpty</code> to turn that empty result into a domain error when the API should return 404.</p>
+
+        <h3>Create with Duplicate Protection</h3>
+        <p>For writes, think about duplicate requests and concurrent calls. A pre-check alone is not enough under race conditions, but it is useful for a readable business flow when combined with a unique index or conditional write pattern.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createReservation(
+        CruiseReservationRequest request) {
+
+    return repository.existsByGuestIdAndShipCodeAndSailingDate(
+                    request.guestId(),
+                    request.shipCode(),
+                    request.sailingDate()
+            )
+            .flatMap(exists -&gt; {
+                if (exists) {
+                    return Mono.error(new DuplicateReservationException(
+                            request.guestId(),
+                            request.shipCode(),
+                            request.sailingDate()
+                    ));
+                }
+
+                return repository.save(toEntity(request));
+            })
+            .map(this::toResponse);
+}</code></pre>
+        <p>In production, enforce uniqueness with a MongoDB unique index when correctness matters. Application checks can race; database constraints are the final guard.</p>
+
+        <h3>Unique Index for Idempotency</h3>
+        <p>An idempotency key can prevent duplicate side effects when clients retry. Store the key with a unique index so only one request can claim it.</p>
+        <pre><code>@Document(collection = "idempotency_records")
+public class IdempotencyRecord {
+    @Id
+    private String id;
+
+    @Indexed(unique = true)
+    private String idempotencyKey;
+
+    private String resourceId;
+    private String status;
+    private Instant createdAt;
+}</code></pre>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createReservation(
+        String idempotencyKey,
+        CruiseReservationRequest request) {
+
+    return idempotencyRepository.findByIdempotencyKey(idempotencyKey)
+            .flatMap(record -&gt;
+                    repository.findById(record.getResourceId())
+            )
+            .switchIfEmpty(createNewReservation(idempotencyKey, request))
+            .map(this::toResponse);
+}</code></pre>
+        <p>For full safety, the <code>createNewReservation</code> path must claim the idempotency key atomically. If two requests arrive at the same time, only one should create the reservation.</p>
+
+        <h3>ReactiveMongoTemplate</h3>
+        <p>Use <code>ReactiveMongoTemplate</code> when repository method names become awkward or when you need partial updates, custom criteria, projections, or aggregations.</p>
+        <pre><code>public Flux&lt;CruiseReservationEntity&gt; searchReservations(
+        String shipCode,
+        OffsetDateTime start,
+        OffsetDateTime end,
+        String status) {
+
+    Query query = new Query()
+            .addCriteria(Criteria.where("shipCode").is(shipCode))
+            .addCriteria(Criteria.where("sailingDate").gte(start).lt(end))
+            .addCriteria(Criteria.where("reservationStatus").is(status))
+            .with(Sort.by(Sort.Direction.ASC, "sailingDate"))
+            .limit(100);
+
+    return mongoTemplate.find(query, CruiseReservationEntity.class);
+}</code></pre>
+        <p>This gives explicit control over the MongoDB query while still returning a <code>Flux</code>.</p>
+
+        <h3>Partial Update Pattern</h3>
+        <p>For targeted updates, avoid loading and saving a full document when an atomic update is clearer.</p>
+        <pre><code>public Mono&lt;CruiseReservationEntity&gt; markConfirmed(
+        String reservationId,
+        String paymentAuthorizationId) {
+
+    Query query = Query.query(Criteria.where("_id").is(reservationId));
+
+    Update update = new Update()
+            .set("reservationStatus", "CONFIRMED")
+            .set("paymentAuthorizationId", paymentAuthorizationId)
+            .set("updatedAt", Instant.now());
+
+    return mongoTemplate.findAndModify(
+            query,
+            update,
+            FindAndModifyOptions.options().returnNew(true),
+            CruiseReservationEntity.class
+    )
+    .switchIfEmpty(Mono.error(
+            new ReservationNotFoundException(reservationId)
+    ));
+}</code></pre>
+        <p><code>findAndModify</code> can update and return the new document in one database operation.</p>
+
+        <h3>Optimistic Locking</h3>
+        <p>Use optimistic locking when multiple requests might update the same document. Spring Data MongoDB supports <code>@Version</code>.</p>
+        <pre><code>@Document(collection = "cruise_reservations")
+public class CruiseReservationEntity {
+    @Id
+    private String id;
+
+    @Version
+    private Long version;
+
+    private String reservationStatus;
+}</code></pre>
+        <p>If two updates read the same version, the first save succeeds and increments the version. The second save fails because it is trying to save an old version. Map that failure to a conflict response.</p>
+        <pre><code>return repository.save(reservation)
+        .onErrorMap(OptimisticLockingFailureException.class, error -&gt;
+                new ReservationConflictException(reservation.getId(), error)
+        );</code></pre>
+
+        <h3>Transactions</h3>
+        <p>MongoDB supports transactions for replica sets and sharded clusters, but do not use them casually. Transactions add overhead and can reduce throughput. Prefer single-document atomic updates when the data model allows it.</p>
+        <pre><code>public Mono&lt;CruiseReservationResponse&gt; createWithOutbox(
+        CruiseReservationRequest request) {
+
+    CruiseReservationEntity reservation = toEntity(request);
+    OutboxEvent event = OutboxEvent.reservationCreated(reservation);
+
+    return transactionalOperator.transactional(
+            repository.save(reservation)
+                    .then(outboxRepository.save(event))
+                    .thenReturn(reservation)
+    )
+    .map(this::toResponse);
+}</code></pre>
+        <p>This pattern is useful when reservation state and the outbox event must be committed together.</p>
+
+        <h3>Streaming Query Results</h3>
+        <p>A MongoDB query that returns many documents should use <code>Flux</code>. Combine it with pagination, limits, or streaming responses so one request does not pull too much data.</p>
+        <pre><code>@GetMapping(value = "/sailings/{sailingId}/reservations",
+        produces = MediaType.APPLICATION_NDJSON_VALUE)
+public Flux&lt;CruiseReservationResponse&gt; streamReservations(
+        @PathVariable String sailingId) {
+
+    return reservationService.streamReservationsForSailing(sailingId);
+}</code></pre>
+        <pre><code>public Flux&lt;CruiseReservationResponse&gt; streamReservationsForSailing(
+        String sailingId) {
+
+    return repository.findBySailingId(sailingId)
+            .limitRate(100)
+            .map(this::toResponse);
+}</code></pre>
+        <p><code>limitRate</code> helps control demand through the stream. It is not a replacement for good query filters and indexes.</p>
+
+        <h3>Index Design</h3>
+        <p>Reactive MongoDB does not make bad queries cheap. Index design is still critical.</p>
+        <ul>
+          <li>Create indexes for fields used in frequent filters and sorts.</li>
+          <li>Use compound indexes for common query combinations, such as <code>shipCode + sailingDate + reservationStatus</code>.</li>
+          <li>Avoid unbounded collection scans in request paths.</li>
+          <li>Use limits and pagination for list endpoints.</li>
+          <li>Monitor slow queries and query execution plans.</li>
+        </ul>
+        <pre><code>@CompoundIndex(
+        name = "ship_sailing_status_idx",
+        def = "{'shipCode': 1, 'sailingDate': 1, 'reservationStatus': 1}"
+)
+@Document(collection = "cruise_reservations")
+public class CruiseReservationEntity {
+    // fields
+}</code></pre>
+
+        <h3>Pagination Pattern</h3>
+        <p>Offset pagination can become expensive for deep pages. Cursor-style pagination is often better for high-volume collections.</p>
+        <pre><code>public Flux&lt;CruiseReservationEntity&gt; findNextPage(
+        String shipCode,
+        OffsetDateTime afterSailingDate,
+        int limit) {
+
+    Query query = Query.query(
+            Criteria.where("shipCode").is(shipCode)
+                    .and("sailingDate").gt(afterSailingDate)
+    )
+    .with(Sort.by(Sort.Direction.ASC, "sailingDate"))
+    .limit(limit);
+
+    return mongoTemplate.find(query, CruiseReservationEntity.class);
+}</code></pre>
+        <p>The next request passes the last seen <code>sailingDate</code> as the cursor.</p>
+
+        <h3>Error Handling</h3>
+        <p>Translate low-level MongoDB errors into domain exceptions. Do not leak raw database messages to API clients.</p>
+        <pre><code>return repository.save(entity)
+        .onErrorMap(DuplicateKeyException.class, error -&gt;
+                new DuplicateReservationException(
+                        entity.getGuestId(),
+                        entity.getShipCode(),
+                        entity.getSailingDate(),
+                        error
+                )
+        )
+        .onErrorMap(DataAccessResourceFailureException.class, error -&gt;
+                new DatabaseUnavailableException(
+                        "Reservation database unavailable",
+                        error
+                )
+        );</code></pre>
+        <p>The global WebFlux error handler can map duplicate reservation to 409 Conflict and database unavailable to 503 Service Unavailable.</p>
+
+        <h3>Backpressure and Large Results</h3>
+        <p>Backpressure helps the application avoid consuming faster than it can process, but MongoDB still has to execute the query. Design the query so the result set is bounded.</p>
+        <pre><code>repository.findByShipCode("DREAM")
+        .filter(reservation -&gt; reservation.isActive())
+        .flatMap(this::enrichReservation, 25)
+        .limitRate(100);</code></pre>
+        <p>Filtering in Java after loading too many documents is usually a design smell. Push filters into MongoDB queries whenever possible.</p>
+
+        <h3>WebFlux Controller Example</h3>
+        <pre><code>@RestController
+@RequestMapping("/api/reservations")
+public class CruiseReservationController {
+    private final CruiseReservationService service;
+
+    @GetMapping("/{id}")
+    public Mono&lt;CruiseReservationResponse&gt; getById(
+            @PathVariable String id) {
+        return service.getReservation(id);
+    }
+
+    @GetMapping
+    public Flux&lt;CruiseReservationResponse&gt; findByGuest(
+            @RequestParam String guestId) {
+        return service.findByGuestId(guestId);
+    }
+
+    @PostMapping
+    public Mono&lt;ResponseEntity&lt;CruiseReservationResponse&gt;&gt; create(
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody CruiseReservationRequest request) {
+
+        return service.createReservation(idempotencyKey, request)
+                .map(response -&gt;
+                        ResponseEntity.status(HttpStatus.CREATED).body(response)
+                );
+    }
+}</code></pre>
+        <p>The controller stays reactive from HTTP input to MongoDB result.</p>
+
+        <h3>Testing with StepVerifier</h3>
+        <p>Service tests should assert emitted values, errors, and completion.</p>
+        <pre><code>@Test
+void getReservationShouldReturnNotFoundWhenMissing() {
+    when(repository.findById("missing-id"))
+            .thenReturn(Mono.empty());
+
+    StepVerifier.create(service.getReservation("missing-id"))
+            .expectErrorSatisfies(error -&gt; {
+                assertThat(error)
+                        .isInstanceOf(ReservationNotFoundException.class);
+                assertThat(error.getMessage())
+                        .isEqualTo("Reservation not found: missing-id");
+            })
+            .verify();
+}</code></pre>
+        <p>For repository integration tests, use <code>@DataMongoTest</code> with reactive repositories and a real MongoDB test instance through Testcontainers when possible.</p>
+
+        <h3>Common Mistakes</h3>
+        <ul>
+          <li>Using blocking <code>MongoRepository</code> inside a WebFlux service.</li>
+          <li>Calling <code>block()</code> to get a document inside service logic.</li>
+          <li>Assuming reactive MongoDB fixes missing indexes or bad query design.</li>
+          <li>Loading a huge collection and filtering in Java instead of querying with criteria.</li>
+          <li>Using application-only duplicate checks without a unique index.</li>
+          <li>Saving full documents when an atomic update would be clearer and safer.</li>
+          <li>Using multi-document transactions when a better document model would avoid them.</li>
+          <li>Returning raw database exception messages to API clients.</li>
+        </ul>
+
+        <h3>Disney Cruise Example</h3>
+        <p>A reservation API can use reactive MongoDB for reservation state, idempotency records, and outbox events. The WebFlux request creates the reservation reactively, MongoDB stores the document, and a Kafka outbox publisher later emits <code>ReservationCreated</code>.</p>
+        <pre><code>Collections:
+  cruise_reservations
+    _id
+    guestId
+    shipCode
+    sailingDate
+    cabinType
+    reservationStatus
+    paymentAuthorizationId
+    version
+
+  idempotency_records
+    idempotencyKey unique
+    resourceId
+    status
+    createdAt
+
+  outbox_events
+    eventId unique
+    aggregateId
+    eventType
+    payload
+    published
+    createdAt</code></pre>
+        <p>This design supports reliable WebFlux APIs, duplicate-safe writes, and event-driven integration.</p>
+
+        <h3>Interview Reference Answer</h3>
+        <p class="answer">Reactive MongoDB in Spring means using the non-blocking MongoDB driver through Spring Data reactive APIs such as <code>ReactiveMongoRepository</code> and <code>ReactiveMongoTemplate</code>. Repository methods return <code>Mono</code> or <code>Flux</code>, so WebFlux services can compose database calls without blocking event-loop threads. I use <code>switchIfEmpty</code> for not-found cases, <code>map</code> for synchronous DTO mapping, and <code>flatMap</code> for additional reactive work. I still design MongoDB carefully: indexes for query patterns, bounded result sets, cursor-style pagination for large collections, unique indexes for idempotency, and optimistic locking or atomic updates for concurrent changes. Reactive does not make poor queries fast. For production reliability, I translate database exceptions into domain errors, avoid leaking raw database details, and test pipelines with <code>StepVerifier</code> plus integration tests against a real MongoDB test container.</p>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

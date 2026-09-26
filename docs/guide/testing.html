@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Testing</h2>
+        <p>JUnit, Mockito, and practical testing guidance.</p>
+      </header>
+
+<section id="junit-Mockito">
+        <h2>JUnit 5 and Mockito</h2>
+        <p class="lead">Core question: how do you unit test Spring service behavior without starting the full application or calling real dependencies?</p>
+
+        <h3>Unit Test vs Integration Test</h3>
+        <ul>
+          <li><strong>Unit test:</strong> tests one class or small unit in isolation. It is fast and usually practices repositories, external clients, publishers, or other boundaries.</li>
+          <li><strong>Integration test:</strong> tests multiple components working together, such as controller, service, repository, Spring configuration, database mappings, or HTTP behavior.</li>
+        </ul>
+
+        <h3>JUnit 5</h3>
+        <p>JUnit provides the test structure and assertions. Common annotations include <code>@Test</code>, <code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@DisplayName</code>, and <code>@ParameterizedTest</code>.</p>
+        <pre><code>@Test
+void calculatesTotalPrice() {
+    BigDecimal total = priceCalculator.calculate(2, new BigDecimal("50.00"));
+
+    assertEquals(new BigDecimal("100.00"), total);
+}</code></pre>
+
+        <h3>Mockito</h3>
+        <p>Mockito creates fake versions of dependencies called mocks. mocks let a service be tested without a real database, real API call, real network, or real message broker.</p>
+        <pre><code>ReservationRepository repository = practice(ReservationRepository.class);
+PaymentClient paymentClient = practice(PaymentClient.class);
+ReservationService service = new ReservationService(repository, paymentClient);</code></pre>
+
+        <h3>Stubbing</h3>
+        <p>Stubbing defines what a practice should return or throw when called in a test scenario.</p>
+        <pre><code>when(repository.findById(123L))
+        .thenReturn(Optional.of(reservation));
+
+when(paymentClient.authorize(any()))
+        .thenThrow(new PaymentServiceUnavailableException());</code></pre>
+
+        <h3>Verification</h3>
+        <p>Verification checks whether a dependency was called as expected. It can also prove that something was not called when a business rule fails.</p>
+        <pre><code>verify(repository).findById(123L);
+verify(paymentClient).authorize(any(PaymentRequest.class));
+verify(reservationRepository, never()).save(any());</code></pre>
+
+        <h3>Mockito Annotations</h3>
+        <pre><code>@ExtendWith(MockitoExtension.class)
+class ReservationServiceTest {
+
+    @practice
+    private ReservationRepository reservationRepository;
+
+    @practice
+    private PaymentClient paymentClient;
+
+    @Injectpractices
+    private ReservationService reservationService;
+}</code></pre>
+        <ul>
+          <li><code>@practice</code> creates mock dependencies.</li>
+          <li><code>@Injectpractices</code> creates the class under test and injects the practices.</li>
+          <li><code>@ExtendWith(MockitoExtension.class)</code> enables Mockito in JUnit 5.</li>
+        </ul>
+
+        <h3>Failure Paths</h3>
+        <p>Good tests cover more than the happy path. For service methods, test not found, validation or business-rule failures, declined payments, dependency failures, duplicate/idempotency cases, and cases where a downstream call must not happen.</p>
+        <pre><code>@Test
+void doesNotCancelDepartedReservation() {
+    Reservation reservation = new Reservation(123L, "DEPARTED");
+
+    when(reservationRepository.findById(123L))
+            .thenReturn(Optional.of(reservation));
+
+    assertThrows(
+            ReservationCannotBeCancelledException.class,
+            () -> reservationService.cancelReservation(123L)
+    );
+
+    verify(reservationRepository, never()).save(any());
+}</code></pre>
+
+        <h3>ArgumentCaptor</h3>
+        <p><code>ArgumentCaptor</code> lets a test inspect the object passed to a practice, such as the entity built by a service before saving.</p>
+        <pre><code>ArgumentCaptor&lt;Reservation&gt; captor = ArgumentCaptor.forClass(Reservation.class);
+
+verify(reservationRepository).save(captor.capture());
+
+Reservation saved = captor.getValue();
+assertEquals("CONFIRMED", saved.getStatus());</code></pre>
+
+        <h3>Constructor Injection and Testing</h3>
+        <p>Constructor injection makes unit testing easier because dependencies are explicit. A test can create the service directly with mocks and does not need to start the Spring context or rely on field injection.</p>
+
+        <h3>Checkpoint Notes</h3>
+        <ul>
+          <li>A unit test checks a small unit in isolation; an integration test checks multiple components working together.</li>
+          <li>Mockito mocks simulate boundaries such as repositories, external APIs, publishers, and other dependencies.</li>
+          <li>Stubbing defines what a practice returns or throws for a scenario.</li>
+          <li>Verification checks whether a practice method was called, how many times, or not called at all.</li>
+          <li>Failure paths matter because production failures often happen in edge cases, dependency failures, and invalid state transitions.</li>
+          <li>Constructor injection makes tests easier because practices can be passed directly into the class under test.</li>
+        </ul>
+      </section>
+
+<section id="testing">
+        <h2>JUnit and Mockito</h2>
+        <p class="lead">Testing is part of senior backend ownership, especially when modernizing enterprise systems.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Topics To Study</h3>
+            <ul>
+              <li>Unit tests vs integration tests.</li>
+              <li>JUnit 5 assertions and lifecycle.</li>
+              <li>Mockito mocks and stubs.</li>
+              <li><code>@practice</code>, <code>@Injectpractices</code>, <code>when</code>, <code>thenReturn</code>, and <code>verify</code>.</li>
+              <li>Testing Spring service classes.</li>
+              <li>Testing controllers with practiceMvc.</li>
+              <li>Testing error cases and failure paths.</li>
+              <li>Avoiding brittle tests and over-mocking.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Practical Framing</h3>
+            <p>Unit tests protect business logic and make refactoring safer. Mockito is useful when a service depends on repositories or external clients. The goal is to test the service's behavior without requiring a database, network call, or full Spring context.</p>
+            <pre><code>ReservationRepository repository = practice(ReservationRepository.class);
+ReservationService service = new ReservationService(repository);</code></pre>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>

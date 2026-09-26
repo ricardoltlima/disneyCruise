@@ -1,0 +1,295 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS and Events | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="#aws">AWS Focus</a>
+            <a href="#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="#lambda-deep">Lambda Deep Dive</a>
+            <a href="#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>AWS and Events</h2>
+        <p>AWS focus areas, Kinesis, DynamoDB, Lambda, and event architecture.</p>
+      </header>
+
+<section id="aws">
+        <h2>AWS Focus</h2>
+        <p class="lead">Kinesis, DynamoDB, and Lambda are high-value topics for real-time, high-volume, cloud-native backend systems.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Kinesis</h3>
+            <p>Study real-time streaming, records, streams, shards, partition keys, ordering guarantees, consumers, enhanced fan-out, retention, replay, throughput, and failure handling.</p>
+            <p><strong>Goal:</strong> explain how to process high-volume real-time events safely.</p>
+          </article>
+          <article class="card">
+            <h3>DynamoDB</h3>
+            <p>Study key-value and document modeling, partition keys, sort keys, access-pattern-first design, GSIs, LSIs, capacity modes, hot partitions, TTL, conditional writes, transactions, optimistic locking, and single-table design basics.</p>
+            <p><strong>Goal:</strong> design a DynamoDB table from access patterns instead of relational habits.</p>
+          </article>
+          <article class="card">
+            <h3>Lambda</h3>
+            <p>Study serverless execution, event sources, API Gateway integration, Kinesis triggers, DynamoDB Streams, cold starts, retries, timeouts, concurrency, idempotency, and observability.</p>
+            <p><strong>Goal:</strong> explain when Lambda is appropriate and how to make it reliable.</p>
+          </article>
+          <article class="card">
+            <h3>Event-Driven Architecture</h3>
+            <p>Study synchronous vs asynchronous communication, event contracts, schema evolution, duplicate events, dead-letter queues, replay, eventual consistency, and saga basics.</p>
+            <p><strong>Goal:</strong> design a backend that handles real-time data without losing correctness.</p>
+          </article>
+        </div>
+      </section>
+
+<section id="kinesis-deep">
+        <h2>Kinesis Deep Dive</h2>
+        <p class="lead">Core question: how do you process high-volume real-time events with ordering, replay, and reliability?</p>
+        <h3>Mental Model</h3>
+        <p>Amazon Kinesis Data Streams is a managed streaming service. Producers put records into a stream. The stream is divided into shards. Consumers read records from shards and process them in near real time.</p>
+        <pre><code>Producer -> Kinesis Stream -> Shards -> Consumers/Lambda -> Downstream systems</code></pre>
+        <h3>Key Concepts</h3>
+        <ul>
+          <li><strong>Record:</strong> one event, such as <code>ReservationCreated</code> or <code>GuestCheckedIn</code>.</li>
+          <li><strong>Partition key:</strong> decides which shard receives the record.</li>
+          <li><strong>Shard:</strong> unit of ordering and throughput.</li>
+          <li><strong>Sequence number:</strong> position of a record inside a shard.</li>
+          <li><strong>Retention:</strong> how long records remain available for replay.</li>
+          <li><strong>Consumer:</strong> application, Lambda, or service that reads records.</li>
+        </ul>
+        <h3>Ordering</h3>
+        <p>Kinesis preserves ordering within a shard, not globally across all shards. Records with the same partition key go to the same shard, so choose partition keys based on the ordering you need.</p>
+        <h3>Partition Key Design</h3>
+        <p>A good partition key spreads traffic evenly while preserving required ordering. For reservation events, <code>reservationId</code> may preserve ordering per reservation. A bad key like <code>eventType</code> can create hot shards if most events share the same type.</p>
+        <h3>Scaling and Hot Shards</h3>
+        <p>If one shard receives too much traffic, it becomes hot and throttles writes or reads. Fixes include better partition key distribution, increasing shard count, on-demand mode where appropriate, batching, and reducing per-record size.</p>
+        <h3>Consumers and Failure Handling</h3>
+        <ul>
+          <li>Consumers checkpoint progress after successful processing.</li>
+          <li>If processing fails before checkpointing, records may be read again.</li>
+          <li>Consumers must be idempotent because delivery is effectively at least once.</li>
+          <li>Poison records need a strategy: retries, skip with alert, DLQ pattern, or quarantine storage.</li>
+        </ul>
+        <h3>Kinesis vs Kafka</h3>
+        <p>Kinesis is AWS-managed and shard-based, with AWS-native integrations like Lambda and CloudWatch. Kafka is broker/partition-based and often gives more ecosystem control, but requires operating a cluster unless using a managed service. Both need partition-key design, consumer lag monitoring, replay strategy, and idempotent consumers.</p>
+        <h3>Reference Answer</h3>
+        <p class="answer">I would use Kinesis for high-volume real-time events when AWS-native streaming, retention, replay, and Lambda integration are useful. I design partition keys around ordering and even distribution, monitor shard throughput and iterator age, and make consumers idempotent because records can be processed more than once. If lag grows, I check consumer speed, downstream dependencies, shard count, hot shards, throttling, poison messages, and batch configuration.</p>
+      </section>
+
+<section id="dynamodb-deep">
+        <h2>DynamoDB Deep Dive</h2>
+        <p class="lead">Core question: how do you design DynamoDB tables from access patterns instead of relational habits?</p>
+        <h3>Mental Model</h3>
+        <p>DynamoDB is a managed NoSQL key-value/document database. It is designed for predictable low-latency access at scale, but it requires modeling around queries you need to support.</p>
+        <h3>Primary Key</h3>
+        <ul>
+          <li><strong>Partition key:</strong> determines where data is stored and is required for efficient lookups.</li>
+          <li><strong>Sort key:</strong> orders related items within the same partition and supports range queries.</li>
+        </ul>
+        <pre><code>PK = GUEST#123
+SK = RESERVATION#2026-06-20#R789</code></pre>
+        <h3>Access-Pattern-First Design</h3>
+        <p>Start by listing queries: get reservation by id, list reservations by guest, list reservations by cruise/date, find active payment by reservation, or load itinerary events by reservation. Then design keys and indexes for those queries.</p>
+        <h3>GSIs and LSIs</h3>
+        <ul>
+          <li><strong>GSI:</strong> alternate partition/sort key for different query patterns. It is eventually consistent.</li>
+          <li><strong>LSI:</strong> alternate sort key under the same partition key, created with the table.</li>
+        </ul>
+        <h3>Capacity and Hot Partitions</h3>
+        <p>Hot partitions happen when too many reads/writes hit the same partition key. Avoid low-cardinality keys like <code>status=ACTIVE</code> for high-volume writes. Use high-cardinality keys and distribute load.</p>
+        <h3>Conditional Writes and Idempotency</h3>
+        <p>Conditional writes are critical for correctness. They can enforce <code>put only if item does not exist</code>, implement optimistic locking, and prevent duplicate processing with idempotency keys.</p>
+        <pre><code>Put payment record only if paymentId does not already exist.
+Put processed event only if eventId does not already exist.</code></pre>
+        <h3>TTL and Streams</h3>
+        <p>TTL automatically expires items such as idempotency records or temporary sessions. DynamoDB Streams emit item-level changes, commonly consumed by Lambda for downstream processing.</p>
+        <h3>Reference Answer</h3>
+        <p class="answer">With DynamoDB, I start from access patterns rather than normalized relational design. I choose partition and sort keys that support the main queries and distribute load, then add GSIs for alternate lookups. I watch for hot partitions, large items, and inefficient scans. For correctness, I use conditional writes for idempotency, uniqueness, and optimistic locking. I also consider TTL for temporary data and DynamoDB Streams when downstream systems need to react to changes.</p>
+      </section>
+
+<section id="lambda-deep">
+        <h2>Lambda Deep Dive</h2>
+        <p class="lead">Core question: when is Lambda appropriate, and how do you make serverless processing reliable?</p>
+        <h3>Mental Model</h3>
+        <p>AWS Lambda runs code in response to events without managing servers. It is a good fit for event processing, glue logic, scheduled tasks, lightweight APIs, stream processing, and background jobs.</p>
+        <h3>Common Event Sources</h3>
+        <ul>
+          <li>API Gateway for HTTP APIs.</li>
+          <li>Kinesis for streaming records.</li>
+          <li>DynamoDB Streams for table change events.</li>
+          <li>SQS for queued work and buffering.</li>
+          <li>S3 for object-created events.</li>
+          <li>EventBridge for scheduled or business events.</li>
+        </ul>
+        <h3>Cold Starts</h3>
+        <p>A cold start happens when AWS initializes a new execution environment before invoking the function. It can add latency, especially with large packages, VPC networking, heavy frameworks, or low traffic. Mitigations include smaller packages, lighter initialization, provisioned concurrency for critical paths, and avoiding unnecessary startup work.</p>
+        <h3>Concurrency</h3>
+        <p>Lambda scales by running concurrent executions. Reserved concurrency can protect downstream systems and isolate critical functions. Too much concurrency can overwhelm databases, APIs, or streams.</p>
+        <h3>Retries and DLQs</h3>
+        <p>Retry behavior depends on the event source. Async invokes may retry automatically. Streams retry batches until success or until records expire unless configured with partial batch handling and failure destinations. SQS can use visibility timeout and dead-letter queues.</p>
+        <h3>Idempotency</h3>
+        <p>Lambda handlers must be idempotent because events can be retried. Use event IDs, idempotency tables, conditional writes, and safe state transitions to avoid duplicate side effects.</p>
+        <h3>When Not To Use Lambda</h3>
+        <ul>
+          <li>Long-running workloads beyond Lambda limits.</li>
+          <li>Very latency-sensitive APIs where cold starts are unacceptable without mitigation.</li>
+          <li>Complex stateful workflows better handled by services or Step Functions.</li>
+          <li>Heavy continuous compute where containers may be more cost-effective.</li>
+        </ul>
+        <h3>Reference Answer</h3>
+        <p class="answer">I use Lambda when event-driven, bursty, or background processing fits the problem, such as Kinesis consumers, DynamoDB Stream handlers, scheduled jobs, and lightweight APIs. I design handlers to be idempotent, monitor errors and duration, control concurrency to protect downstream systems, and understand retry behavior for each event source. For critical latency paths, I consider cold starts, package size, initialization work, and provisioned concurrency.</p>
+      </section>
+
+<section id="event-architecture-deep">
+        <h2>Event-Driven Architecture</h2>
+        <p class="lead">Core question: how do you design an event-driven backend that handles real-time data safely?</p>
+        <h3>Core Ideas</h3>
+        <ul>
+          <li><strong>Event:</strong> a fact that happened, such as <code>ReservationCreated</code>.</li>
+          <li><strong>Command:</strong> a request to do something, such as <code>CreateReservation</code>.</li>
+          <li><strong>Producer:</strong> publishes events.</li>
+          <li><strong>Consumer:</strong> reacts to events.</li>
+          <li><strong>Broker/stream:</strong> Kafka, RabbitMQ, Kinesis, SNS/SQS, or EventBridge.</li>
+        </ul>
+        <h3>Reliability Rules</h3>
+        <ul>
+          <li>Assume at-least-once delivery and make consumers idempotent.</li>
+          <li>Use stable event IDs and business keys.</li>
+          <li>Design schemas carefully and evolve them backward-compatibly.</li>
+          <li>Have a retry and poison-message strategy.</li>
+          <li>Monitor lag, error rate, processing time, DLQ count, and downstream dependency health.</li>
+        </ul>
+        <h3>Outbox Pattern</h3>
+        <p>The outbox pattern avoids losing events when database updates and event publishing must happen together. Save the business entity and an outbox event in the same database transaction. A separate worker publishes the event and marks it as published.</p>
+        <pre><code>1. Save reservation and outbox row in one transaction.
+2. Worker reads unpublished outbox rows.
+3. Worker publishes ReservationCreated.
+4. Worker marks outbox row as published.</code></pre>
+        <h3>Saga Pattern</h3>
+        <p>A saga coordinates a multi-step distributed workflow without a single database transaction. Each step has a compensating action if later steps fail. Example: reserve cabin, authorize payment, confirm booking. If payment fails, release the cabin hold.</p>
+        <h3>Kafka vs RabbitMQ vs Kinesis</h3>
+        <ul>
+          <li><strong>Kafka:</strong> durable log, partitions, replay, high-throughput event streaming.</li>
+          <li><strong>RabbitMQ:</strong> queue/message routing, work queues, flexible routing patterns.</li>
+          <li><strong>Kinesis:</strong> AWS-managed stream, shards, retention, replay, Lambda integration.</li>
+        </ul>
+        <h3>Reference Answer</h3>
+        <p class="answer">For event-driven systems, I treat events as facts and design consumers for at-least-once delivery. That means stable event IDs, idempotent handlers, duplicate detection, retry limits, poison-message handling, and observability around lag and errors. I use the outbox pattern when a database change and event publish must stay consistent. I also design event schemas to evolve safely and choose Kafka, RabbitMQ, or Kinesis based on throughput, replay, routing, cloud integration, and operational needs.</p>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>
