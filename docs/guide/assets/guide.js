@@ -12,7 +12,11 @@
         link.classList.toggle('active', isActive);
         link.toggleAttribute('aria-current', isActive);
 
-        if (isActive) {
+        const sidebar = link.closest('aside');
+        const sidebarCanScroll = sidebar && sidebar.scrollHeight > sidebar.clientHeight;
+        const sidebarIsSticky = sidebar && getComputedStyle(sidebar).position === 'sticky';
+
+        if (isActive && sidebarCanScroll && sidebarIsSticky) {
           link.scrollIntoView({ block: 'nearest' });
         }
       });
