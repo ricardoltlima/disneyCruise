@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS Certified Developer Associate DVA-C02 | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+        <a href="../../src/main/resources/static/resource-hub.html">Resource Atlas</a>
+
+        <div class="nav-group">
+          <div class="nav-title">Certification</div>
+          <div class="nav-items">
+            <a href="#dva-overview">DVA-C02 Overview</a>
+            <a href="#exam-domains">Exam Domains</a>
+            <a href="#aws-foundations">AWS Foundations</a>
+            <a href="#iam-security">IAM and Security</a>
+            <a href="#compute-networking">Compute and Networking</a>
+            <a href="#storage-data">Storage and Data</a>
+            <a href="#serverless">Serverless</a>
+            <a href="#integration">Integration and Messaging</a>
+            <a href="#deployment">Deployment</a>
+            <a href="#monitoring">Monitoring and Troubleshooting</a>
+            <a href="#study-plan">Study Plan</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Platform Delivery</div>
+          <div class="nav-items">
+            <a href="platform-delivery.html#docker">Docker</a>
+            <a href="platform-delivery.html#kubernetes">Kubernetes</a>
+            <a href="platform-delivery.html#cicd">CI/CD</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Certification Prep</p>
+        <h2>AWS Certified Developer Associate DVA-C02</h2>
+        <p>This page turns the uploaded course PDF into a readable certification roadmap. It follows the PDF topics, explains the ideas in plain language, and connects them to the current DVA-C02 exam domains.</p>
+      </header>
+
+      <section id="dva-overview">
+        <h2>DVA-C02 Overview</h2>
+        <p class="lead">The AWS Certified Developer Associate exam validates that you can build, secure, deploy, and troubleshoot cloud applications using AWS services. It is not only a memorization exam. It tests whether you can choose the right developer-focused service and understand how the pieces work together.</p>
+
+        <div class="grid">
+          <article class="card">
+            <h3>What the PDF Covers</h3>
+            <p>The PDF table of contents starts with foundations, IAM, EC2, storage, networking, S3, SDKs, then moves into CloudFront, containers, Elastic Beanstalk, CloudFormation, messaging, monitoring, Lambda, DynamoDB, API Gateway, CI/CD, SAM, CDK, Cognito, advanced identity, encryption, and exam prep.</p>
+          </article>
+          <article class="card">
+            <h3>How to Read This Page</h3>
+            <p>Use the PDF as the slide source and this page as the explanation layer. For every topic, ask: what problem does this solve, when would I use it, how does a developer interact with it, and what mistake would the exam try to catch?</p>
+          </article>
+        </div>
+
+        <h3>The Developer Mindset</h3>
+        <p>A Solutions Architect thinks heavily about broad architecture. A Developer Associate thinks more about building and operating application code on AWS. That means SDK calls, permissions, service integrations, event flows, deployment pipelines, observability, retries, errors, and security boundaries.</p>
+
+        <h3>Exam Facts to Remember</h3>
+        <ul>
+          <li>The current DVA-C02 exam has 50 scored questions and 15 unscored questions.</li>
+          <li>You have 130 minutes.</li>
+          <li>The passing scaled score is 720 out of 1000.</li>
+          <li>You do not need to pass every domain separately; the exam uses a compensatory scoring model.</li>
+          <li>The current DVA-C02 domains are Development with AWS Services, Security, Deployment, and Troubleshooting and Optimization.</li>
+        </ul>
+      </section>
+
+      <section id="exam-domains">
+        <h2>Exam Domains</h2>
+        <p class="lead">The official DVA-C02 exam guide organizes the exam into four weighted domains. The PDF topics map into these domains.</p>
+
+        <div class="grid">
+          <article class="card">
+            <h3>1. Development with AWS Services - 32%</h3>
+            <p>This is the largest domain. Expect Lambda, DynamoDB, API Gateway, SDK usage, S3, event sources, application integration, and service-specific behavior.</p>
+            <p><strong>Study lens:</strong> how does application code call, configure, retry, and integrate with AWS services?</p>
+          </article>
+          <article class="card">
+            <h3>2. Security - 26%</h3>
+            <p>IAM, roles, resource policies, Cognito, KMS, Secrets Manager, encryption, signed requests, and secure access patterns.</p>
+            <p><strong>Study lens:</strong> who is allowed to do what, against which resource, under which conditions?</p>
+          </article>
+          <article class="card">
+            <h3>3. Deployment - 24%</h3>
+            <p>Elastic Beanstalk, CloudFormation, SAM, CDK, CodeCommit, CodeBuild, CodeDeploy, CodePipeline, containers, and safe release practices.</p>
+            <p><strong>Study lens:</strong> how does code become a tested, deployed application?</p>
+          </article>
+          <article class="card">
+            <h3>4. Troubleshooting and Optimization - 18%</h3>
+            <p>CloudWatch, X-Ray, logs, metrics, alarms, performance bottlenecks, Lambda tuning, DynamoDB capacity, API Gateway errors, and retry behavior.</p>
+            <p><strong>Study lens:</strong> when something is slow, broken, throttled, denied, or expensive, where do you look first?</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="aws-foundations">
+        <h2>AWS Foundations</h2>
+        <p class="lead">The PDF starts with AWS basics because DVA-C02 assumes you can reason about regions, availability zones, global services, regional services, and the shared responsibility model.</p>
+
+        <h3>Regions and Availability Zones</h3>
+        <p>A Region is a geographic area such as <code>us-east-1</code>. An Availability Zone is an isolated data center group inside a Region. Multi-AZ designs protect applications from a single data center failure.</p>
+        <p>Day-to-day analogy: a Region is a city, and Availability Zones are separate buildings in that city. If one building loses power, the other buildings can still operate.</p>
+
+        <h3>Global vs Regional Services</h3>
+        <ul>
+          <li><strong>Global:</strong> IAM, Route 53, CloudFront, WAF in many common scenarios.</li>
+          <li><strong>Regional:</strong> Lambda, API Gateway, DynamoDB, S3 bucket region placement, EC2, RDS, CloudWatch logs and metrics.</li>
+        </ul>
+        <p>Exam trap: if an application works in one Region but not another, ask whether the service, resource, key, bucket, or deployment exists in that Region.</p>
+
+        <h3>Shared Responsibility Model</h3>
+        <p>AWS secures the cloud: facilities, hardware, managed service infrastructure, and global network. You secure what you put in the cloud: IAM policies, data, application code, network rules, encryption choices, and configuration.</p>
+        <p>For fully managed services like Lambda and DynamoDB, AWS owns more infrastructure. You still own IAM permissions, code behavior, data access, encryption choices, and monitoring.</p>
+      </section>
+
+      <section id="iam-security">
+        <h2>IAM and Security</h2>
+        <p class="lead">Security is the second-largest DVA-C02 domain. You need to understand IAM deeply enough to debug AccessDenied errors and design least-privilege application access.</p>
+
+        <h3>IAM Users, Groups, Roles, and Policies</h3>
+        <p><strong>User:</strong> a human or long-term identity. <strong>Group:</strong> a collection of users. <strong>Role:</strong> temporary permissions that can be assumed by AWS services, users, or external identities. <strong>Policy:</strong> JSON rules that allow or deny actions.</p>
+        <pre><code>{
+  "Effect": "Allow",
+  "Action": "dynamodb:GetItem",
+  "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/Reservations"
+}</code></pre>
+        <p>For applications, roles are usually better than access keys. A Lambda function should use a Lambda execution role. An EC2 instance should use an instance profile. A container task should use a task role.</p>
+
+        <h3>Identity Policy vs Resource Policy</h3>
+        <p>An identity policy is attached to a principal, such as a user or role. A resource policy is attached to a resource, such as an S3 bucket, SQS queue, KMS key, or Lambda function. Access is allowed when the relevant policy evaluation results in allow and no explicit deny blocks it.</p>
+        <p>Exam trap: S3 access might be controlled by IAM policy, bucket policy, ACLs in older setups, block public access settings, KMS key policy, and VPC endpoint policy. If access fails, check every layer.</p>
+
+        <h3>KMS and Encryption</h3>
+        <p>KMS manages encryption keys. Many AWS services integrate with KMS for encryption at rest. The developer exam often tests whether the application role has both service permissions and KMS permissions.</p>
+        <pre><code>{
+  "Effect": "Allow",
+  "Action": [
+    "kms:Decrypt",
+    "kms:GenerateDataKey"
+  ],
+  "Resource": "arn:aws:kms:us-east-1:123456789012:key/key-id"
+}</code></pre>
+
+        <h3>Secrets Manager and Parameter Store</h3>
+        <p>Do not put database passwords or API keys in source code, Docker images, or plaintext environment files. Use Secrets Manager for secrets with rotation support. Use Systems Manager Parameter Store for configuration and, when appropriate, secure strings.</p>
+
+        <h3>Cognito</h3>
+        <p>Cognito helps with user authentication and authorization for applications. User Pools handle user sign-up and sign-in. Identity Pools provide temporary AWS credentials so authenticated users can access AWS resources with controlled permissions.</p>
+        <p>Simple rule: User Pool answers "who is the user?" Identity Pool answers "what temporary AWS credentials can this user receive?"</p>
+      </section>
+
+      <section id="compute-networking">
+        <h2>Compute and Networking</h2>
+        <p class="lead">The PDF covers EC2, load balancing, auto scaling, containers, Beanstalk, Route 53, and VPC basics. DVA-C02 is developer-focused, so learn enough to deploy and troubleshoot applications without going too deep into network architecture.</p>
+
+        <h3>EC2 Basics</h3>
+        <p>EC2 gives you virtual machines. You choose instance type, AMI, storage, security groups, IAM role, and user data. Developers should know how applications use instance roles instead of storing access keys on the instance.</p>
+        <p>For DVA-C02, EC2 often appears around instance metadata, IAM roles, security groups, user data, load balancers, auto scaling, and deployment targets.</p>
+
+        <h3>Load Balancers and Auto Scaling</h3>
+        <p>A load balancer distributes traffic across healthy targets. Auto Scaling adjusts capacity based on demand or schedules. For APIs, Application Load Balancer is common because it understands HTTP routing, path routing, host routing, and target groups.</p>
+        <p>Developer angle: if users get intermittent errors, check target health, security groups, listener rules, health check path, and whether the app actually listens on the expected port.</p>
+
+        <h3>Route 53</h3>
+        <p>Route 53 is DNS. It maps names like <code>api.example.com</code> to resources such as load balancers, CloudFront distributions, or API Gateway custom domains. Know A records, CNAME records, alias records, hosted zones, TTL, and routing policies.</p>
+
+        <h3>VPC Basics</h3>
+        <p>A VPC is your isolated network in AWS. You should recognize public subnets, private subnets, route tables, internet gateways, NAT gateways, security groups, network ACLs, and VPC endpoints.</p>
+        <p>Exam trap: a Lambda in a VPC may lose internet access unless private subnets route outbound traffic through a NAT gateway. For private access to S3 or DynamoDB, VPC endpoints can avoid public internet routing.</p>
+
+        <h3>Containers on AWS</h3>
+        <p>The PDF includes containers because modern AWS applications often package code as Docker images. ECS runs containers using tasks and services. ECR stores container images. Fargate runs containers without managing servers.</p>
+        <p>For developer exam purposes, know the difference between image registry, task definition, task role, execution role, cluster, service, and load-balanced container deployment.</p>
+
+        <h3>Elastic Beanstalk</h3>
+        <p>Elastic Beanstalk is a platform-as-a-service layer. You upload application code and Beanstalk provisions infrastructure such as EC2, load balancer, auto scaling, logs, and health monitoring.</p>
+        <p>Think of it as a managed deployment environment for teams that want AWS to handle much of the infrastructure wiring while still allowing configuration.</p>
+      </section>
+
+      <section id="storage-data">
+        <h2>Storage and Data</h2>
+        <p class="lead">The PDF covers S3, RDS, Aurora, ElastiCache, and DynamoDB. For DVA-C02, DynamoDB and S3 are especially important because developers directly interact with them through SDKs and service integrations.</p>
+
+        <h3>S3</h3>
+        <p>S3 stores objects in buckets. It is not a filesystem. Each object has a key, value, metadata, version behavior if enabled, encryption settings, storage class, and access controls.</p>
+        <ul>
+          <li><strong>Versioning:</strong> keeps previous versions of objects.</li>
+          <li><strong>Lifecycle policies:</strong> move or expire objects over time.</li>
+          <li><strong>Pre-signed URLs:</strong> temporary URLs that allow upload or download without exposing AWS credentials.</li>
+          <li><strong>Event notifications:</strong> trigger Lambda, SQS, or SNS when objects change.</li>
+          <li><strong>Encryption:</strong> SSE-S3, SSE-KMS, and client-side encryption patterns.</li>
+        </ul>
+        <p>Exam trap: public access can be blocked even when a bucket policy seems to allow access. Check S3 Block Public Access.</p>
+
+        <h3>DynamoDB</h3>
+        <p>DynamoDB is a managed NoSQL database designed for predictable low-latency access at scale. You model data by access patterns, not by normalized relational design.</p>
+        <ul>
+          <li><strong>Partition key:</strong> decides where data is stored and how it is distributed.</li>
+          <li><strong>Sort key:</strong> allows multiple related items under one partition and supports range queries.</li>
+          <li><strong>GSI:</strong> alternate query pattern with its own partition/sort key.</li>
+          <li><strong>Conditional writes:</strong> protect correctness and idempotency.</li>
+          <li><strong>TTL:</strong> expires temporary items.</li>
+          <li><strong>Streams:</strong> emits item changes for Lambda or event processing.</li>
+        </ul>
+        <pre><code>PutItem with condition:
+attribute_not_exists(idempotencyKey)</code></pre>
+        <p>Developer exam mindset: prefer Query over Scan, design keys around queries, handle throttling, and use conditional writes for duplicate prevention.</p>
+
+        <h3>RDS and Aurora</h3>
+        <p>RDS and Aurora are relational databases. Developers should understand connection strings, IAM authentication, Secrets Manager, read replicas, Multi-AZ, backups, and connection pooling.</p>
+        <p>Exam trap: Lambda can overwhelm relational databases if it scales quickly and opens too many connections. Use RDS Proxy or control concurrency.</p>
+
+        <h3>ElastiCache</h3>
+        <p>ElastiCache provides Redis or Memcached. Use it for low-latency caching, session storage, rate-limiting counters, and expensive query results. Cache invalidation and TTLs matter.</p>
+      </section>
+
+      <section id="serverless">
+        <h2>Serverless</h2>
+        <p class="lead">The PDF spends major time on Lambda, API Gateway, DynamoDB, SAM, Cognito, and other serverless services. This is central to DVA-C02.</p>
+
+        <h3>Lambda</h3>
+        <p>Lambda runs code in response to events. You manage code, configuration, permissions, memory, timeout, environment variables, and event source mappings. AWS manages servers and scaling.</p>
+        <ul>
+          <li><strong>Handler:</strong> function entry point.</li>
+          <li><strong>Execution role:</strong> permissions used by the function.</li>
+          <li><strong>Memory:</strong> also affects CPU allocation.</li>
+          <li><strong>Timeout:</strong> maximum execution time.</li>
+          <li><strong>Cold start:</strong> initialization delay for a new execution environment.</li>
+          <li><strong>Layers:</strong> shared code or dependencies.</li>
+          <li><strong>Destinations and DLQs:</strong> handle async success/failure outcomes.</li>
+        </ul>
+        <p>Java angle: keep initialization efficient, reuse SDK clients outside the handler, size memory deliberately, and understand that package size and framework startup can affect cold starts.</p>
+
+        <h3>Lambda Event Sources</h3>
+        <p>API Gateway invokes Lambda for HTTP APIs. S3 can invoke Lambda on object events. DynamoDB Streams and Kinesis invoke Lambda with batches. SQS invokes Lambda from queues. EventBridge invokes Lambda on schedules or event patterns.</p>
+        <p>Exam trap: retry behavior depends on invocation type and event source. Async Lambda retries differ from stream retries and SQS visibility timeout behavior.</p>
+
+        <h3>API Gateway</h3>
+        <p>API Gateway exposes APIs to clients. It can integrate with Lambda, HTTP backends, AWS services, authorization, throttling, caching, stages, deployments, mapping templates, and custom domains.</p>
+        <ul>
+          <li><strong>REST API:</strong> feature-rich, older, supports many advanced controls.</li>
+          <li><strong>HTTP API:</strong> simpler, lower latency/cost for common HTTP workloads.</li>
+          <li><strong>WebSocket API:</strong> bidirectional client communication.</li>
+        </ul>
+        <p>Common troubleshooting: 403 can be auth or resource policy; 429 is throttling; 502 often means integration failure; 504 means timeout.</p>
+
+        <h3>SAM and CDK</h3>
+        <p>SAM is a serverless-focused extension of CloudFormation. CDK lets you define cloud infrastructure using programming languages. SAM is concise for Lambda/API Gateway/DynamoDB serverless apps. CDK is broader and code-driven.</p>
+      </section>
+
+      <section id="integration">
+        <h2>Integration and Messaging</h2>
+        <p class="lead">The PDF includes AWS Integration and Messaging. This is where DVA-C02 tests decoupling, retries, asynchronous design, and event-driven architecture.</p>
+
+        <h3>SQS</h3>
+        <p>SQS is a queue. Producers send messages. Consumers poll messages. SQS decouples services and absorbs traffic spikes.</p>
+        <ul>
+          <li><strong>Standard queue:</strong> high throughput, at-least-once delivery, best-effort ordering.</li>
+          <li><strong>FIFO queue:</strong> ordering and exactly-once processing behavior within the FIFO constraints.</li>
+          <li><strong>Visibility timeout:</strong> time a message is hidden after a consumer receives it.</li>
+          <li><strong>DLQ:</strong> stores messages that fail repeatedly.</li>
+        </ul>
+        <p>Exam trap: if messages are processed more than once, your consumer must be idempotent. SQS standard queues can deliver duplicates.</p>
+
+        <h3>SNS</h3>
+        <p>SNS is pub/sub. One publisher can fan out events to multiple subscribers: SQS, Lambda, HTTP endpoints, email, or SMS. Use SNS when multiple consumers should react to the same event.</p>
+
+        <h3>Kinesis</h3>
+        <p>Kinesis is for streaming data. Records are distributed across shards by partition key. Ordering is guaranteed within a shard, not globally. Consumers process records from shards and checkpoint progress.</p>
+
+        <h3>EventBridge</h3>
+        <p>EventBridge routes events using rules and event buses. It is useful for SaaS integrations, AWS service events, scheduled events, and application event routing.</p>
+
+        <h3>Step Functions</h3>
+        <p>Step Functions orchestrates workflows. Use it when business logic spans multiple steps, needs retries, branching, waits, human approval, or compensation logic. It can coordinate Lambda, ECS, Batch, SNS, SQS, DynamoDB, and more.</p>
+      </section>
+
+      <section id="deployment">
+        <h2>Deployment</h2>
+        <p class="lead">The PDF includes Elastic Beanstalk, CloudFormation, CodeCommit, CodeBuild, CodeDeploy, CodePipeline, SAM, and CDK. DVA-C02 expects you to understand deployment tools and safe release patterns.</p>
+
+        <h3>CloudFormation</h3>
+        <p>CloudFormation is infrastructure as code. A template declares resources and AWS creates, updates, or deletes them as stacks. Know parameters, mappings, outputs, change sets, drift detection, and rollback behavior.</p>
+
+        <h3>CodeBuild</h3>
+        <p>CodeBuild runs build jobs based on a <code>buildspec.yml</code>. It can compile Java, run tests, build Docker images, and publish artifacts.</p>
+        <pre><code>phases:
+  build:
+    commands:
+      - ./mvnw clean verify
+      - docker build -t reservation-api:$CODEBUILD_RESOLVED_SOURCE_VERSION .</code></pre>
+
+        <h3>CodeDeploy</h3>
+        <p>CodeDeploy deploys application revisions to EC2, Lambda, or ECS. It supports deployment strategies like in-place, blue/green, canary, and linear depending on target type.</p>
+
+        <h3>CodePipeline</h3>
+        <p>CodePipeline coordinates source, build, test, approval, and deploy stages. Think of it as the release workflow.</p>
+
+        <h3>Elastic Beanstalk vs CloudFormation vs SAM vs CDK</h3>
+        <ul>
+          <li><strong>Elastic Beanstalk:</strong> easiest managed app environment for web apps and workers.</li>
+          <li><strong>CloudFormation:</strong> direct infrastructure-as-code service.</li>
+          <li><strong>SAM:</strong> concise serverless IaC built on CloudFormation.</li>
+          <li><strong>CDK:</strong> define AWS infrastructure using programming languages.</li>
+        </ul>
+      </section>
+
+      <section id="monitoring">
+        <h2>Monitoring and Troubleshooting</h2>
+        <p class="lead">DVA-C02 troubleshooting is practical. You need to know where logs, metrics, traces, deployment events, and service errors appear.</p>
+
+        <h3>CloudWatch</h3>
+        <p>CloudWatch collects metrics, logs, alarms, dashboards, and events. Lambda logs go to CloudWatch Logs. Many services publish metrics automatically. Custom metrics let applications report business or technical signals.</p>
+
+        <h3>X-Ray</h3>
+        <p>X-Ray traces requests across services. It helps identify which downstream call is slow or failing. For distributed systems, traces are often the fastest way to understand where time is spent.</p>
+
+        <h3>CloudTrail</h3>
+        <p>CloudTrail records AWS API activity. If someone changed a security group, deleted a function, updated a policy, or called an AWS API, CloudTrail is the audit trail.</p>
+
+        <h3>Common Exam Troubleshooting Patterns</h3>
+        <ul>
+          <li><strong>AccessDenied:</strong> check IAM identity policy, resource policy, KMS key policy, boundaries, SCPs, and explicit denies.</li>
+          <li><strong>Lambda timeout:</strong> check timeout value, VPC networking, downstream latency, memory/CPU sizing, and retries.</li>
+          <li><strong>DynamoDB throttling:</strong> check partition key design, capacity mode, hot keys, retry with backoff, and GSIs.</li>
+          <li><strong>API Gateway 5xx:</strong> check Lambda errors, permissions, integration timeout, mapping templates, and backend response format.</li>
+          <li><strong>SQS duplicates:</strong> make consumers idempotent and tune visibility timeout.</li>
+        </ul>
+      </section>
+
+      <section id="study-plan">
+        <h2>Study Plan</h2>
+        <p class="lead">This plan follows the PDF order but emphasizes the highest-value DVA-C02 developer topics.</p>
+
+        <div class="grid">
+          <article class="card">
+            <h3>Phase 1: Foundation</h3>
+            <ul>
+              <li>AWS global infrastructure</li>
+              <li>IAM users, roles, policies, and MFA</li>
+              <li>EC2 basics, load balancing, auto scaling</li>
+              <li>S3 basics and security</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Phase 2: Developer Core</h3>
+            <ul>
+              <li>AWS CLI, SDKs, SigV4, roles</li>
+              <li>Lambda, API Gateway, DynamoDB</li>
+              <li>SQS, SNS, EventBridge, Step Functions</li>
+              <li>CloudWatch, X-Ray, CloudTrail</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Phase 3: Deployment</h3>
+            <ul>
+              <li>Elastic Beanstalk</li>
+              <li>CloudFormation</li>
+              <li>SAM and CDK</li>
+              <li>CodeBuild, CodeDeploy, CodePipeline</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Phase 4: Exam Readiness</h3>
+            <ul>
+              <li>Practice questions by domain</li>
+              <li>Review all wrong answers</li>
+              <li>Memorize service limits only when they affect design</li>
+              <li>Focus on IAM, Lambda, DynamoDB, API Gateway, SQS, S3, and CI/CD</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3>How to Know You Are Ready</h3>
+        <p>You are ready when you can explain not just what each service is, but when to choose it, how a developer calls it, how it is secured, how it fails, where it logs, how it scales, and how it is deployed.</p>
+      </section>
+
+      <footer>
+        <p><a href="../../index.html#guide-sections">Back to guide sections</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>
