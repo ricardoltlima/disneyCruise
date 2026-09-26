@@ -352,6 +352,9 @@
         <a href="#dynamodb-deep">DynamoDB Deep Dive</a>
         <a href="#lambda-deep">Lambda Deep Dive</a>
         <a href="#event-architecture-deep">Event Architecture</a>
+        <a href="#docker">Docker</a>
+        <a href="#kubernetes">Kubernetes</a>
+        <a href="#cicd">CI/CD</a>
         <a href="#collaboration">Collaboration Scenarios</a>
         <a href="#practice-pack">Practice Question Pack</a>
         <a href="#next">Review Plan</a>
@@ -1729,6 +1732,235 @@ Put processed event only if eventId does not already exist.</code></pre>
         </ul>
         <h3>Reference Answer</h3>
         <p class="answer">For event-driven systems, I treat events as facts and design consumers for at-least-once delivery. That means stable event IDs, idempotent handlers, duplicate detection, retry limits, poison-message handling, and observability around lag and errors. I use the outbox pattern when a database change and event publish must stay consistent. I also design event schemas to evolve safely and choose Kafka, RabbitMQ, or Kinesis based on throughput, replay, routing, cloud integration, and operational needs.</p>
+      </section>
+
+      <section id="docker">
+        <h2>Docker</h2>
+        <p class="lead">Core question: how do you package a backend service so it runs the same way on a laptop, in CI, and in production?</p>
+        <p>Docker is like packing a meal kit with the exact recipe, ingredients, tools, and serving instructions. Instead of asking every server or developer laptop to install Java, Maven, environment variables, and system packages by hand, the team ships a container image that describes the service runtime.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Image vs Container</h3>
+            <p><strong>Image:</strong> a read-only package or blueprint, such as <code>reservation-api:1.4.2</code>.</p>
+            <p><strong>Container:</strong> a running instance of that image with process state, networking, logs, and optional mounted storage.</p>
+          </article>
+          <article class="card">
+            <h3>Why It Matters</h3>
+            <ul>
+              <li>Local development becomes closer to production.</li>
+              <li>CI runs tests in a consistent environment.</li>
+              <li>Deployments become immutable and versioned.</li>
+              <li>Rollback can mean running the previous image tag.</li>
+            </ul>
+          </article>
+        </div>
+        <h3>Spring Boot Dockerfile</h3>
+        <pre><code>FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY target/disney-cruise-api.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+        <h3>Multi-Stage Build</h3>
+        <pre><code>FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+COPY pom.xml .
+COPY src ./src
+RUN mvn -DskipTests package
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /workspace/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+        <h3>Run and Configure</h3>
+        <pre><code>docker build -t disney-cruise-api:local .
+docker run --rm -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=local \
+  disney-cruise-api:local</code></pre>
+        <p>Images should be reusable across environments. Put environment-specific values outside the image, such as database URLs, log levels, and feature flags. Do not bake secrets into a Dockerfile.</p>
+        <h3>Docker Compose Example</h3>
+        <pre><code>services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/cruise
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: cruise
+      POSTGRES_USER: cruise
+      POSTGRES_PASSWORD: cruise</code></pre>
+        <h3>Production Practices</h3>
+        <ul>
+          <li>Use specific image tags instead of relying on <code>latest</code>.</li>
+          <li>Keep runtime images small and remove build tools from production images.</li>
+          <li>Run as a non-root user when possible.</li>
+          <li>Log to stdout/stderr so the platform can collect logs.</li>
+          <li>Scan images for vulnerabilities in CI.</li>
+        </ul>
+        <p class="answer">Docker packages an application and runtime dependencies into a repeatable image. For a Spring Boot service, I build the JAR, copy it into a Java runtime image, inject configuration at runtime, and publish a versioned image tag. I avoid secrets in images, keep images small, expose health endpoints, and scan images before deployment.</p>
+      </section>
+
+      <section id="kubernetes">
+        <h2>Kubernetes</h2>
+        <p class="lead">Core question: how do you run many containers reliably across a cluster while handling traffic, scaling, rollouts, failures, and configuration?</p>
+        <p>Kubernetes is like the operations manager for a busy restaurant chain. Docker gives you the boxed meal. Kubernetes decides how many kitchens should prepare it, where they should run, how customers reach them, what happens when a kitchen fails, and how a new recipe rolls out without closing the restaurant.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Core Objects</h3>
+            <ul>
+              <li><strong>Pod:</strong> smallest deployable unit, usually one application container.</li>
+              <li><strong>Deployment:</strong> manages replicated pods and rolling updates.</li>
+              <li><strong>Service:</strong> stable network name and load balancing for pods.</li>
+              <li><strong>Ingress:</strong> external HTTP routing into the cluster.</li>
+              <li><strong>ConfigMap and Secret:</strong> runtime configuration.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Desired State</h3>
+            <p>You tell Kubernetes what should be true, such as three replicas of this API should be running. Kubernetes continuously reconciles reality with that desired state.</p>
+          </article>
+        </div>
+        <h3>Deployment</h3>
+        <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reservation-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: reservation-api
+  template:
+    metadata:
+      labels:
+        app: reservation-api
+    spec:
+      containers:
+        - name: api
+          image: registry.example.com/reservation-api:1.4.2
+          ports:
+            - containerPort: 8080</code></pre>
+        <h3>Service</h3>
+        <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: reservation-api
+spec:
+  selector:
+    app: reservation-api
+  ports:
+    - port: 80
+      targetPort: 8080</code></pre>
+        <p>A Service lets other workloads call <code>http://reservation-api</code> instead of tracking temporary pod IP addresses.</p>
+        <h3>Health Probes</h3>
+        <pre><code>livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080</code></pre>
+        <p>Liveness probes restart broken containers. Readiness probes remove pods from traffic until they are ready. A database outage may mean not ready, but it does not always mean Kubernetes should kill every pod.</p>
+        <h3>Resources and Scaling</h3>
+        <pre><code>resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"</code></pre>
+        <p>Requests help Kubernetes schedule pods. Limits protect the node from one workload consuming everything. Horizontal Pod Autoscaler can add replicas based on CPU, memory, or custom metrics.</p>
+        <h3>Rollout and Rollback</h3>
+        <pre><code>kubectl set image deployment/reservation-api \
+  api=registry.example.com/reservation-api:1.4.3
+
+kubectl rollout status deployment/reservation-api
+kubectl rollout undo deployment/reservation-api</code></pre>
+        <h3>Production Practices</h3>
+        <ul>
+          <li>Use multiple replicas for critical APIs.</li>
+          <li>Set readiness and liveness probes based on meaningful health endpoints.</li>
+          <li>Define CPU and memory requests and limits.</li>
+          <li>Use ConfigMaps and Secrets instead of hard-coded environment values.</li>
+          <li>Collect logs, metrics, and traces from pods.</li>
+          <li>Use rolling, canary, or blue/green deployments for safer releases.</li>
+        </ul>
+        <p class="answer">Kubernetes orchestrates containers across a cluster. I deploy a backend service as a Deployment with multiple replicas, expose it through a Service, route external traffic through Ingress or a gateway, and configure it with ConfigMaps and Secrets. I define probes, resource requests and limits, and a rollout strategy. Kubernetes gives self-healing, service discovery, scaling, and rolling deployments, but it requires careful health checks, secrets management, observability, and release practices.</p>
+      </section>
+
+      <section id="cicd">
+        <h2>CI/CD</h2>
+        <p class="lead">Core question: how do you move code from commit to production safely, repeatably, and with fast feedback?</p>
+        <p>CI/CD is like an assembly line with quality gates. A code change enters the line. The line compiles it, tests it, packages it, scans it, and promotes it. If a station finds a problem, the line stops before the bad change reaches customers.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>Pipeline Stages</h3>
+            <ol>
+              <li>Checkout source.</li>
+              <li>Compile and run tests.</li>
+              <li>Run static analysis and security checks.</li>
+              <li>Build the JAR and Docker image.</li>
+              <li>Push image to a registry.</li>
+              <li>Deploy to test or staging.</li>
+              <li>Run smoke tests.</li>
+              <li>Promote to production.</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Goal</h3>
+            <p>A good pipeline protects production, shortens feedback loops, creates traceability, makes rollback practical, and removes dependency on one person's laptop.</p>
+          </article>
+        </div>
+        <h3>GitHub Actions Example</h3>
+        <pre><code>name: build
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: ./mvnw test</code></pre>
+        <h3>Build and Publish Image</h3>
+        <pre><code>./mvnw -DskipTests package
+docker build -t registry.example.com/reservation-api:${GIT_SHA} .
+docker push registry.example.com/reservation-api:${GIT_SHA}</code></pre>
+        <p>Using the commit SHA as an image tag creates traceability. If production is running image <code>abc123</code>, the team can identify exactly which commit produced it.</p>
+        <h3>Quality Gates</h3>
+        <ul>
+          <li>Unit tests for service logic and edge cases.</li>
+          <li>Integration tests for database, messaging, and external client behavior.</li>
+          <li>Contract tests between services.</li>
+          <li>Static analysis and dependency scanning.</li>
+          <li>Container image scanning.</li>
+          <li>Smoke tests after deployment.</li>
+        </ul>
+        <h3>Promotion and Deployment Strategies</h3>
+        <p>Build once, promote the same artifact. Do not rebuild separate images for dev, staging, and production. The image should stay the same while configuration changes by environment.</p>
+        <ul>
+          <li><strong>Rolling deployment:</strong> replace instances gradually.</li>
+          <li><strong>Blue/green:</strong> run old and new environments side by side, then switch traffic.</li>
+          <li><strong>Canary:</strong> send a small percentage of traffic to the new version before broad rollout.</li>
+          <li><strong>Feature flags:</strong> deploy code separately from releasing behavior.</li>
+        </ul>
+        <h3>Database Changes</h3>
+        <p>Rollback is harder when schema changes are not backward-compatible. Safer migrations add new structures first, support old and new application versions during rollout, backfill data, switch reads, and remove old structures only after all running versions no longer need them.</p>
+        <p class="answer">CI/CD automates the path from code change to deployed service. In CI, I compile the service, run tests, analyze code, and build a versioned artifact or Docker image. In CD, I promote the same artifact through environments, deploy with a controlled strategy, run smoke tests, and monitor production health. I treat the pipeline as a safety system that catches defects early, protects secrets, gives traceability from deployment to commit, and supports rollback.</p>
       </section>
 
       <section id="collaboration">
