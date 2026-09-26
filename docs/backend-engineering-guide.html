@@ -1754,6 +1754,17 @@ Put processed event only if eventId does not already exist.</code></pre>
             </ul>
           </article>
         </div>
+        <h3>Why Docker Exists</h3>
+        <p>Docker exists because deploying directly onto long-lived servers creates drift. One server may have a different Java patch version, another may have a manual package change, and another may have forgotten configuration. Docker makes the runtime explicit by packaging the application with its JRE, filesystem layout, startup command, exposed port, and default runtime behavior.</p>
+        <h3>Java and Cloud Integration</h3>
+        <p>A Spring Boot JAR contains application code, but the Docker image defines the runtime contract. The image says which Java runtime runs the JAR, how the process starts, what port is exposed, and how the platform should launch it. Cloud platforms such as Kubernetes, ECS, Cloud Run, and Azure Container Apps can all use this image as the standard deployment unit.</p>
+        <h3>Container Features</h3>
+        <ul>
+          <li><strong>Layers:</strong> reusable filesystem changes that make builds and pushes faster.</li>
+          <li><strong>Registries:</strong> stores for images, such as ECR, Docker Hub, or internal registries.</li>
+          <li><strong>Tags and digests:</strong> tags are readable labels; digests identify exact immutable image content.</li>
+          <li><strong>Volumes and networks:</strong> let containers mount external storage and communicate in local or platform networks.</li>
+        </ul>
         <h3>Spring Boot Dockerfile</h3>
         <pre><code>FROM eclipse-temurin:21-jre
 WORKDIR /app
@@ -1771,6 +1782,13 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+        <h3>Java Memory in Containers</h3>
+        <pre><code>ENTRYPOINT ["java",
+  "-XX:MaxRAMPercentage=75",
+  "-XX:+ExitOnOutOfMemoryError",
+  "-jar",
+  "app.jar"]</code></pre>
+        <p>The JVM needs heap and non-heap memory. Container memory limits should leave room for metaspace, thread stacks, direct buffers, and native memory. <code>ExitOnOutOfMemoryError</code> lets the platform restart the container cleanly after a severe memory failure.</p>
         <h3>Run and Configure</h3>
         <pre><code>docker build -t disney-cruise-api:local .
 docker run --rm -p 8080:8080 \
@@ -1809,6 +1827,16 @@ docker run --rm -p 8080:8080 \
         <h2>Kubernetes</h2>
         <p class="lead">Core question: how do you run many containers reliably across a cluster while handling traffic, scaling, rollouts, failures, and configuration?</p>
         <p>Kubernetes is like the operations manager for a busy restaurant chain. Docker gives you the boxed meal. Kubernetes decides how many kitchens should prepare it, where they should run, how customers reach them, what happens when a kitchen fails, and how a new recipe rolls out without closing the restaurant.</p>
+        <h3>Why Kubernetes Exists</h3>
+        <p>Containers solve packaging, but they do not solve fleet operations. Kubernetes exists to answer where containers should run, how many copies should exist, how traffic finds them, how failed containers are replaced, how configuration is injected, how releases roll out, and how services scale during traffic spikes.</p>
+        <h3>Cluster Architecture</h3>
+        <ul>
+          <li><strong>API server:</strong> front door for commands and automation.</li>
+          <li><strong>etcd:</strong> stores cluster state.</li>
+          <li><strong>Scheduler:</strong> chooses where pods run.</li>
+          <li><strong>Controllers:</strong> reconcile desired state with actual state.</li>
+          <li><strong>Kubelet:</strong> node agent that runs and monitors containers.</li>
+        </ul>
         <div class="grid">
           <article class="card">
             <h3>Core Objects</h3>
@@ -1857,6 +1885,8 @@ spec:
     - port: 80
       targetPort: 8080</code></pre>
         <p>A Service lets other workloads call <code>http://reservation-api</code> instead of tracking temporary pod IP addresses.</p>
+        <h3>Networking, Namespaces, and Cloud</h3>
+        <p>Pods get temporary IPs, while Services provide stable DNS names. Namespaces separate environments or teams and work with RBAC, quotas, and network policies. In cloud platforms such as EKS, AKS, and GKE, Kubernetes integrates with load balancers, IAM, storage, container registries, autoscaling node groups, and observability systems.</p>
         <h3>Health Probes</h3>
         <pre><code>livenessProbe:
   httpGet:
@@ -1868,6 +1898,13 @@ readinessProbe:
     path: /actuator/health/readiness
     port: 8080</code></pre>
         <p>Liveness probes restart broken containers. Readiness probes remove pods from traffic until they are ready. A database outage may mean not ready, but it does not always mean Kubernetes should kill every pod.</p>
+        <h3>Spring Boot Integration</h3>
+        <pre><code>management:
+  endpoint:
+    health:
+      probes:
+        enabled: true</code></pre>
+        <p>Spring Boot Actuator can expose liveness and readiness endpoints for Kubernetes. Java services should also handle graceful shutdown so rolling updates can finish in-flight requests before the pod exits.</p>
         <h3>Resources and Scaling</h3>
         <pre><code>resources:
   requests:
@@ -1877,6 +1914,12 @@ readinessProbe:
     cpu: "1"
     memory: "1Gi"</code></pre>
         <p>Requests help Kubernetes schedule pods. Limits protect the node from one workload consuming everything. Horizontal Pod Autoscaler can add replicas based on CPU, memory, or custom metrics.</p>
+        <h3>Additional Kubernetes Features</h3>
+        <ul>
+          <li><strong>Scheduling:</strong> node selectors, taints, tolerations, affinity, and topology spread control pod placement.</li>
+          <li><strong>Storage:</strong> PersistentVolumes, PersistentVolumeClaims, and StatefulSets support workloads that need stable identity or storage.</li>
+          <li><strong>Security:</strong> RBAC, service accounts, network policies, security contexts, and admission controllers reduce risk.</li>
+        </ul>
         <h3>Rollout and Rollback</h3>
         <pre><code>kubectl set image deployment/reservation-api \
   api=registry.example.com/reservation-api:1.4.3
@@ -1899,6 +1942,11 @@ kubectl rollout undo deployment/reservation-api</code></pre>
         <h2>CI/CD</h2>
         <p class="lead">Core question: how do you move code from commit to production safely, repeatably, and with fast feedback?</p>
         <p>CI/CD is like an assembly line with quality gates. A code change enters the line. The line compiles it, tests it, packages it, scans it, and promotes it. If a station finds a problem, the line stops before the bad change reaches customers.</p>
+        <h3>Why CI/CD Exists</h3>
+        <p>CI/CD exists because manual releases are slow, inconsistent, hard to audit, and dependent on individual laptops or tribal knowledge. The pipeline becomes the documented path from source code to running service. It gives fast feedback, produces trusted artifacts, and connects deployments back to commits.</p>
+        <h3>Java Build Lifecycle</h3>
+        <pre><code>./mvnw clean verify</code></pre>
+        <p>For Java services, CI usually compiles code, runs unit tests, runs integration or contract tests, packages the JAR, and builds a Docker image with a known JDK version. The same image should then be promoted through environments.</p>
         <div class="grid">
           <article class="card">
             <h3>Pipeline Stages</h3>
@@ -1941,6 +1989,16 @@ jobs:
 docker build -t registry.example.com/reservation-api:${GIT_SHA} .
 docker push registry.example.com/reservation-api:${GIT_SHA}</code></pre>
         <p>Using the commit SHA as an image tag creates traceability. If production is running image <code>abc123</code>, the team can identify exactly which commit produced it.</p>
+        <h3>Artifact Repositories and Cloud</h3>
+        <p>Source code belongs in Git, JARs belong in an artifact repository, and images belong in a container registry. In cloud systems, the pipeline may push images to ECR, deploy to EKS or ECS, run smoke tests through a gateway URL, and publish deployment status to monitoring or change-management systems.</p>
+        <h3>Pipeline Features</h3>
+        <ul>
+          <li><strong>Triggers:</strong> pull requests, merges, tags, schedules, or manual approvals.</li>
+          <li><strong>Artifacts:</strong> JARs, test reports, coverage reports, images, and deployment metadata.</li>
+          <li><strong>Approvals:</strong> human gates before production.</li>
+          <li><strong>Caching:</strong> Maven dependencies and Docker layers for faster feedback.</li>
+          <li><strong>Secrets:</strong> protected credentials injected at runtime, not committed to source control.</li>
+        </ul>
         <h3>Quality Gates</h3>
         <ul>
           <li>Unit tests for service logic and edge cases.</li>
@@ -1950,6 +2008,8 @@ docker push registry.example.com/reservation-api:${GIT_SHA}</code></pre>
           <li>Container image scanning.</li>
           <li>Smoke tests after deployment.</li>
         </ul>
+        <h3>GitOps and Supply Chain Security</h3>
+        <p>GitOps stores desired runtime state in Git. A pipeline builds an image, updates a manifest repository, and a controller such as Argo CD or Flux reconciles the cluster. Modern pipelines also protect the supply chain with dependency scanning, image scanning, SBOMs, provenance, image signing, protected branches, and least-privilege tokens.</p>
         <h3>Promotion and Deployment Strategies</h3>
         <p>Build once, promote the same artifact. Do not rebuild separate images for dev, staging, and production. The image should stay the same while configuration changes by environment.</p>
         <ul>

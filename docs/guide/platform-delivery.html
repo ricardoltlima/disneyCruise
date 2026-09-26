@@ -162,6 +162,35 @@
           <li>Dependencies such as Java versions are explicit instead of hidden on a server.</li>
         </ul>
 
+        <h3>Why Docker Exists</h3>
+        <p>Before containers, teams often deployed applications directly onto long-lived servers. Over time, those servers drifted: one had a different Java patch version, another had an older system library, another had a manual configuration change nobody remembered. This created the classic problem: it works on my machine but fails in test or production.</p>
+        <p>Docker exists to make the application runtime explicit and portable. The source code is not the only thing that matters; the Java runtime, operating system packages, startup command, exposed port, and filesystem layout matter too. Docker captures those runtime assumptions in an image so the deployment unit is repeatable.</p>
+        <p>In software architecture terms, Docker standardizes the boundary between the application and the platform. The application team publishes an image. The platform team, Kubernetes cluster, ECS service, or CI runner knows how to run that image without understanding the build details of the application.</p>
+
+        <h3>How Docker Fits Java</h3>
+        <p>Java already packages code into JARs, but a JAR alone does not answer every runtime question. It does not guarantee which JDK runs it, how memory is configured, which port is exposed, what user runs the process, or how environment-specific settings are injected. Docker wraps the JAR with those operational decisions.</p>
+        <div class="grid">
+          <article class="card">
+            <h3>JAR Responsibility</h3>
+            <p>The JAR contains compiled application code, dependencies, resources, and Spring Boot startup logic.</p>
+          </article>
+          <article class="card">
+            <h3>Image Responsibility</h3>
+            <p>The image contains the runtime environment: JRE, filesystem layout, startup command, exposed port, and default runtime behavior.</p>
+          </article>
+        </div>
+        <p>For Spring Boot, Docker works especially well because the service is usually a single process with an embedded server. The container starts one Java process, exposes one port, and lets the platform restart or replace it if it fails.</p>
+
+        <h3>Container Features That Matter</h3>
+        <ul>
+          <li><strong>Layered filesystem:</strong> each Dockerfile step creates a reusable layer. If dependencies do not change, builds can reuse cached layers.</li>
+          <li><strong>Image registry:</strong> images are pushed to a registry such as Docker Hub, ECR, GCR, ACR, or an internal registry.</li>
+          <li><strong>Tags and digests:</strong> tags are human-friendly labels; digests identify exact immutable image content.</li>
+          <li><strong>Port publishing:</strong> a container can listen on an internal port while the host maps traffic into it.</li>
+          <li><strong>Volumes:</strong> external storage can be mounted into a container, but stateless backend services should avoid relying on local container state.</li>
+          <li><strong>Networks:</strong> containers can communicate through virtual networks, useful in Compose or local integration environments.</li>
+        </ul>
+
         <h3>Dockerfile for a Spring Boot Service</h3>
         <p>A Dockerfile is the recipe for building an image. For Java services, a common production pattern is to build the JAR separately in CI, then copy only the final artifact into a small runtime image.</p>
         <pre><code>FROM eclipse-temurin:21-jre
@@ -184,6 +213,28 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /workspace/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre>
+
+        <h3>Java Memory in Containers</h3>
+        <p>Java services must respect container memory limits. Modern JVMs are container-aware, but senior engineers still pay attention to heap, metaspace, thread stacks, direct buffers, and native memory. A container with a 512 MiB limit cannot safely use a 512 MiB Java heap because the JVM needs memory outside the heap too.</p>
+        <pre><code>ENTRYPOINT ["java",
+  "-XX:MaxRAMPercentage=75",
+  "-XX:+ExitOnOutOfMemoryError",
+  "-jar",
+  "app.jar"]</code></pre>
+        <p><code>MaxRAMPercentage</code> tells the JVM to size the heap as a percentage of available container memory. <code>ExitOnOutOfMemoryError</code> makes the process exit on OOM so the platform can restart it instead of leaving it in a damaged state.</p>
+
+        <h3>Layered Spring Boot Images</h3>
+        <p>Spring Boot can split an executable JAR into layers: dependencies, Spring Boot loader, snapshot dependencies, and application classes. This improves Docker build caching because dependencies usually change less often than application code.</p>
+        <pre><code>java -Djarmode=layertools -jar app.jar extract
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY dependencies/ ./
+COPY spring-boot-loader/ ./
+COPY snapshot-dependencies/ ./
+COPY application/ ./
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]</code></pre>
+        <p>This matters in CI/CD because smaller changed layers can make builds and pushes faster.</p>
 
         <h3>Running a Container</h3>
         <pre><code>docker build -t disney-cruise-api:local .
@@ -230,6 +281,10 @@ docker run --rm -p 8080:8080 disney-cruise-api:local</code></pre>
           <li>Scan images for known vulnerabilities in CI.</li>
         </ul>
 
+        <h3>Docker and Cloud Architecture</h3>
+        <p>Cloud platforms like containers because containers provide a standard scheduling unit. Whether the target is Kubernetes, AWS ECS, Azure Container Apps, Google Cloud Run, or a platform-as-a-service layer, the common contract is similar: give the platform an image, environment variables, resource requirements, health checks, and networking rules.</p>
+        <p>Docker also supports microservice architecture by making each service independently buildable and deployable. The reservation API, payment API, notification worker, and event consumer can each have their own image, release cadence, and scaling profile.</p>
+
         <h3>Common Mistakes</h3>
         <ul>
           <li>Putting secrets in the Dockerfile.</li>
@@ -250,6 +305,11 @@ docker run --rm -p 8080:8080 disney-cruise-api:local</code></pre>
         <h3>Simple Mental Model</h3>
         <p>Kubernetes is like the operations manager for a busy restaurant chain. Docker gives you a boxed meal that can be prepared consistently. Kubernetes decides how many kitchens should prepare it, where they should run, how customers reach them, what happens if a kitchen fails, and how a new recipe rolls out without closing the restaurant.</p>
 
+        <h3>Why Kubernetes Exists</h3>
+        <p>Containers solve packaging, but they do not solve operating a fleet. Once a system has many services and many containers, teams need answers to harder questions: where should each container run, how many copies should exist, how does traffic find them, what happens when a node fails, how do we deploy without downtime, how do we scale during traffic spikes, and how do we keep configuration separate from images?</p>
+        <p>Kubernetes exists as a control plane for those operational problems. Instead of manually starting containers on servers, engineers declare the desired state. Kubernetes watches the cluster and continuously works to make reality match that desired state.</p>
+        <p>In architecture terms, Kubernetes is the runtime substrate for containerized systems. It gives microservices a standard model for deployment, discovery, configuration, scaling, and failure recovery.</p>
+
         <div class="grid">
           <article class="card">
             <h3>Main Objects</h3>
@@ -266,6 +326,18 @@ docker run --rm -p 8080:8080 disney-cruise-api:local</code></pre>
             <p>You tell Kubernetes what should be true: three replicas of this API image should be running. Kubernetes continuously reconciles reality with that desired state.</p>
           </article>
         </div>
+
+        <h3>Cluster Architecture</h3>
+        <p>A Kubernetes cluster has a control plane and worker nodes. The control plane stores desired state and makes scheduling decisions. Worker nodes run pods.</p>
+        <ul>
+          <li><strong>API server:</strong> front door for commands and automation. Tools like <code>kubectl</code>, Helm, and CI/CD systems talk to it.</li>
+          <li><strong>etcd:</strong> strongly consistent store for cluster state.</li>
+          <li><strong>Scheduler:</strong> chooses which node should run a new pod based on resources, constraints, and policies.</li>
+          <li><strong>Controller manager:</strong> runs reconciliation loops, such as ensuring the desired number of replicas exists.</li>
+          <li><strong>Kubelet:</strong> node agent that starts and monitors containers on each worker node.</li>
+          <li><strong>Container runtime:</strong> runs containers, commonly through containerd.</li>
+        </ul>
+        <p>The important mindset is reconciliation. Kubernetes is not a one-time script. Controllers keep watching and correcting drift.</p>
 
         <h3>Pod</h3>
         <p>A pod wraps one or more closely related containers. For backend APIs, one pod usually contains one app container. Pods are replaceable. If a pod dies, a controller can create another one.</p>
@@ -315,6 +387,18 @@ spec:
     - port: 80
       targetPort: 8080</code></pre>
         <p>Other services can call <code>http://reservation-api</code> instead of tracking individual pod IPs.</p>
+
+        <h3>Networking and Service Discovery</h3>
+        <p>Kubernetes gives each pod its own IP address, but pods are temporary. Services provide stable virtual addresses and DNS names. This is why service-to-service calls should target a Service name, not a pod IP.</p>
+        <pre><code>http://reservation-api.default.svc.cluster.local</code></pre>
+        <p>In a backend architecture, a payment service might call a reservation service through its Service name, while external users reach the system through an ingress controller, gateway, or cloud load balancer.</p>
+
+        <h3>Namespaces and Multi-Environment Design</h3>
+        <p>Namespaces partition cluster resources. Teams often use namespaces for environments, teams, or bounded contexts.</p>
+        <pre><code>kubectl get pods -n dev
+kubectl get pods -n staging
+kubectl get pods -n production</code></pre>
+        <p>Namespaces are not a hard security boundary by themselves, but they are useful with RBAC, network policies, quotas, and deployment automation.</p>
 
         <h3>Ingress</h3>
         <p>Ingress routes external HTTP traffic to services. A common setup is an external load balancer pointing to an ingress controller, which routes paths or hosts to internal services.</p>
@@ -366,6 +450,20 @@ readinessProbe:
   periodSeconds: 5</code></pre>
         <p>A common mistake is using the same health check for liveness and readiness. A temporary database outage may mean the pod is not ready, but killing every pod can make the outage worse.</p>
 
+        <h3>Spring Boot Health Integration</h3>
+        <p>Spring Boot Actuator can expose liveness and readiness endpoints that map naturally to Kubernetes probes. This is one of the most important integrations between Java services and Kubernetes.</p>
+        <pre><code>management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true</code></pre>
+        <p>A readiness endpoint should answer whether the pod should receive traffic. A liveness endpoint should answer whether the process is fundamentally broken and needs a restart. Keeping that distinction clear prevents Kubernetes from making an outage worse.</p>
+
         <h3>Resource Requests and Limits</h3>
         <p>Requests tell Kubernetes how much CPU and memory a pod needs for scheduling. Limits cap usage. Without requests and limits, noisy services can starve neighbors or be scheduled onto nodes that cannot realistically support them.</p>
         <pre><code>resources:
@@ -397,6 +495,25 @@ spec:
           type: Utilization
           averageUtilization: 70</code></pre>
 
+        <h3>Scheduling Features</h3>
+        <p>Scheduling is more than placing pods randomly. Kubernetes can use labels, taints, tolerations, affinity, anti-affinity, and topology spread constraints to influence placement.</p>
+        <ul>
+          <li><strong>Node selector:</strong> run pods only on nodes with specific labels.</li>
+          <li><strong>Taints and tolerations:</strong> keep general workloads away from special nodes unless they explicitly tolerate them.</li>
+          <li><strong>Pod anti-affinity:</strong> avoid putting all replicas of the same service on the same node.</li>
+          <li><strong>Topology spread:</strong> distribute replicas across zones or nodes for resilience.</li>
+        </ul>
+        <p>For a critical API, spreading replicas across availability zones helps avoid a single-node or single-zone failure taking down every replica.</p>
+
+        <h3>Storage and Stateful Workloads</h3>
+        <p>Stateless services are easiest to run in Kubernetes. If a reservation API pod dies, another pod can replace it because persistent data lives in a database, not inside the pod. Stateful workloads need more care.</p>
+        <ul>
+          <li><strong>PersistentVolume:</strong> storage resource in the cluster.</li>
+          <li><strong>PersistentVolumeClaim:</strong> a pod's request for storage.</li>
+          <li><strong>StatefulSet:</strong> controller for workloads that need stable identity or stable storage.</li>
+        </ul>
+        <p>Many teams run stateless Java services in Kubernetes and use managed cloud databases such as RDS, DynamoDB, Cloud SQL, or managed Redis outside the cluster.</p>
+
         <h3>Rolling Updates and Rollbacks</h3>
         <p>A Deployment can roll out a new image gradually. Kubernetes starts new pods, waits for readiness, and terminates old pods. If the new version fails readiness checks, rollout can pause and be rolled back.</p>
         <pre><code>kubectl set image deployment/reservation-api \
@@ -404,6 +521,33 @@ spec:
 
 kubectl rollout status deployment/reservation-api
 kubectl rollout undo deployment/reservation-api</code></pre>
+
+        <h3>Security Features</h3>
+        <ul>
+          <li><strong>RBAC:</strong> controls who can read or change cluster resources.</li>
+          <li><strong>Service accounts:</strong> give workloads an identity inside the cluster.</li>
+          <li><strong>Network policies:</strong> restrict which pods can talk to each other.</li>
+          <li><strong>Security contexts:</strong> control Linux-level settings such as running as non-root and read-only root filesystems.</li>
+          <li><strong>Admission controllers:</strong> enforce policies before resources are accepted by the API server.</li>
+        </ul>
+        <pre><code>securityContext:
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false</code></pre>
+
+        <h3>Kubernetes in the Cloud</h3>
+        <p>Managed Kubernetes services such as Amazon EKS, Azure AKS, and Google GKE reduce the burden of running the control plane. The team still owns application manifests, workload security, scaling settings, observability, deployment strategy, and cost control.</p>
+        <p>Cloud integration commonly includes load balancers, IAM integration, managed secrets, container registries, autoscaling node groups, persistent volumes backed by cloud disks, and observability tools. Kubernetes becomes the application runtime layer sitting above cloud infrastructure.</p>
+
+        <h3>How Kubernetes Fits Software Architecture</h3>
+        <p>Kubernetes encourages services to be horizontally scalable, stateless where possible, observable, and disposable. A service should start quickly, expose health, handle termination gracefully, and externalize configuration. These are architectural qualities, not just deployment details.</p>
+        <pre><code>server:
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s</code></pre>
+        <p>Graceful shutdown matters because Kubernetes may terminate a pod during rolling updates, scaling events, or node maintenance. A Java service should stop accepting new work, finish in-flight requests where possible, and exit cleanly.</p>
 
         <h3>Production Practices</h3>
         <ul>
@@ -437,6 +581,11 @@ kubectl rollout undo deployment/reservation-api</code></pre>
         <p>CI/CD is like an assembly line with quality gates. A code change enters the line. The line compiles it, tests it, packages it, scans it, and promotes it. If a station finds a problem, the line stops before the bad change reaches customers.</p>
         <p><strong>Continuous Integration</strong> means changes are merged frequently and validated automatically. <strong>Continuous Delivery</strong> means the application is always in a deployable state. <strong>Continuous Deployment</strong> means approved changes can automatically reach production without a manual deploy step.</p>
 
+        <h3>Why CI/CD Exists</h3>
+        <p>Without CI/CD, releases depend on manual steps, tribal knowledge, and local machines. One engineer may know how to build the service, another may know how to deploy it, and a third may know which tests to run. That process is slow, inconsistent, hard to audit, and risky during incidents.</p>
+        <p>CI/CD exists to turn delivery into a repeatable system. The pipeline becomes the documented path from source code to running service. It gives the team fast feedback, reduces manual error, creates deployment traceability, and makes production changes easier to reason about.</p>
+        <p>In architecture terms, CI/CD is the control system around the application lifecycle. It enforces quality gates, produces trusted artifacts, promotes those artifacts through environments, and connects code changes to operational outcomes.</p>
+
         <div class="grid">
           <article class="card">
             <h3>Typical Pipeline</h3>
@@ -458,6 +607,12 @@ kubectl rollout undo deployment/reservation-api</code></pre>
           </article>
         </div>
 
+        <h3>How CI/CD Fits Java</h3>
+        <p>Java backend pipelines usually start with deterministic builds. Maven or Gradle compiles the code, runs tests, packages a JAR, and may publish artifacts. The pipeline should use a known JDK version so developers, CI, and production agree on the Java baseline.</p>
+        <pre><code>./mvnw clean verify</code></pre>
+        <p><code>verify</code> is often better than only <code>test</code> because it can include integration test phases, static checks, generated sources, and packaging validation depending on the Maven configuration.</p>
+        <p>For Spring Boot, the output may be an executable JAR, a Docker image, or both. The JAR is the application artifact; the image is the deployable runtime artifact.</p>
+
         <h3>Simple GitHub Actions Example</h3>
         <pre><code>name: build
 
@@ -477,6 +632,16 @@ jobs:
           java-version: '21'
       - run: ./mvnw test</code></pre>
 
+        <h3>Maven Pipeline Stages</h3>
+        <pre><code>validate   -> check project structure and configuration
+compile    -> compile main code
+test       -> run unit tests
+package    -> build JAR
+verify     -> run additional checks and integration tests
+install    -> publish to local Maven repository
+deploy     -> publish artifact to remote repository</code></pre>
+        <p>A CI pipeline does not always run every phase for every branch. Pull requests might run compile, unit tests, and static analysis. Main branch builds might also publish images and deploy to a lower environment.</p>
+
         <h3>Build, Package, and Publish an Image</h3>
         <pre><code>jobs:
   package:
@@ -493,12 +658,28 @@ jobs:
       - run: docker push registry.example.com/reservation-api:${{ github.sha }}</code></pre>
         <p>Using the commit SHA as an image tag creates traceability. If production is running image <code>abc123</code>, the team can identify exactly which commit produced it.</p>
 
+        <h3>Artifact Repository and Container Registry</h3>
+        <p>CI/CD separates source code from built artifacts. Source code lives in Git. Built JARs may live in a Maven repository such as Nexus, Artifactory, or GitHub Packages. Container images live in a registry such as ECR, GCR, ACR, Docker Hub, or an internal registry.</p>
+        <p>This matters because production should deploy a known artifact, not rebuild from source at deployment time. Rebuilding later can produce a different artifact due to dependency changes, plugin changes, or environment drift.</p>
+
         <h3>Deployment Step</h3>
         <p>A deployment step updates the runtime platform, often Kubernetes. The exact mechanism varies: Helm, Kustomize, Argo CD, Flux, Terraform, or direct <code>kubectl</code>.</p>
         <pre><code>kubectl set image deployment/reservation-api \
   api=registry.example.com/reservation-api:${GIT_SHA}
 
 kubectl rollout status deployment/reservation-api</code></pre>
+
+        <h3>Pipeline Features That Matter</h3>
+        <ul>
+          <li><strong>Triggers:</strong> pull request, merge to main, tag creation, scheduled run, or manual approval.</li>
+          <li><strong>Stages:</strong> logical groups such as build, test, scan, package, deploy, and verify.</li>
+          <li><strong>Artifacts:</strong> files or images produced by one stage and consumed by later stages.</li>
+          <li><strong>Approvals:</strong> human gates for production, regulated environments, or risky changes.</li>
+          <li><strong>Secrets:</strong> protected values injected into jobs without committing them to source control.</li>
+          <li><strong>Caching:</strong> reuse Maven dependencies, Gradle caches, or Docker layers to speed up builds.</li>
+          <li><strong>Matrix builds:</strong> test multiple Java versions, operating systems, or dependency variants.</li>
+          <li><strong>Environments:</strong> dev, QA, staging, and production with different variables and approvals.</li>
+        </ul>
 
         <h3>Quality Gates</h3>
         <ul>
@@ -511,6 +692,17 @@ kubectl rollout status deployment/reservation-api</code></pre>
           <li><strong>Smoke tests:</strong> verify a deployed environment is basically healthy.</li>
         </ul>
 
+        <h3>Test Pyramid in CI</h3>
+        <p>A strong Java pipeline uses different test levels for different feedback speeds.</p>
+        <ul>
+          <li><strong>Unit tests:</strong> fast, many, run on every pull request.</li>
+          <li><strong>Slice tests:</strong> focused Spring tests such as MVC, repository, or JSON serialization tests.</li>
+          <li><strong>Integration tests:</strong> verify database, messaging, or HTTP clients, often with Testcontainers.</li>
+          <li><strong>Contract tests:</strong> protect service-to-service API compatibility.</li>
+          <li><strong>End-to-end tests:</strong> fewer, slower tests that validate critical user journeys.</li>
+        </ul>
+        <p>The goal is not to put every possible test in every stage. The goal is fast feedback early and high confidence before production.</p>
+
         <h3>Environment Promotion</h3>
         <p>Build once, promote the same artifact. Do not rebuild different images for dev, staging, and production because each rebuild can produce a different result. The image should stay the same while configuration changes by environment.</p>
         <pre><code>Commit abc123
@@ -518,6 +710,22 @@ kubectl rollout status deployment/reservation-api</code></pre>
   -> deploy same image to dev
   -> promote same image to staging
   -> promote same image to production</code></pre>
+
+        <h3>CI/CD and Cloud Architecture</h3>
+        <p>In cloud systems, CI/CD often becomes the bridge between application code and cloud runtime. The pipeline may authenticate to a cloud provider, push an image to a cloud registry, update Kubernetes manifests, deploy to EKS or ECS, run database migrations, invalidate a CDN cache, or publish deployment metadata.</p>
+        <p>For AWS-oriented Java services, a pipeline might build a Spring Boot image, push it to ECR, update an EKS Deployment, run smoke tests through an API Gateway URL, and publish deployment status to Slack or a change-management system.</p>
+
+        <h3>GitOps</h3>
+        <p>GitOps is a deployment model where Git stores the desired runtime state. Instead of a pipeline directly changing the cluster, the pipeline updates a manifest repository. A tool such as Argo CD or Flux watches that repository and reconciles the cluster to match it.</p>
+        <pre><code>Application repo:
+  builds image reservation-api:abc123
+
+Manifest repo:
+  updates image tag from abc122 to abc123
+
+GitOps controller:
+  applies desired state to Kubernetes</code></pre>
+        <p>This improves auditability because the deployment history is visible as Git commits. It also matches Kubernetes' desired-state model.</p>
 
         <h3>Deployment Strategies</h3>
         <div class="grid">
@@ -549,8 +757,22 @@ kubectl rollout status deployment/reservation-api</code></pre>
           <li>Remove old columns only after all running versions no longer need them.</li>
         </ol>
 
+        <h3>Feature Flags and Architecture</h3>
+        <p>Feature flags let teams deploy code before exposing behavior. This is valuable in microservices because it separates technical deployment from product release. It also lets teams disable a risky path quickly without rebuilding or redeploying.</p>
+        <p>Flags should be treated as production configuration and eventually cleaned up. Old flags become hidden complexity if nobody removes them.</p>
+
         <h3>Secrets and Permissions</h3>
         <p>Pipelines often need credentials to push images and deploy. Those credentials should live in the CI secret store or cloud identity system, not in source code. Use least privilege: a build job may push images, but it should not have broad production admin access unless required.</p>
+
+        <h3>Supply Chain Security</h3>
+        <p>Modern CI/CD also protects the software supply chain. That means knowing what dependencies are in the build, who changed the code, which artifact was produced, whether the image was scanned, and whether the deployment used the approved artifact.</p>
+        <ul>
+          <li><strong>SBOM:</strong> software bill of materials listing dependencies.</li>
+          <li><strong>Image signing:</strong> prove an image came from the expected pipeline.</li>
+          <li><strong>Provenance:</strong> metadata showing how and where an artifact was built.</li>
+          <li><strong>Protected branches:</strong> prevent unreviewed changes from reaching release branches.</li>
+          <li><strong>Least privilege tokens:</strong> reduce blast radius if a pipeline secret is exposed.</li>
+        </ul>
 
         <h3>Observability After Deployment</h3>
         <p>A mature pipeline does not stop after deploy. It watches health metrics, error rate, latency, logs, and traces. If smoke tests fail or error rate spikes, the pipeline or release process should stop promotion and make rollback obvious.</p>
