@@ -325,6 +325,7 @@
       <h1>Backend Engineering Guide</h1>
       <p>Prepared from the study sessions through June 15, 2026.</p>
       <nav aria-label="Table of contents">
+        <a href="../src/main/resources/static/resource-hub.html">Resource Atlas</a>
         <a href="#role">Engineering Focus</a>
         <a href="#strategy">Study Strategy</a>
         <a href="#schedule">Learning Roadmap</a>
@@ -1383,6 +1384,7 @@ assertEquals("CONFIRMED", saved.getStatus());</code></pre>
       <section id="aws">
         <h2>AWS Focus</h2>
         <p class="lead">Kinesis, DynamoDB, and Lambda are high-value topics for real-time, high-volume, cloud-native backend systems.</p>
+        <p class="lead">Official AWS entry point: <a href="https://docs.aws.amazon.com/">AWS Documentation</a>.</p>
         <div class="grid">
           <article class="card">
             <h3>Kinesis</h3>
@@ -1393,16 +1395,28 @@ assertEquals("CONFIRMED", saved.getStatus());</code></pre>
             <h3>DynamoDB</h3>
             <p>Study key-value and document modeling, partition keys, sort keys, access-pattern-first design, GSIs, LSIs, capacity modes, hot partitions, TTL, conditional writes, transactions, optimistic locking, and single-table design basics.</p>
             <p><strong>Goal:</strong> design a DynamoDB table from access patterns instead of relational habits.</p>
+            <p><a href="https://docs.aws.amazon.com/dynamodb/?icmpid=docs_homepage_featuredsvcs">DynamoDB documentation</a></p>
           </article>
           <article class="card">
             <h3>Lambda</h3>
             <p>Study serverless execution, event sources, API Gateway integration, Kinesis triggers, DynamoDB Streams, cold starts, retries, timeouts, concurrency, idempotency, and observability.</p>
             <p><strong>Goal:</strong> explain when Lambda is appropriate and how to make it reliable.</p>
+            <p><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-java.html">AWS Lambda Java documentation</a></p>
           </article>
           <article class="card">
             <h3>Event-Driven Architecture</h3>
             <p>Study synchronous vs asynchronous communication, event contracts, schema evolution, duplicate events, dead-letter queues, replay, eventual consistency, and saga basics.</p>
             <p><strong>Goal:</strong> design a backend that handles real-time data without losing correctness.</p>
+            <p><a href="https://docs.aws.amazon.com/reference-architecture-diagrams/?icmpid=docs_homepage_featuredsvcs">AWS reference architecture diagrams</a></p>
+          </article>
+          <article class="card">
+            <h3>Supporting AWS Services</h3>
+            <p>Use these references when reviewing common backend infrastructure choices around relational storage, object storage, and compute.</p>
+            <ul>
+              <li><a href="https://docs.aws.amazon.com/rds/?icmpid=docs_homepage_featuredsvcs">Amazon RDS documentation</a></li>
+              <li><a href="https://docs.aws.amazon.com/s3/?icmpid=docs_homepage_featuredsvcs">Amazon S3 documentation</a></li>
+              <li><a href="https://docs.aws.amazon.com/ec2/?icmpid=docs_homepage_featuredsvcs">Amazon EC2 documentation</a></li>
+            </ul>
           </article>
         </div>
       </section>
@@ -1616,6 +1630,7 @@ ReservationService service = new ReservationService(repository);</code></pre>
       <section id="dynamodb-deep">
         <h2>DynamoDB Deep Dive</h2>
         <p class="lead">Core question: how do you design DynamoDB tables from access patterns instead of relational habits?</p>
+        <p class="lead">Official reference: <a href="https://docs.aws.amazon.com/dynamodb/?icmpid=docs_homepage_featuredsvcs">Amazon DynamoDB documentation</a>.</p>
         <h3>Mental Model</h3>
         <p>DynamoDB is a managed NoSQL key-value/document database. It is designed for predictable low-latency access at scale, but it requires modeling around queries you need to support.</p>
         <h3>Primary Key</h3>
@@ -1647,6 +1662,7 @@ Put processed event only if eventId does not already exist.</code></pre>
       <section id="lambda-deep">
         <h2>Lambda Deep Dive</h2>
         <p class="lead">Core question: when is Lambda appropriate, and how do you make serverless processing reliable?</p>
+        <p class="lead">Official Java reference: <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-java.html">AWS Lambda for Java</a>.</p>
         <h3>Mental Model</h3>
         <p>AWS Lambda runs code in response to events without managing servers. It is a good fit for event processing, glue logic, scheduled tasks, lightweight APIs, stream processing, and background jobs.</p>
         <h3>Common Event Sources</h3>
@@ -1680,6 +1696,7 @@ Put processed event only if eventId does not already exist.</code></pre>
       <section id="event-architecture-deep">
         <h2>Event-Driven Architecture</h2>
         <p class="lead">Core question: how do you design an event-driven backend that handles real-time data safely?</p>
+        <p class="lead">Architecture reference: <a href="https://docs.aws.amazon.com/reference-architecture-diagrams/?icmpid=docs_homepage_featuredsvcs">AWS reference architecture diagrams</a>.</p>
         <h3>Core Ideas</h3>
         <ul>
           <li><strong>Event:</strong> a fact that happened, such as <code>ReservationCreated</code>.</li>
@@ -1826,6 +1843,8 @@ Put processed event only if eventId does not already exist.</code></pre>
   </div>
 </body>
 </html>
+
+
 
 
 

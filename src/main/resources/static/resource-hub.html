@@ -1,0 +1,797 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backend Resource Atlas</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #667085;
+      --paper: #f7f9fc;
+      --panel: #ffffff;
+      --line: #dde4ef;
+      --navy: #10223f;
+      --blue: #1b63b7;
+      --cyan: #0e8f9c;
+      --green: #16794c;
+      --gold: #a66b00;
+      --red: #a64242;
+      --shadow: 0 18px 48px rgba(16, 34, 63, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(27, 99, 183, 0.08), transparent 460px),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--blue);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 292px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 26px 20px;
+      color: #f1f6ff;
+      background: var(--navy);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    aside h1 {
+      margin: 0 0 6px;
+      font-size: 1.08rem;
+      line-height: 1.2;
+    }
+
+    aside p {
+      margin: 0 0 22px;
+      color: #bdcbe0;
+      font-size: 0.88rem;
+    }
+
+    nav,
+    .filter-panel {
+      display: grid;
+      gap: 8px;
+    }
+
+    nav a,
+    .filter-panel button {
+      width: 100%;
+      min-height: 38px;
+      padding: 9px 11px;
+      color: #e7eefb;
+      background: transparent;
+      border: 0;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 0.9rem;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav a:hover,
+    .filter-panel button:hover,
+    .filter-panel button.active {
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .filter-panel {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .filter-panel h2 {
+      margin: 0 0 4px;
+      color: #91acd3;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    main {
+      width: min(1280px, 100%);
+      padding: 36px clamp(18px, 4vw, 56px) 72px;
+    }
+
+    .hero {
+      min-height: 360px;
+      display: grid;
+      align-content: end;
+      padding: clamp(28px, 5vw, 58px);
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(16, 34, 63, 0.96), rgba(14, 143, 156, 0.82)),
+        url("API%20Gateway%20Architecture.jpg");
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #b8fff8;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 1;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 18px 0 0;
+      color: #e4f0ff;
+      font-size: clamp(1rem, 1.8vw, 1.22rem);
+    }
+
+    section {
+      margin-top: 44px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.55rem, 3vw, 2.2rem);
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 1.04rem;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .lead {
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric,
+    .card,
+    .poster-card,
+    .pdf-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 26px rgba(16, 34, 63, 0.06);
+    }
+
+    .metric {
+      padding: 16px;
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--navy);
+      font-size: 1.85rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .path {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .card .step {
+      display: inline-grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      margin-bottom: 12px;
+      color: white;
+      background: var(--blue);
+      border-radius: 50%;
+      font-weight: 800;
+    }
+
+    .card ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .spotlight {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .spotlight img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 560px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .spotlight .card {
+      display: grid;
+      align-content: center;
+    }
+
+    .poster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .poster-card {
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .poster-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      object-position: top;
+      background: #e8edf5;
+      border-bottom: 1px solid var(--line);
+      cursor: zoom-in;
+    }
+
+    .poster-body {
+      padding: 14px;
+    }
+
+    .poster-body p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      color: #23405f;
+      background: #edf3fb;
+      border: 1px solid #d8e4f2;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .pdf-card {
+      padding: 20px;
+      display: grid;
+      align-content: space-between;
+      min-height: 190px;
+    }
+
+    .pdf-card .doc-type {
+      width: max-content;
+      margin-bottom: 14px;
+      padding: 4px 9px;
+      color: white;
+      background: var(--red);
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .pdf-card p {
+      color: var(--muted);
+    }
+
+    .pdf-card a {
+      width: max-content;
+      margin-top: 8px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    dialog {
+      width: min(96vw, 980px);
+      max-height: 94vh;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop {
+      background: rgba(8, 17, 32, 0.72);
+    }
+
+    .viewer {
+      display: grid;
+      background: white;
+    }
+
+    .viewer header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .viewer h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .viewer button {
+      min-width: 38px;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f6f8fb;
+      cursor: pointer;
+    }
+
+    .viewer img {
+      display: block;
+      width: 100%;
+      max-height: calc(94vh - 64px);
+      object-fit: contain;
+      background: #101828;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+        height: auto;
+      }
+
+      .metrics,
+      .path,
+      .spotlight,
+      .pdf-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <h1>Resource Atlas</h1>
+      <p>A focused visual library for backend interview prep, production thinking, AWS, and system design.</p>
+      <nav aria-label="Page sections">
+        <a href="../../../../index.html">Backend Guide</a>
+        <a href="#overview">Overview</a>
+        <a href="#study-path">Study Path</a>
+        <a href="#spotlight">Featured Poster</a>
+        <a href="#posters">Poster Library</a>
+        <a href="#pdfs">PDF Library</a>
+      </nav>
+
+      <div class="filter-panel" aria-label="Poster filters">
+        <h2>Filter Posters</h2>
+        <button class="active" type="button" data-filter="all">All Resources</button>
+        <button type="button" data-filter="java">Java Core</button>
+        <button type="button" data-filter="spring">Spring Boot</button>
+        <button type="button" data-filter="api">APIs and Security</button>
+        <button type="button" data-filter="systems">System Design</button>
+        <button type="button" data-filter="data">Data and Messaging</button>
+        <button type="button" data-filter="production">Production</button>
+      </div>
+    </aside>
+
+    <main>
+      <header id="overview" class="hero">
+        <p class="eyebrow">Static Resource Collection</p>
+        <h2>Backend Engineering Visual Resource Atlas</h2>
+        <p>Every poster and PDF in this folder has been turned into a browsable study deck, grouped by topic and arranged as a practical interview-prep path.</p>
+      </header>
+
+      <section aria-label="Library summary">
+        <div class="metrics">
+          <div class="metric">
+            <strong>37</strong>
+            <span>visual study posters</span>
+          </div>
+          <div class="metric">
+            <strong>2</strong>
+            <span>PDF reference guides</span>
+          </div>
+          <div class="metric">
+            <strong>6</strong>
+            <span>topic tracks</span>
+          </div>
+          <div class="metric">
+            <strong>30</strong>
+            <span>day-based review arc</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="study-path">
+        <h2>Study Path</h2>
+        <p class="lead">The assets naturally form a senior backend review sequence: Java fundamentals first, then Spring, APIs, data, production hardening, and system design.</p>
+        <div class="path">
+          <article class="card">
+            <span class="step">1</span>
+            <h3>Java Runtime and Language</h3>
+            <p>Start with JVM management, collections, streams, immutability, concurrency, and memory behavior.</p>
+            <ul>
+              <li>JVM Management</li>
+              <li>Java Streams</li>
+              <li>Concurrency</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="step">2</span>
+            <h3>Spring Application Model</h3>
+            <p>Move into bean lifecycle, auto-configuration, AOP, transactions, caching, and observability.</p>
+            <ul>
+              <li>Spring Bean Lifecycle</li>
+              <li>Auto Configuration</li>
+              <li>Actuator</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="step">3</span>
+            <h3>API Design and Security</h3>
+            <p>Review REST design, gateways, HTTP methods, JWT, and secure request routing.</p>
+            <ul>
+              <li>REST API</li>
+              <li>API Gateway</li>
+              <li>Spring Security + JWT</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="step">4</span>
+            <h3>Data and Messaging</h3>
+            <p>Cover Hibernate N+1, database performance, Redis, Kafka, and collection tradeoffs.</p>
+            <ul>
+              <li>Database Performance</li>
+              <li>Apache Kafka</li>
+              <li>Redis</li>
+            </ul>
+          </article>
+          <article class="card">
+            <span class="step">5</span>
+            <h3>Production Architecture</h3>
+            <p>Finish with resiliency, production breaks, microservices, load balancing, and system design.</p>
+            <ul>
+              <li>Resiliency</li>
+              <li>Load Balancing</li>
+              <li>Production Ready Architecture</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="spotlight">
+        <h2>Featured Poster</h2>
+        <p class="lead">The anonymous image file was read visually and titled here as Java 8 Interview Sample Coding Questions.</p>
+        <div class="spotlight">
+          <img src="1781324151846.jpg" alt="Java 8 Interview Sample Coding Questions poster" data-title="Java 8 Interview Sample Coding Questions" />
+          <article class="card">
+            <p class="eyebrow">Interview Drill</p>
+            <h3>Java 8 Interview Sample Coding Questions</h3>
+            <p>This poster is a compact stream API workout: distinct, grouping, sorting, mapping, reducing, matching, flatMap, duplicate detection, CSV conversion, and common collector patterns.</p>
+            <p>Use it after reviewing Java Streams and before service-layer coding practice. It is the bridge between syntax knowledge and interview-ready muscle memory.</p>
+            <div class="tag-row">
+              <span class="tag">Streams API</span>
+              <span class="tag">Collectors</span>
+              <span class="tag">Lambda</span>
+              <span class="tag">Interview Practice</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="posters">
+        <h2>Poster Library</h2>
+        <p class="lead">Click any poster to inspect it larger. The filters in the left rail stay available while you review.</p>
+        <div class="poster-grid">
+          <article class="poster-card" data-category="systems production">
+            <img src="15%20Microservices%20Concepts.jpg" alt="15 Microservices Concepts" data-title="15 Microservices Concepts" />
+            <div class="poster-body"><h3>15 Microservices Concepts</h3><p>Architecture vocabulary for distributed backend systems.</p><div class="tag-row"><span class="tag">Microservices</span><span class="tag">Architecture</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="1781324151846.jpg" alt="Java 8 Interview Sample Coding Questions" data-title="Java 8 Interview Sample Coding Questions" />
+            <div class="poster-body"><h3>Java 8 Interview Sample Coding Questions</h3><p>Hands-on Stream API coding drills.</p><div class="tag-row"><span class="tag">Java</span><span class="tag">Streams</span></div></div>
+          </article>
+          <article class="poster-card" data-category="data systems">
+            <img src="Apache%20Kafka.jpg" alt="Apache Kafka" data-title="Apache Kafka" />
+            <div class="poster-body"><h3>Apache Kafka</h3><p>Messaging, event streaming, and consumer patterns.</p><div class="tag-row"><span class="tag">Kafka</span><span class="tag">Events</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api systems">
+            <img src="API%20Gateway%20Architecture.jpg" alt="API Gateway Architecture" data-title="API Gateway Architecture" />
+            <div class="poster-body"><h3>API Gateway Architecture</h3><p>Routing, auth, traffic control, and edge responsibilities.</p><div class="tag-row"><span class="tag">Gateway</span><span class="tag">Architecture</span></div></div>
+          </article>
+          <article class="poster-card" data-category="production">
+            <img src="Breaks%20in%20Production.jpg" alt="Breaks in Production" data-title="Breaks in Production" />
+            <div class="poster-body"><h3>Breaks in Production</h3><p>Failure response and production debugging mindset.</p><div class="tag-row"><span class="tag">Production</span><span class="tag">Incidents</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="Day%201%20-%20JVM%20Management.jpg" alt="Day 1 - JVM Management" data-title="Day 1 - JVM Management" />
+            <div class="poster-body"><h3>Day 1 - JVM Management</h3><p>Runtime, memory, and operational JVM basics.</p><div class="tag-row"><span class="tag">JVM</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java data">
+            <img src="Day%2010%20-%20Hashmap%20Internal%20Working.jpg" alt="Day 10 - Hashmap Internal Working" data-title="Day 10 - Hashmap Internal Working" />
+            <div class="poster-body"><h3>Day 10 - Hashmap Internal Working</h3><p>Hashing, buckets, collisions, and lookup behavior.</p><div class="tag-row"><span class="tag">Collections</span><span class="tag">HashMap</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api">
+            <img src="Day%2011%20-%20Rest%20API.jpg" alt="Day 11 - Rest API" data-title="Day 11 - Rest API" />
+            <div class="poster-body"><h3>Day 11 - Rest API</h3><p>REST fundamentals and endpoint design.</p><div class="tag-row"><span class="tag">REST</span><span class="tag">API</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api">
+            <img src="Day%2011%20-%20Rest%20API%20Continuation.jpg" alt="Day 11 - Rest API Continuation" data-title="Day 11 - Rest API Continuation" />
+            <div class="poster-body"><h3>Day 11 - Rest API Continuation</h3><p>Continuation topics for REST API design.</p><div class="tag-row"><span class="tag">REST</span><span class="tag">API</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="Day%2013%20-%20Immutable%20Objects.jpg" alt="Day 13 - Immutable Objects" data-title="Day 13 - Immutable Objects" />
+            <div class="poster-body"><h3>Day 13 - Immutable Objects</h3><p>Object safety, defensive design, and thread-friendly models.</p><div class="tag-row"><span class="tag">Java</span><span class="tag">Immutability</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java api">
+            <img src="Day%2014%20-%20Exception%20Handling%20Best%20Practices.jpg" alt="Day 14 - Exception Handling Best Practices" data-title="Day 14 - Exception Handling Best Practices" />
+            <div class="poster-body"><h3>Day 14 - Exception Handling Best Practices</h3><p>Error modeling and service boundary behavior.</p><div class="tag-row"><span class="tag">Exceptions</span><span class="tag">API</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring">
+            <img src="Day%2015%20-%20Spring%20Bean%20Lifecycle.jpg" alt="Day 15 - Spring Bean Lifecycle" data-title="Day 15 - Spring Bean Lifecycle" />
+            <div class="poster-body"><h3>Day 15 - Spring Bean Lifecycle</h3><p>Container lifecycle and dependency injection timing.</p><div class="tag-row"><span class="tag">Spring</span><span class="tag">Beans</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring">
+            <img src="Day%2017%20-%20Spring%20Boot%20Auto%20Configuration.jpg" alt="Day 17 - Spring Boot Auto Configuration" data-title="Day 17 - Spring Boot Auto Configuration" />
+            <div class="poster-body"><h3>Day 17 - Spring Boot Auto Configuration</h3><p>How Spring Boot wires defaults and conditions.</p><div class="tag-row"><span class="tag">Spring Boot</span><span class="tag">Auto Config</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api">
+            <img src="Day%2018%20-%20Rest%20API%20Best%20Practices.jpg" alt="Day 18 - Rest API Best Practices" data-title="Day 18 - Rest API Best Practices" />
+            <div class="poster-body"><h3>Day 18 - Rest API Best Practices</h3><p>Production-grade API conventions and contracts.</p><div class="tag-row"><span class="tag">REST</span><span class="tag">Best Practices</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring api">
+            <img src="Day%2019%20-%20Spring%20Security%20+%20JWT.jpg" alt="Day 19 - Spring Security + JWT" data-title="Day 19 - Spring Security + JWT" />
+            <div class="poster-body"><h3>Day 19 - Spring Security + JWT</h3><p>Authentication, authorization, and token-based APIs.</p><div class="tag-row"><span class="tag">Security</span><span class="tag">JWT</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring data">
+            <img src="Day%2020%20-%20Spring%20Transactional.jpg" alt="Day 20 - Spring Transactional" data-title="Day 20 - Spring Transactional" />
+            <div class="poster-body"><h3>Day 20 - Spring Transactional</h3><p>Transaction boundaries, rollback behavior, and consistency.</p><div class="tag-row"><span class="tag">Spring</span><span class="tag">Transactions</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring production">
+            <img src="Day%2022%20-%20Spring%20Boot%20Caching.jpg" alt="Day 22 - Spring Boot Caching" data-title="Day 22 - Spring Boot Caching" />
+            <div class="poster-body"><h3>Day 22 - Spring Boot Caching</h3><p>Cache behavior, invalidation, and performance tradeoffs.</p><div class="tag-row"><span class="tag">Caching</span><span class="tag">Spring</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring production">
+            <img src="Day%2025%20-%20Spring%20Boot%20Actuator%20&%20Observability.jpg" alt="Day 25 - Spring Boot Actuator & Observability" data-title="Day 25 - Spring Boot Actuator & Observability" />
+            <div class="poster-body"><h3>Day 25 - Spring Boot Actuator & Observability</h3><p>Health, metrics, diagnostics, and operational visibility.</p><div class="tag-row"><span class="tag">Observability</span><span class="tag">Actuator</span></div></div>
+          </article>
+          <article class="poster-card" data-category="production systems">
+            <img src="Day%2026%20-%20Resiliency.jpg" alt="Day 26 - Resiliency" data-title="Day 26 - Resiliency" />
+            <div class="poster-body"><h3>Day 26 - Resiliency</h3><p>Timeouts, retries, fallback thinking, and failure isolation.</p><div class="tag-row"><span class="tag">Reliability</span><span class="tag">Resilience</span></div></div>
+          </article>
+          <article class="poster-card" data-category="data production">
+            <img src="Day%2027%20-%20Database%20Performance.jpg" alt="Day 27 - Database Performance" data-title="Day 27 - Database Performance" />
+            <div class="poster-body"><h3>Day 27 - Database Performance</h3><p>Query efficiency, indexes, bottlenecks, and tuning.</p><div class="tag-row"><span class="tag">Database</span><span class="tag">Performance</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java production">
+            <img src="Day%2028%20-%20Memory%20leaks.jpg" alt="Day 28 - Memory leaks" data-title="Day 28 - Memory leaks" />
+            <div class="poster-body"><h3>Day 28 - Memory Leaks</h3><p>Leak symptoms, heap analysis, and prevention patterns.</p><div class="tag-row"><span class="tag">Memory</span><span class="tag">JVM</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java production">
+            <img src="Day%2029%20-%20Java%20Concurrency.jpg" alt="Day 29 - Java Concurrency" data-title="Day 29 - Java Concurrency" />
+            <div class="poster-body"><h3>Day 29 - Java Concurrency</h3><p>Threading, synchronization, and concurrent execution.</p><div class="tag-row"><span class="tag">Concurrency</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="data spring">
+            <img src="Day%203%20-%20Hibernate%20N+1%20Problem.jpg" alt="Day 3 - Hibernate N+1 Problem" data-title="Day 3 - Hibernate N+1 Problem" />
+            <div class="poster-body"><h3>Day 3 - Hibernate N+1 Problem</h3><p>ORM query pitfalls and performance correction.</p><div class="tag-row"><span class="tag">Hibernate</span><span class="tag">Database</span></div></div>
+          </article>
+          <article class="poster-card" data-category="systems production">
+            <img src="Day%2030%20-%20Production%20Ready%20Architecture.jpg" alt="Day 30 - Production Ready Architecture" data-title="Day 30 - Production Ready Architecture" />
+            <div class="poster-body"><h3>Day 30 - Production Ready Architecture</h3><p>End-to-end readiness for resilient services.</p><div class="tag-row"><span class="tag">Architecture</span><span class="tag">Production</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="Day%204%20-%20Multithreading.jpg" alt="Day 4 - Multithreading" data-title="Day 4 - Multithreading" />
+            <div class="poster-body"><h3>Day 4 - Multithreading</h3><p>Threads, execution flow, and concurrent code basics.</p><div class="tag-row"><span class="tag">Threads</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="Day%205%20-%20Completable%20Future.jpg" alt="Day 5 - Completable Future" data-title="Day 5 - Completable Future" />
+            <div class="poster-body"><h3>Day 5 - Completable Future</h3><p>Asynchronous composition in Java.</p><div class="tag-row"><span class="tag">Async</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java">
+            <img src="Day%208%20-%20Java%20Streams.jpg" alt="Day 8 - Java Streams" data-title="Day 8 - Java Streams" />
+            <div class="poster-body"><h3>Day 8 - Java Streams</h3><p>Stream pipelines, transformations, and collection operations.</p><div class="tag-row"><span class="tag">Streams</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api">
+            <img src="HTTP%20Query%20Method.jpg" alt="HTTP Query Method" data-title="HTTP Query Method" />
+            <div class="poster-body"><h3>HTTP Query Method</h3><p>HTTP request semantics and API query behavior.</p><div class="tag-row"><span class="tag">HTTP</span><span class="tag">API</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java data">
+            <img src="Java%20Collection%20Decision%20Tree.jpg" alt="Java Collection Decision Tree" data-title="Java Collection Decision Tree" />
+            <div class="poster-body"><h3>Java Collection Decision Tree</h3><p>Choosing the right collection for the job.</p><div class="tag-row"><span class="tag">Collections</span><span class="tag">Decision Tree</span></div></div>
+          </article>
+          <article class="poster-card" data-category="java data">
+            <img src="Java%20Collections.jpg" alt="Java Collections" data-title="Java Collections" />
+            <div class="poster-body"><h3>Java Collections</h3><p>Collection types, tradeoffs, and usage patterns.</p><div class="tag-row"><span class="tag">Collections</span><span class="tag">Java</span></div></div>
+          </article>
+          <article class="poster-card" data-category="data production">
+            <img src="Redis.jpg" alt="Redis" data-title="Redis" />
+            <div class="poster-body"><h3>Redis</h3><p>Cache and data-structure server patterns.</p><div class="tag-row"><span class="tag">Redis</span><span class="tag">Caching</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring">
+            <img src="Spring%20AOP.jpg" alt="Spring AOP" data-title="Spring AOP" />
+            <div class="poster-body"><h3>Spring AOP</h3><p>Cross-cutting behavior and proxy-based interception.</p><div class="tag-row"><span class="tag">Spring</span><span class="tag">AOP</span></div></div>
+          </article>
+          <article class="poster-card" data-category="spring">
+            <img src="Spring%20boot%20concepts.jpg" alt="Spring boot concepts" data-title="Spring boot concepts" />
+            <div class="poster-body"><h3>Spring Boot Concepts</h3><p>Core concepts for Spring Boot services.</p><div class="tag-row"><span class="tag">Spring Boot</span><span class="tag">Concepts</span></div></div>
+          </article>
+          <article class="poster-card" data-category="systems">
+            <img src="System%20Design%20Day%201%20-%20Fundamentals.jpg" alt="System Design Day 1 - Fundamentals" data-title="System Design Day 1 - Fundamentals" />
+            <div class="poster-body"><h3>System Design Day 1 - Fundamentals</h3><p>Foundational system design vocabulary.</p><div class="tag-row"><span class="tag">System Design</span><span class="tag">Fundamentals</span></div></div>
+          </article>
+          <article class="poster-card" data-category="systems production">
+            <img src="System%20Design%20Day%202%20-%20Scalability.jpg" alt="System Design Day 2 - Scalability" data-title="System Design Day 2 - Scalability" />
+            <div class="poster-body"><h3>System Design Day 2 - Scalability</h3><p>Horizontal scale, capacity, and growth planning.</p><div class="tag-row"><span class="tag">Scalability</span><span class="tag">System Design</span></div></div>
+          </article>
+          <article class="poster-card" data-category="systems production">
+            <img src="System%20Design%20Day%203%20-%20Load%20Balancing.jpg" alt="System Design Day 3 - Load Balancing" data-title="System Design Day 3 - Load Balancing" />
+            <div class="poster-body"><h3>System Design Day 3 - Load Balancing</h3><p>Traffic distribution and high-availability routing.</p><div class="tag-row"><span class="tag">Load Balancing</span><span class="tag">Traffic</span></div></div>
+          </article>
+          <article class="poster-card" data-category="api systems">
+            <img src="System%20Design%20Day%204%20-%20Gateway.jpg" alt="System Design Day 4 - Gateway" data-title="System Design Day 4 - Gateway" />
+            <div class="poster-body"><h3>System Design Day 4 - Gateway</h3><p>Gateway patterns in distributed systems.</p><div class="tag-row"><span class="tag">Gateway</span><span class="tag">System Design</span></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="pdfs">
+        <h2>PDF Library</h2>
+        <p class="lead">These two larger references sit beside the visual deck: one for serverless AWS depth, one for AI/RAG architecture vocabulary.</p>
+        <div class="pdf-grid">
+          <article class="pdf-card">
+            <div>
+              <span class="doc-type">PDF</span>
+              <h3>AWS Lambda - Developer Guide</h3>
+              <p>Official AWS Lambda reference material. Best used after the Lambda and event-driven architecture posters.</p>
+            </div>
+            <a href="lambda-dg.pdf">Open Lambda guide</a>
+          </article>
+          <article class="pdf-card">
+            <div>
+              <span class="doc-type">PDF</span>
+              <h3>Developer's Guide to RAG</h3>
+              <p>Reference material for retrieval-augmented generation concepts, useful when connecting backend systems with AI search and knowledge workflows.</p>
+            </div>
+            <a href="20250221-WP-Developers_Guide_to_RAG.pdf">Open RAG guide</a>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <p>Built from the image and PDF titles in <code>src/main/resources/static</code>. Serve the Spring Boot app and open <code>/resource-hub.html</code>.</p>
+      </footer>
+    </main>
+  </div>
+
+  <dialog id="posterDialog">
+    <div class="viewer">
+      <header>
+        <h3 id="dialogTitle">Poster</h3>
+        <button type="button" id="closeDialog" aria-label="Close poster preview">X</button>
+      </header>
+      <img id="dialogImage" alt="" />
+    </div>
+  </dialog>
+
+  <script>
+    const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+    const cards = Array.from(document.querySelectorAll('.poster-card'));
+    const dialog = document.querySelector('#posterDialog');
+    const dialogImage = document.querySelector('#dialogImage');
+    const dialogTitle = document.querySelector('#dialogTitle');
+    const closeDialog = document.querySelector('#closeDialog');
+
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+        cards.forEach((card) => {
+          const visible = filter === 'all' || card.dataset.category.split(' ').includes(filter);
+          card.hidden = !visible;
+        });
+      });
+    });
+
+    document.querySelectorAll('.poster-card img, .spotlight img').forEach((image) => {
+      image.addEventListener('click', () => {
+        dialogImage.src = image.currentSrc || image.src;
+        dialogImage.alt = image.alt;
+        dialogTitle.textContent = image.dataset.title || image.alt;
+        dialog.showModal();
+      });
+    });
+
+    closeDialog.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
+  </script>
+</body>
+</html>
+
+
