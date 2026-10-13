@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview Questions | Backend Engineering Reference Guide</title>
+  <link rel="stylesheet" href="assets/guide.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>Backend Guide</h1>
+      <p>Senior Java backend review organized by topic.</p>
+      <nav>
+        <a href="../../index.html#role">Overview</a>
+        <a href="../../src/main/resources/static/resource-hub.html">Resource Atlas</a>
+        <div class="nav-group">
+          <div class="nav-title">Certification</div>
+          <div class="nav-items">
+            <a href="aws-certified-developer-dva-c02.html#dva-overview">DVA-C02 Overview</a>
+            <a href="aws-certified-developer-dva-c02.html#exam-domains">Exam Domains</a>
+            <a href="aws-certified-developer-dva-c02.html#serverless">Serverless</a>
+            <a href="aws-certified-developer-dva-c02.html#deployment">Deployment</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Java Core</div>
+          <div class="nav-items">
+            <a href="java-core.html#java-language-features">Java Language Features</a>
+            <a href="java-core.html#functional-programming-foundations">Functional Programming Foundations</a>
+            <a href="java-core.html#higher-order-functions">Higher-Order Functions</a>
+            <a href="java-core.html#composability">Composability</a>
+            <a href="java-core.html#functional-interfaces">Functional Interfaces</a>
+            <a href="java-core.html#java-streams">Java Streams</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reactive Java</div>
+          <div class="nav-items">
+            <a href="reactive-java.html#project-reactor-fundamentals">Project Reactor Fundamentals</a>
+            <a href="reactive-java.html#reactor-deep-dive">Reactor Deep Dive</a>
+            <a href="reactive-java.html#reactive-kafka">Reactive Kafka</a>
+            <a href="reactive-java.html#reactive-mongodb">Reactive MongoDB</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring WebFlux</div>
+          <div class="nav-items">
+            <a href="spring-webflux.html#spring-webflux-fundamentals">Spring WebFlux Fundamentals</a>
+            <a href="spring-webflux.html#webflux-error-handling">WebFlux Error Handling</a>
+            <a href="spring-webflux.html#reactive-architecture-patterns">Reactive Architecture Patterns</a>
+            <a href="spring-webflux.html#reactive-reservation-code">Reactive Reservation Code</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Spring Boot APIs</div>
+          <div class="nav-items">
+            <a href="spring-boot-apis.html#spring-request">Spring Request Lifecycle</a>
+            <a href="spring-boot-apis.html#beans">Beans and Dependency Injection</a>
+            <a href="spring-boot-apis.html#rest-api">REST API Design</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Microservices</div>
+          <div class="nav-items">
+            <a href="microservices.html#microservices-concepts">Microservices Concepts</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Reliability</div>
+          <div class="nav-items">
+            <a href="reliability.html#reliability">Reliability Roadmap</a>
+            <a href="reliability.html#idempotency">Idempotency</a>
+            <a href="reliability.html#timeouts-retries">Timeouts and Retries</a>
+            <a href="reliability.html#circuit-breakers">Circuit Breakers</a>
+            <a href="reliability.html#error-observability">Errors and Observability</a>
+            <a href="reliability.html#sync-async">Sync vs Async</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Security and Traffic</div>
+          <div class="nav-items">
+            <a href="security-traffic.html#spring-security">Spring Security OAuth2</a>
+            <a href="security-traffic.html#gateway-load-balancing">Gateway and Load Balancing</a>
+            <a href="security-traffic.html#security">Security, Gateway, Load Balancing</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Testing</div>
+          <div class="nav-items">
+            <a href="testing.html#junit-Mockito">JUnit and Mockito Deep Dive</a>
+            <a href="testing.html#testing">JUnit and Mockito</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">AWS and Events</div>
+          <div class="nav-items">
+            <a href="aws-events.html#aws">AWS Focus</a>
+            <a href="aws-events.html#kinesis-deep">Kinesis Deep Dive</a>
+            <a href="aws-events.html#dynamodb-deep">DynamoDB Deep Dive</a>
+            <a href="aws-events.html#lambda-deep">Lambda Deep Dive</a>
+            <a href="aws-events.html#event-architecture-deep">Event Architecture</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Platform Delivery</div>
+          <div class="nav-items">
+            <a href="platform-delivery.html#docker">Docker</a>
+            <a href="platform-delivery.html#kubernetes">Kubernetes</a>
+            <a href="platform-delivery.html#cicd">CI/CD</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Interview Questions</div>
+          <div class="nav-items">
+            <a href="#java-concurrency">Java Concurrency</a>
+            <a href="#spring-boot-interview">Spring Boot</a>
+            <a href="#microservices-interview">Microservices</a>
+            <a href="#kafka-interview">Kafka</a>
+            <a href="#database-interview">Database</a>
+            <a href="#system-design-aws">System Design and AWS</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-title">Career and Review</div>
+          <div class="nav-items">
+            <a href="career-review.html#reference-answers">Reference Answers</a>
+            <a href="career-review.html#ai">AI at Work</a>
+            <a href="career-review.html#production-support">Production Support</a>
+            <a href="career-review.html#modernization">Modernization</a>
+            <a href="career-review.html#collaboration">Collaboration Scenarios</a>
+            <a href="career-review.html#practice-pack">Practice Question Pack</a>
+            <a href="career-review.html#next">Review Plan</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    <main>
+      <header class="section-header">
+        <p class="eyebrow">Backend Engineering Reference Guide</p>
+        <h2>Interview Questions</h2>
+        <p>Scenario-based Java, Spring Boot, microservices, Kafka, database, and AWS system design answers for senior backend interviews.</p>
+      </header>
+
+      <section id="java-concurrency">
+        <h2>Java Concurrency</h2>
+        <p class="lead">These answers focus on race conditions, shared state, JVM boundaries, thread explosions, and consistency under concurrent access.</p>
+
+        <article class="card">
+          <h3>Multiple threads access a HashMap. What can go wrong?</h3>
+          <p><code>HashMap</code> is not thread-safe. If several threads access it at the same time and at least one thread writes, the map can return stale data, lose updates, throw during iteration, or corrupt its internal structure.</p>
+          <ul>
+            <li><strong>Lost updates:</strong> two threads can read the same bucket state and one write can overwrite the other.</li>
+            <li><strong>Non-atomic check-then-act:</strong> code such as <code>containsKey</code> followed by <code>put</code> can race.</li>
+            <li><strong>Resize corruption:</strong> concurrent writes during rehashing can lose entries or corrupt buckets.</li>
+            <li><strong>Visibility issues:</strong> without synchronization, one thread may not see another thread's writes.</li>
+            <li><strong>ConcurrentModificationException:</strong> iteration while another thread mutates the map may throw, but the check is best effort.</li>
+          </ul>
+          <pre><code>if (!map.containsKey(k)) {
+    map.put(k, v);        // two threads can both pass the check
+}
+
+map.put(k, map.get(k) + 1); // increments can be lost</code></pre>
+          <p>Use <code>ConcurrentHashMap</code> for shared mutable maps and use its atomic methods for compound operations.</p>
+          <pre><code>ConcurrentHashMap&lt;String, Integer&gt; counts = new ConcurrentHashMap&lt;&gt;();
+counts.merge(key, 1, Integer::sum);</code></pre>
+          <table>
+            <thead>
+              <tr><th>Option</th><th>When to use it</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>ConcurrentHashMap</code></td><td>Usual choice for shared maps inside one JVM. Use <code>putIfAbsent</code>, <code>computeIfAbsent</code>, <code>merge</code>, and <code>compute</code>.</td></tr>
+              <tr><td><code>Collections.synchronizedMap</code></td><td>Simple single-lock wrapper. Synchronize manually during iteration.</td></tr>
+              <tr><td>Immutable map</td><td>Best when data is built once and safely published for reads.</td></tr>
+              <tr><td>External locking</td><td>Useful when several map operations must be one atomic unit.</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="card">
+          <h3>What if there is more than one instance of the app? Does ConcurrentHashMap still work?</h3>
+          <p>No. <code>ConcurrentHashMap</code> protects shared state only inside one JVM. With multiple pods, servers, or containers, every instance has its own separate memory and its own map.</p>
+          <ul>
+            <li><strong>Inconsistent data:</strong> one instance may have a newer cache value than another.</li>
+            <li><strong>Broken limits:</strong> a limit of 100 per instance becomes 100 multiplied by the number of instances.</li>
+            <li><strong>No cross-instance locking:</strong> <code>computeIfAbsent</code> works only inside one process.</li>
+            <li><strong>Lost state:</strong> in-memory data disappears on restart, crash, or scale-down.</li>
+          </ul>
+          <table>
+            <thead>
+              <tr><th>Need</th><th>Common solution</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Shared cache or key-value state</td><td>Redis, Memcached, Hazelcast, Apache Ignite</td></tr>
+              <tr><td>Atomic counters and rate limits</td><td>Redis <code>INCR</code>, Lua scripts, Bucket4j with Redis</td></tr>
+              <tr><td>Distributed lock</td><td>Redisson, ZooKeeper, etcd, or database row locks</td></tr>
+              <tr><td>Durable source of truth</td><td>Database transactions, unique constraints, optimistic locking</td></tr>
+              <tr><td>Cluster-safe scheduled job</td><td>ShedLock, Quartz clustered mode, leader election</td></tr>
+              <tr><td>Sessions</td><td>Spring Session with Redis or JDBC</td></tr>
+            </tbody>
+          </table>
+          <pre><code>Long count = redisTemplate.opsForValue().increment("counter:" + key);</code></pre>
+          <pre><code>RLock lock = redisson.getLock("order:" + orderId);
+if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
+    try {
+        processOrder(orderId);
+    } finally {
+        lock.unlock();
+    }
+}</code></pre>
+          <p><code>ConcurrentHashMap</code> is still fine for local caches, static lookup data, or per-instance state such as local metrics.</p>
+        </article>
+
+        <article class="card">
+          <h3>A race condition caused a duplicate payment. How do you solve this?</h3>
+          <p>Locks alone are not enough. The durable fix is idempotency: running the same payment request twice must have the same effect as running it once. Enforce that in the database and with the payment provider.</p>
+          <ol>
+            <li>Find and refund existing duplicates. Check charges with the same order, user, amount, and close timestamps.</li>
+            <li>Create one idempotency key per payment intent and reuse it on every retry.</li>
+            <li>Store that key under a database unique constraint.</li>
+            <li>Send the same key to the payment provider.</li>
+            <li>Use conditional state transitions, such as <code>UNPAID</code> to <code>PAYING</code> to <code>PAID</code>.</li>
+            <li>Use reconciliation jobs to compare your payment records with provider reports.</li>
+          </ol>
+          <pre><code>CREATE TABLE payments (
+  id               BIGSERIAL PRIMARY KEY,
+  idempotency_key  VARCHAR(64) NOT NULL UNIQUE,
+  order_id         BIGINT NOT NULL,
+  amount           NUMERIC(12,2) NOT NULL,
+  status           VARCHAR(20) NOT NULL,
+  provider_ref     VARCHAR(100),
+  created_at       TIMESTAMP NOT NULL DEFAULT now()
+);</code></pre>
+          <pre><code>@Transactional
+public Payment pay(String idemKey, long orderId, BigDecimal amount) {
+    try {
+        paymentRepo.insertPending(idemKey, orderId, amount);
+    } catch (DuplicateKeyException e) {
+        return paymentRepo.findByKey(idemKey);
+    }
+
+    // Call the provider with the same idempotency key,
+    // then update status to SUCCEEDED or FAILED.
+}</code></pre>
+          <p>Do not keep a database transaction open during the provider call. Insert a pending payment and commit, call the provider with the idempotency key, then update the result. If the process crashes, a recovery job checks the provider status instead of blindly charging again.</p>
+        </article>
+
+        <article class="card">
+          <h3>Who is the payment provider?</h3>
+          <p>The provider is the payment service provider or payment gateway that actually charges the card or bank account. Examples include Stripe, Adyen, PayPal, Braintree, Checkout.com, Square, Mollie, Razorpay, Worldpay, and Authorize.net.</p>
+          <p>To find the provider in an application, check dependencies such as <code>stripe-java</code> or <code>adyen-java-api-library</code>, configuration such as <code>STRIPE_SECRET_KEY</code> or <code>api.stripe.com</code>, and the payment client or service class that creates the charge.</p>
+        </article>
+
+        <article class="card">
+          <h3>Thousands of threads are created, and CPU usage spikes. What would you do?</h3>
+          <p>Diagnose first, then contain, then fix. Thousands of threads plus high CPU usually means unbounded thread creation, busy waiting, heavy context switching, or a retry storm.</p>
+          <ol>
+            <li>Stabilize production: rate limit, scale out, restart only if needed, and pause retrying jobs or queue consumers.</li>
+            <li>Capture evidence before restarting: thread dumps, JFR, GC logs, and process metrics.</li>
+            <li>Find CPU-heavy threads with <code>top -H -p &lt;pid&gt;</code>, convert the OS thread id to hex, and search for <code>nid=0x...</code> in <code>jstack</code>.</li>
+            <li>Take 3 to 5 thread dumps a few seconds apart and group by thread name prefix.</li>
+          </ol>
+          <table>
+            <thead>
+              <tr><th>Signal</th><th>Likely cause</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Many <code>pool-1</code>, <code>pool-2</code>, <code>pool-900</code> names</td><td>Executor created per request and never shut down</td></tr>
+              <tr><td>Many threads RUNNABLE on same stack</td><td>Busy loop, CPU-heavy work, or regex backtracking</td></tr>
+              <tr><td>Many threads blocked on one lock</td><td>Lock contention and context switching</td></tr>
+              <tr><td>Threads stuck on network I/O</td><td>Missing timeouts or slow downstream dependency</td></tr>
+            </tbody>
+          </table>
+          <pre><code>ThreadPoolExecutor executor = new ThreadPoolExecutor(
+    16, 32,
+    60, TimeUnit.SECONDS,
+    new ArrayBlockingQueue&lt;&gt;(1000),
+    new ThreadFactoryBuilder().setNameFormat("payment-worker-%d").build(),
+    new ThreadPoolExecutor.CallerRunsPolicy()
+);</code></pre>
+          <p>Prevent it with named bounded pools, queue depth metrics, rejected-task metrics, downstream timeouts, retry limits with jitter, circuit breakers, and load tests that simulate slow dependencies.</p>
+        </article>
+
+        <article class="card">
+          <h3>A REST API takes 30 seconds because of 3 downstream calls. How would you optimize it?</h3>
+          <p>Measure first, then parallelize independent calls, reduce each call's cost, and move non-critical work off the request path.</p>
+          <pre><code>ExecutorService ioPool = ...; // bounded pool or Java 21 virtual threads
+
+CompletableFuture&lt;User&gt; userF = CompletableFuture
+    .supplyAsync(() -&gt; userClient.get(id), ioPool)
+    .orTimeout(2, TimeUnit.SECONDS);
+
+CompletableFuture&lt;Orders&gt; ordersF = CompletableFuture
+    .supplyAsync(() -&gt; orderClient.get(id), ioPool)
+    .orTimeout(2, TimeUnit.SECONDS);
+
+CompletableFuture&lt;Prices&gt; pricesF = CompletableFuture
+    .supplyAsync(() -&gt; pricingClient.get(id), ioPool)
+    .orTimeout(2, TimeUnit.SECONDS)
+    .exceptionally(ex -&gt; Prices.fallback());
+
+CompletableFuture.allOf(userF, ordersF, pricesF).join();
+return combine(userF.join(), ordersF.join(), pricesF.join());</code></pre>
+          <table>
+            <thead>
+              <tr><th>Technique</th><th>Impact</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Parallel calls</td><td>Latency becomes the slowest call instead of the sum.</td></tr>
+              <tr><td>Caching</td><td>Skips calls for rarely changing data.</td></tr>
+              <tr><td>Batching</td><td>Replaces N calls with one bulk call.</td></tr>
+              <tr><td>Connection pooling and keep-alive</td><td>Avoids repeated TCP/TLS setup.</td></tr>
+              <tr><td>Timeouts and circuit breakers</td><td>Stops one dependency from consuming all threads.</td></tr>
+              <tr><td>Async design</td><td>Return <code>202 Accepted</code> for long-running work.</td></tr>
+            </tbody>
+          </table>
+          <p>For reactive stacks, use <code>Mono.zip(...)</code> with <code>WebClient</code>. For dependent calls, chain with <code>thenCompose</code> and run independent work alongside it.</p>
+        </article>
+
+        <article class="card">
+          <h3>Multiple threads update the same record. How would you maintain consistency?</h3>
+          <p>Enforce consistency where the data lives. If the record is in a database and the app has multiple instances, JVM locks do not protect the data.</p>
+          <table>
+            <thead>
+              <tr><th>Strategy</th><th>Best for</th><th>Trade-off</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Atomic SQL update</td><td>Counters, balances, stock</td><td>Best if the logic fits in one statement</td></tr>
+              <tr><td>Optimistic locking</td><td>Low to moderate contention</td><td>Conflicts need retry</td></tr>
+              <tr><td>Pessimistic locking</td><td>High contention or money</td><td>Blocks writers and can deadlock</td></tr>
+              <tr><td>State-machine update</td><td>Status transitions</td><td>Only one transition wins</td></tr>
+              <tr><td>Single writer per key</td><td>Very hot records</td><td>Adds queue or event infrastructure</td></tr>
+            </tbody>
+          </table>
+          <pre><code>UPDATE account
+SET balance = balance - 10
+WHERE id = ? AND balance &gt;= 10;</code></pre>
+          <pre><code>@Entity
+class Order {
+    @Id Long id;
+    @Version Long version;
+    String status;
+}</code></pre>
+          <pre><code>@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("select a from Account a where a.id = :id")
+Account findForUpdate(@Param("id") Long id);</code></pre>
+          <p>Keep locked transactions short, use lock timeouts, and never call HTTP services or payment providers while holding a database lock.</p>
+        </article>
+      </section>
+
+      <section id="spring-boot-interview">
+        <h2>Spring Boot Questions</h2>
+        <p class="lead">These answers focus on startup diagnostics, bean cycles, JPA session boundaries, transactions, and memory failures.</p>
+
+        <article class="card">
+          <h3>Startup time increases from 15 seconds to 2 minutes. How would you investigate?</h3>
+          <p>Treat it as a regression. Find which phase got slower, which bean or operation is blocking, and what changed.</p>
+          <ol>
+            <li>Compare deployments, commits, dependency upgrades, profiles, and environment variables.</li>
+            <li>Use log timestamps to find big gaps in startup phases.</li>
+            <li>Enable <code>ApplicationStartup</code> and expose Actuator <code>/startup</code>.</li>
+            <li>Take thread dumps during startup if it appears stuck.</li>
+            <li>Use JFR or wall-clock profiling if the slow phase is unclear.</li>
+          </ol>
+          <pre><code>public static void main(String[] args) {
+    SpringApplication app = new SpringApplication(MyApp.class);
+    app.setApplicationStartup(new BufferingApplicationStartup(10000));
+    app.run(args);
+}</code></pre>
+          <pre><code>management.endpoints.web.exposure.include=startup</code></pre>
+          <table>
+            <thead>
+              <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Waiting on DB connection</td><td>DB unreachable or slow</td><td>Fix network/credentials, lower timeouts</td></tr>
+              <tr><td>Slow Flyway/Liquibase</td><td>Heavy migration or lock</td><td>Move data migrations out of startup</td></tr>
+              <tr><td>Slow Hibernate init</td><td>Schema validation or metadata lookups</td><td>Tune Hibernate settings and schema management</td></tr>
+              <tr><td>Slow runner or <code>@PostConstruct</code></td><td>Cache warmup or remote calls</td><td>Make async or run after readiness</td></tr>
+              <tr><td>Slow only in containers</td><td>CPU, heap, GC, or DNS</td><td>Check resource limits and host resolution</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="card">
+          <h3>Circular dependency appears after deployment. How do you solve it?</h3>
+          <p>A circular dependency means bean A needs B and B needs A, directly or through a chain. If it appears only after deployment, compare Spring Boot version, active profiles, conditional beans, proxying, and dependency upgrades.</p>
+          <p>The best fix is to remove the cycle by separating responsibilities.</p>
+          <ul>
+            <li>Extract shared logic into a third bean.</li>
+            <li>Use events if one service only needs to notify another.</li>
+            <li>Depend on an interface in the correct layer.</li>
+            <li>Merge the beans if they cannot work independently.</li>
+          </ul>
+          <pre><code>@Service
+class OrderService {
+    private final ApplicationEventPublisher events;
+
+    void placeOrder(Order order) {
+        events.publishEvent(new OrderPlacedEvent(order.getId()));
+    }
+}
+
+@Service
+class PaymentService {
+    @EventListener
+    void on(OrderPlacedEvent event) {
+        // handle payment workflow
+    }
+}</code></pre>
+          <p>Short-term workarounds include <code>@Lazy</code>, <code>ObjectProvider</code>, or <code>spring.main.allow-circular-references=true</code>, but those should be treated as temporary because the cycle is usually a design problem. Spring Boot 2.6 and later disallow circular references by default.</p>
+        </article>
+
+        <article class="card">
+          <h3>API works locally but fails in production with LazyInitializationException.</h3>
+          <p><code>LazyInitializationException</code> means code touched a lazy Hibernate association after the session closed. It often works locally because Open Session in View is enabled, while production disables it.</p>
+          <p>The fix is to fetch the data you need inside the transaction and return DTOs, not JPA entities.</p>
+          <pre><code>@Service
+class OrderService {
+    @Transactional(readOnly = true)
+    public OrderDto getOrder(Long id) {
+        Order order = repo.findWithItemsById(id).orElseThrow();
+        return OrderDto.from(order);
+    }
+}</code></pre>
+          <pre><code>@Query("select o from Order o left join fetch o.items where o.id = :id")
+Optional&lt;Order&gt; findWithItemsById(@Param("id") Long id);
+
+@EntityGraph(attributePaths = {"items", "customer"})
+Optional&lt;Order&gt; findWithItemsById(Long id);</code></pre>
+          <p>Avoid fixing this with <code>FetchType.EAGER</code>, <code>open-in-view=true</code>, <code>hibernate.enable_lazy_load_no_trans=true</code>, or <code>@Transactional</code> on controllers. Set <code>spring.jpa.open-in-view=false</code> in every environment so the problem appears during development.</p>
+        </article>
+
+        <article class="card">
+          <h3>Transaction partially updates data even though rollback was expected. Why?</h3>
+          <p>Usually the transaction was not active where expected, the exception was not a rollback trigger, or part of the work happened outside the transaction.</p>
+          <table>
+            <thead>
+              <tr><th>Cause</th><th>What happens</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Checked exception</td><td>Spring rolls back by default on <code>RuntimeException</code> and <code>Error</code>, not checked exceptions.</td></tr>
+              <tr><td>Exception caught and swallowed</td><td>Spring never sees the failure and commits.</td></tr>
+              <tr><td>Self-invocation</td><td><code>this.otherMethod()</code> bypasses the Spring proxy.</td></tr>
+              <tr><td><code>REQUIRES_NEW</code></td><td>Inner transaction commits independently.</td></tr>
+              <tr><td>Wrong transaction manager</td><td>DB A is transactional while DB B writes in auto-commit.</td></tr>
+              <tr><td>Async or external side effects</td><td>Other threads, HTTP calls, Kafka, files, and email are not rolled back with the DB.</td></tr>
+            </tbody>
+          </table>
+          <pre><code>@Transactional(rollbackFor = Exception.class)
+public void process() throws Exception {
+    // checked exceptions now trigger rollback
+}</code></pre>
+          <pre><code>catch (PaymentException e) {
+    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+    throw e;
+}</code></pre>
+          <p>Diagnose with <code>logging.level.org.springframework.transaction=TRACE</code>, check propagation settings, exception types, proxy boundaries, table engines, and all side effects outside the database.</p>
+        </article>
+
+        <article class="card">
+          <h3>Application suddenly throws OutOfMemoryError. How would you debug it?</h3>
+          <p>First read the exact error. <code>OutOfMemoryError</code> can mean heap, metaspace, native threads, direct buffers, or container memory.</p>
+          <table>
+            <thead>
+              <tr><th>Message</th><th>Likely cause</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>Java heap space</code></td><td>Leak, huge collection, whole-file load, whole-result-set load</td></tr>
+              <tr><td><code>GC overhead limit exceeded</code></td><td>Heap nearly full with live objects</td></tr>
+              <tr><td><code>Metaspace</code></td><td>Classloader leak or heavy dynamic class generation</td></tr>
+              <tr><td><code>unable to create native thread</code></td><td>Thread explosion or OS thread limit</td></tr>
+              <tr><td><code>Direct buffer memory</code></td><td>Off-heap Netty or NIO buffer growth</td></tr>
+              <tr><td>Pod <code>OOMKilled</code></td><td>Container limit exceeded, possibly without Java heap OOM</td></tr>
+            </tbody>
+          </table>
+          <pre><code>-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/dumps/
+-XX:+ExitOnOutOfMemoryError
+-Xlog:gc*:file=/logs/gc.log:time,uptime:filecount=5,filesize=20M</code></pre>
+          <p>If still running, capture a heap dump, class histogram, thread dump, native memory summary, and metrics. Analyze the heap dump in Eclipse MAT using Leak Suspects, Dominator Tree, and Path to GC Roots.</p>
+          <p>Common Spring Boot culprits include unbounded caches, <code>findAll()</code> on huge tables, long Hibernate batch transactions, unbounded executor queues, ThreadLocal leaks, logging huge payloads, unreleased Netty buffers, and container heap sizing that leaves no room for native memory.</p>
+        </article>
+      </section>
+
+      <section id="microservices-interview">
+        <h2>Microservices Questions</h2>
+        <p class="lead">These answers focus on preventing cascades, handling latency, tracing, and choosing communication patterns.</p>
+
+        <article class="card">
+          <h3>Service A calls B, B calls C, and C is down. How do you prevent cascade failure?</h3>
+          <p>The danger is resource exhaustion. B's threads and connections wait on C, then A waits on B, and the failure spreads upstream. Prevent it with fast failure, isolation, fallbacks, and fewer synchronous dependencies.</p>
+          <table>
+            <thead>
+              <tr><th>Pattern</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Timeouts</td><td>Cap how long any outbound call can wait.</td></tr>
+              <tr><td>Circuit breaker</td><td>Reject calls to C quickly after repeated failures.</td></tr>
+              <tr><td>Bulkhead</td><td>Give C its own small pool so it cannot consume all of B's resources.</td></tr>
+              <tr><td>Retries with backoff and jitter</td><td>Handle brief glitches without flooding C.</td></tr>
+              <tr><td>Fallback</td><td>Return cached, default, partial, or queued results.</td></tr>
+              <tr><td>Rate limiting and load shedding</td><td>Reject excess traffic instead of queueing until everything is slow.</td></tr>
+              <tr><td>Deadline propagation</td><td>Stop downstream work when the caller's time budget has expired.</td></tr>
+            </tbody>
+          </table>
+          <pre><code>resilience4j:
+  circuitbreaker:
+    instances:
+      serviceC:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        wait-duration-in-open-state: 30s
+  bulkhead:
+    instances:
+      serviceC:
+        max-concurrent-calls: 20
+  timelimiter:
+    instances:
+      serviceC:
+        timeout-duration: 2s</code></pre>
+          <p>Long term, use async messaging and local read models so B does not need C to be available synchronously.</p>
+        </article>
+
+        <article class="card">
+          <h3>One microservice becomes slow and affects the entire system. What patterns would you use?</h3>
+          <p>A slow service is often worse than a dead one. It holds resources for longer, which grows queues and causes retry storms.</p>
+          <ul>
+            <li>Set aggressive timeouts based on p99 latency.</li>
+            <li>Propagate deadlines so downstream services do not continue useless work.</li>
+            <li>Use circuit breakers with slow-call detection, not only error-rate thresholds.</li>
+            <li>Use bulkheads and bounded queues.</li>
+            <li>Use load shedding, adaptive concurrency, and retry budgets.</li>
+            <li>Use fallbacks, stale cache, partial responses, and graceful degradation.</li>
+            <li>Use async messaging or local read models for long-running dependencies.</li>
+          </ul>
+          <p>Monitor p95 and p99 latency, queue depth, pool saturation, circuit breaker state, and bulkhead rejections. Averages hide tail latency.</p>
+        </article>
+
+        <article class="card">
+          <h3>How would you trace a request across 15 microservices?</h3>
+          <p>Use distributed tracing. A trace ID is created at the entry point, each service creates spans, and the trace context is propagated through HTTP headers, gRPC metadata, and message headers.</p>
+          <table>
+            <thead>
+              <tr><th>Concept</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Trace</td><td>The full journey of one request.</td></tr>
+              <tr><td>Span</td><td>One operation, such as an HTTP call, DB query, or Kafka publish.</td></tr>
+              <tr><td>Trace ID</td><td>Shared by every span in the trace.</td></tr>
+              <tr><td>Context propagation</td><td>Passing trace context between services.</td></tr>
+              <tr><td>Sampling</td><td>Choosing which traces to retain.</td></tr>
+            </tbody>
+          </table>
+          <pre><code>traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01</code></pre>
+          <p>Use OpenTelemetry instrumentation, send spans to the OpenTelemetry Collector, and store them in Jaeger, Grafana Tempo, Zipkin, Datadog, New Relic, Honeycomb, or Dynatrace.</p>
+          <pre><code>java -javaagent:opentelemetry-javaagent.jar \
+     -Dotel.service.name=order-service \
+     -Dotel.exporter.otlp.endpoint=http://otel-collector:4317 \
+     -Dotel.traces.sampler=parentbased_traceidratio \
+     -Dotel.traces.sampler.arg=0.1 \
+     -jar app.jar</code></pre>
+          <p>Put trace IDs in log lines, preserve context across async executors and Kafka, and use tail-based sampling to keep all slow and failed traces.</p>
+        </article>
+
+        <article class="card">
+          <h3>REST, Kafka, or gRPC: which would you choose and why?</h3>
+          <p>They solve different communication problems. REST and gRPC are synchronous request/response. Kafka is asynchronous event streaming. Mature systems often use all three.</p>
+          <table>
+            <thead>
+              <tr><th>Choice</th><th>Best for</th><th>Trade-off</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>REST</td><td>Public APIs, browser/mobile clients, simple CRUD, broad tooling</td><td>JSON overhead and looser contracts</td></tr>
+              <tr><td>gRPC</td><td>Internal low-latency service calls, strict contracts, streaming</td><td>Harder debugging and browser support</td></tr>
+              <tr><td>Kafka</td><td>Events, fan-out, decoupling, replay, load absorption</td><td>Eventual consistency, ordering limits, operational cost</td></tr>
+            </tbody>
+          </table>
+          <p>Decision rule: if the caller needs an answer now, use REST or gRPC. If the service is announcing a fact that many consumers may react to, publish an event with Kafka.</p>
+        </article>
+      </section>
+
+      <section id="kafka-interview">
+        <h2>Kafka Questions</h2>
+        <p class="lead">These answers focus on duplicates, hot partitions, consumer lag, poison messages, and ordering guarantees.</p>
+
+        <article class="card">
+          <h3>Kafka consumer processes the same message twice. How would you handle it?</h3>
+          <p>Duplicate delivery is normal with at-least-once messaging. Design the consumer to be idempotent so processing the same message twice has the same result as once.</p>
+          <pre><code>CREATE TABLE processed_messages (
+  message_id VARCHAR(64) PRIMARY KEY,
+  processed_at TIMESTAMP NOT NULL
+);</code></pre>
+          <pre><code>@KafkaListener(topics = "payments")
+@Transactional
+public void handle(PaymentEvent event) {
+    try {
+        processedRepo.insert(event.getEventId());
+    } catch (DuplicateKeyException e) {
+        log.info("Duplicate {} skipped", event.getEventId());
+        return;
+    }
+
+    paymentService.apply(event);
+}</code></pre>
+          <p>Keep the dedup insert and the business update in one database transaction. Use upserts, conditional state transitions, version checks, and provider idempotency keys for external side effects. Kafka exactly-once transactions help Kafka-to-Kafka flows, but they do not make database or HTTP side effects exactly once.</p>
+        </article>
+
+        <article class="card">
+          <h3>One partition has much higher traffic than others. How do you fix it?</h3>
+          <p>A hot partition is usually a key distribution problem. Kafka sends the same key to the same partition, so a low-cardinality key or one heavy key overloads one partition.</p>
+          <ol>
+            <li>Confirm skew with per-partition throughput and lag.</li>
+            <li>Sample message keys to find hot keys.</li>
+            <li>Ask what ordering is actually required.</li>
+            <li>Choose a better key, such as <code>orderId</code> instead of <code>tenantId</code>, if the ordering requirement allows it.</li>
+            <li>Salt hot keys when strict order for that key is not required.</li>
+            <li>Move heavy tenants or event types to a separate topic if they need isolation.</li>
+          </ol>
+          <pre><code>String key = hotKeys.contains(tenantId)
+    ? tenantId + "-" + ThreadLocalRandom.current().nextInt(8)
+    : tenantId;</code></pre>
+          <p>Adding partitions does not fix a single hot key because that key still maps to one partition. It also remaps existing keys, so use it carefully.</p>
+        </article>
+
+        <article class="card">
+          <h3>Consumer lag keeps increasing. How would you investigate?</h3>
+          <p>Lag grows when consumers process more slowly than producers write, or when consumers are not processing at all.</p>
+          <table>
+            <thead>
+              <tr><th>Pattern</th><th>Likely meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Lag rising on all partitions</td><td>Throughput problem, slow processing, or traffic spike</td></tr>
+              <tr><td>Lag rising on one partition</td><td>Hot key, poison message, or stuck consumer</td></tr>
+              <tr><td>Lag flat but high</td><td>Consumers keep up but have backlog</td></tr>
+              <tr><td>Offsets not moving</td><td>Consumer stuck, dead, or failing commits</td></tr>
+              <tr><td>Sawtooth lag</td><td>Frequent rebalances or batch commits</td></tr>
+            </tbody>
+          </table>
+          <p>Compare produce rate with consume rate, verify the consumer group is stable, check for rebalance storms, commit failures, poison messages, pod restarts, OOMKills, CPU throttling, slow DB calls, pool saturation, and blocking retries.</p>
+          <p>Fixes include batching, faster downstreams, more consumers up to the partition count, in-partition parallelism, cooperative rebalancing, static membership, dead letter topics, and better partition keys.</p>
+        </article>
+
+        <article class="card">
+          <h3>A message fails repeatedly during processing. What should happen next?</h3>
+          <p>Do not retry forever. One poison message can block the whole partition.</p>
+          <table>
+            <thead>
+              <tr><th>Failure type</th><th>Response</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Transient timeout or 503</td><td>Retry with bounded exponential backoff.</td></tr>
+              <tr><td>Validation or schema error</td><td>Do not retry. Send to DLT.</td></tr>
+              <tr><td>Consumer bug</td><td>DLT, fix code, replay later.</td></tr>
+            </tbody>
+          </table>
+          <pre><code>@Bean
+public DefaultErrorHandler errorHandler(KafkaTemplate&lt;Object, Object&gt; template) {
+    var recoverer = new DeadLetterPublishingRecoverer(template,
+        (rec, ex) -&gt; new TopicPartition(rec.topic() + ".DLT", rec.partition()));
+
+    var backoff = new ExponentialBackOffWithMaxRetries(3);
+    backoff.setInitialInterval(1000);
+    backoff.setMultiplier(2.0);
+
+    var handler = new DefaultErrorHandler(recoverer, backoff);
+    handler.addNotRetryableExceptions(
+        DeserializationException.class,
+        ValidationException.class,
+        IllegalArgumentException.class);
+    return handler;
+}</code></pre>
+          <p>The DLT should include original topic, partition, offset, key, headers, exception, attempts, and timestamps. Alert on DLT volume and provide a safe replay path. Make consumers idempotent so retries and replays are safe.</p>
+        </article>
+
+        <article class="card">
+          <h3>How would you guarantee message ordering for a customer?</h3>
+          <p>Kafka guarantees order only within a partition. Key all customer events by <code>customerId</code>, keep producer retries ordered, and process sequentially per customer.</p>
+          <pre><code>kafkaTemplate.send("customer-events", customerId, event);</code></pre>
+          <pre><code>enable.idempotence=true
+acks=all
+retries=2147483647
+max.in.flight.requests.per.connection=5</code></pre>
+          <ul>
+            <li>Use the Outbox pattern so Kafka event order matches database commit order.</li>
+            <li>Do not hand records to an unordered thread pool inside the listener.</li>
+            <li>Use blocking retries if strict order matters.</li>
+            <li>For strict per-key recovery, pause the partition or park later events for the affected customer.</li>
+            <li>Add per-customer sequence numbers and apply only the next expected version.</li>
+          </ul>
+          <pre><code>UPDATE customer_state
+SET status = :status, version = :newVersion
+WHERE customer_id = :id
+  AND version = :newVersion - 1;</code></pre>
+          <p>Avoid changing partition count on a live keyed topic unless you understand the remapping impact.</p>
+        </article>
+      </section>
+
+      <section id="database-interview">
+        <h2>Database Questions</h2>
+        <p class="lead">These answers focus on slow queries, peak CPU, row-level concurrency, and very large tables.</p>
+
+        <article class="card">
+          <h3>A query that took 50 ms now takes 10 seconds. How would you troubleshoot it?</h3>
+          <p>Find out whether the query is running slowly, waiting on locks or I/O, or paying for changed data volume or changed plans.</p>
+          <ol>
+            <li>Scope it: always slow or intermittent, all parameters or only some, one query or the whole database.</li>
+            <li>Check whether it is waiting with <code>pg_stat_activity</code>, <code>pg_locks</code>, <code>SHOW PROCESSLIST</code>, or database-specific wait views.</li>
+            <li>Compare the actual execution plan with the old plan.</li>
+            <li>Look for stale statistics, missing indexes, predicate changes, data growth, skew, bloat, lock contention, and ORM query changes.</li>
+          </ol>
+          <pre><code>EXPLAIN (ANALYZE, BUFFERS) SELECT ...;
+EXPLAIN ANALYZE SELECT ...;</code></pre>
+          <p>The cheapest fix is often refreshing statistics after a bulk load. Other fixes include restoring indexes, making predicates index-friendly, adding composite indexes, rewriting joins, archiving old data, or using an emergency plan override as a stopgap.</p>
+        </article>
+
+        <article class="card">
+          <h3>Database CPU reaches 100% during peak hours. What steps would you take?</h3>
+          <p>High CPU usually means a few expensive queries or a flood of cheap queries. Rank by total cost, not just slowest single call.</p>
+          <ul>
+            <li>Find top CPU queries with <code>pg_stat_statements</code>, Performance Schema, Query Store, or active session views.</li>
+            <li>Check whether connection count, retries, or batch jobs increased.</li>
+            <li>Kill runaway queries and pause reporting jobs if production is impacted.</li>
+            <li>Fix expensive queries with indexes, plan analysis, pagination, and query rewrites.</li>
+            <li>Fix chatty access with batching, caching, and eliminating N+1 queries.</li>
+            <li>Right-size connection pools and use PgBouncer or ProxySQL when appropriate.</li>
+            <li>Scale with read replicas or vertical capacity after optimizing the workload.</li>
+          </ul>
+          <p>Prevent recurrence with per-query latency alerts, statement timeouts, realistic load tests, query history, and release comparisons.</p>
+        </article>
+
+        <article class="card">
+          <h3>Two transactions update the same row simultaneously. How would you handle concurrency?</h3>
+          <p>The risk is a lost update. The right fix depends on the data and contention level.</p>
+          <table>
+            <thead>
+              <tr><th>Scenario</th><th>Approach</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Counters, stock, balances</td><td>Atomic SQL update with a guard condition</td></tr>
+              <tr><td>Rare conflicts</td><td>Optimistic locking with <code>@Version</code></td></tr>
+              <tr><td>High contention or money</td><td><code>SELECT ... FOR UPDATE</code> with short transactions</td></tr>
+              <tr><td>Status transitions</td><td>Conditional update on current state</td></tr>
+              <tr><td>Complex multi-row invariants</td><td><code>SERIALIZABLE</code> isolation with retry</td></tr>
+            </tbody>
+          </table>
+          <pre><code>UPDATE account
+SET balance = balance - 20
+WHERE id = 1 AND balance &gt;= 20;</code></pre>
+          <pre><code>SELECT * FROM account WHERE id = 1 FOR UPDATE;</code></pre>
+          <p>Do not rely on <code>synchronized</code> or JVM locks in a multi-instance system. The consistency rule belongs in the database.</p>
+        </article>
+
+        <article class="card">
+          <h3>A table has hundreds of millions of records. How would you improve performance?</h3>
+          <p>Stop touching most of the table. Read fewer rows, keep less hot data in the OLTP table, and move analytics or expensive reads elsewhere.</p>
+          <ul>
+            <li>Identify top queries and access patterns.</li>
+            <li>Add composite, covering, partial, or BRIN indexes that match real queries.</li>
+            <li>Use keyset pagination instead of large <code>OFFSET</code>.</li>
+            <li>Keep predicates index-friendly and avoid <code>SELECT *</code>.</li>
+            <li>Partition by the key most queries filter on, usually date or tenant.</li>
+            <li>Archive cold data and drop old partitions instead of deleting millions of rows.</li>
+            <li>Use read replicas, Redis/Caffeine caches, materialized views, summary tables, CDC, Elasticsearch, ClickHouse, or a warehouse for read-heavy analytics.</li>
+            <li>Tune statistics, vacuum, bloat management, and storage.</li>
+            <li>Shard only after indexing, partitioning, archiving, and read scaling are not enough.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="system-design-aws">
+        <h2>System Design and AWS</h2>
+        <p class="lead">These answers focus on scaling APIs, rate limiting, Redis failure modes, and safe rollback after latency regressions.</p>
+
+        <article class="card">
+          <h3>API receives 100,000 requests per minute. How would you scale it?</h3>
+          <p>100,000 requests per minute is about 1,700 requests per second on average. Plan for peaks of 5,000 to 8,000 RPS depending on traffic shape. The API layer is usually easier to scale than the database and downstream dependencies.</p>
+          <div class="flow" aria-label="AWS scaling architecture">
+            <span>Clients</span>
+            <span>Route 53</span>
+            <span>CloudFront + AWS WAF</span>
+            <span>API Gateway or ALB</span>
+            <span>Stateless services on ECS Fargate or EKS across multiple AZs</span>
+            <span>ElastiCache Redis</span>
+            <span>Aurora with read replicas or DynamoDB</span>
+            <span>SQS, Kinesis, or MSK for async work</span>
+          </div>
+          <ul>
+            <li>Clarify read/write ratio, p99 target, traffic pattern, geography, auth, and payload size.</li>
+            <li>Cache aggressively with CloudFront, Redis, and local Caffeine where safe.</li>
+            <li>Keep services stateless and auto-scale by CPU, request count, queue depth, or latency.</li>
+            <li>Use Aurora with read replicas and RDS Proxy, or DynamoDB for high-scale key-value workloads.</li>
+            <li>Move long-running work to queues and return <code>202 Accepted</code>.</li>
+            <li>Protect with rate limiting, timeouts, circuit breakers, retries with jitter, idempotency keys, and load shedding.</li>
+            <li>Load test at multiple times expected peak and watch p99 latency and error rate.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>Users are abusing your API. How would you implement rate limiting?</h3>
+          <p>Rate limit in layers. Use edge protection for floods and app-aware limits for user, API key, tenant, or endpoint behavior. In a multi-instance app, counters need a shared store such as Redis.</p>
+          <table>
+            <thead>
+              <tr><th>Algorithm</th><th>Use</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Fixed window</td><td>Simplest, but allows bursts at window boundaries.</td></tr>
+              <tr><td>Sliding window log</td><td>Exact but memory-heavy.</td></tr>
+              <tr><td>Sliding window counter</td><td>Accurate enough and cheap.</td></tr>
+              <tr><td>Token bucket</td><td>Most common; supports controlled bursts.</td></tr>
+              <tr><td>Leaky bucket</td><td>Smooths output but can add latency.</td></tr>
+            </tbody>
+          </table>
+          <p>Default to token bucket. Limit by IP for anonymous abuse, API key for partners, user ID for logged-in users, and endpoint plus key for expensive operations.</p>
+          <pre><code>spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api
+          uri: lb://api-service
+          predicates: [ Path=/api/** ]
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@apiKeyResolver}"</code></pre>
+          <p>Return <code>429 Too Many Requests</code> with <code>Retry-After</code> and rate-limit headers. Roll out new limits in shadow mode first, then enforce.</p>
+        </article>
+
+        <article class="card">
+          <h3>Redis crashes unexpectedly. How should your application behave?</h3>
+          <p>The app should degrade gracefully. If Redis is only a cache, treat failures as misses. If Redis protects correctness, fail closed or fall back to a database guarantee.</p>
+          <table>
+            <thead>
+              <tr><th>Redis role</th><th>Behavior when down</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Cache</td><td>Bypass and read from source of truth, with DB protection.</td></tr>
+              <tr><td>Rate limiting</td><td>Fail open with local fallback for most APIs; fail closed for login, OTP, and payments.</td></tr>
+              <tr><td>Sessions</td><td>Prefer JWTs; otherwise users may need to log in again.</td></tr>
+              <tr><td>Distributed locks</td><td>Fail closed or use DB locks.</td></tr>
+              <tr><td>Idempotency keys</td><td>Fall back to DB unique constraints or reject.</td></tr>
+              <tr><td>Queues or streams</td><td>Use durable broker behavior, buffering, or retry.</td></tr>
+            </tbody>
+          </table>
+          <p>Use short Redis timeouts, a bounded pool, a circuit breaker, local Caffeine cache, request coalescing, bulkheads, and load shedding so losing Redis does not overload the database.</p>
+          <pre><code>spring:
+  data:
+    redis:
+      timeout: 200ms
+      connect-timeout: 300ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-wait: 100ms</code></pre>
+          <p>Liveness checks should not depend on Redis unless the application truly cannot run without it. Use Multi-AZ Redis with automatic failover and test Redis outages in staging.</p>
+        </article>
+
+        <article class="card">
+          <h3>A deployment causes increased latency. How would you find the root cause and roll back safely?</h3>
+          <p>Mitigate first, investigate second. If the deployment correlates with a latency regression and users are impacted, roll back or shift traffic away quickly, then use saved evidence to find the cause.</p>
+          <ol>
+            <li>Confirm the regression lines up with the deploy using version-labeled metrics and deploy markers.</li>
+            <li>Compare old and new pods side by side during canary or rolling deployment.</li>
+            <li>If only the new version is slow and SLOs are breached, roll back immediately.</li>
+            <li>Check rollback safety: database migrations, event formats, cache keys, config changes, and backwards compatibility.</li>
+            <li>Save evidence before killing bad pods: slow traces, thread dumps, JFR, logs, and metrics.</li>
+          </ol>
+          <table>
+            <thead>
+              <tr><th>Area</th><th>What to check</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Database</td><td>N+1 queries, missing indexes, changed ORM fetches, migration locks</td></tr>
+              <tr><td>Connection pools</td><td>Pool size, acquisition time, leaks, pending threads</td></tr>
+              <tr><td>JVM</td><td>GC pauses, allocation rate, changed heap, JDK flags</td></tr>
+              <tr><td>Threads and locks</td><td>Blocking on locks, event-loop blocking, thread pool exhaustion</td></tr>
+              <tr><td>Downstream calls</td><td>New calls, longer timeouts, retries, circuit breaker state</td></tr>
+              <tr><td>Caching</td><td>Changed keys, disabled cache, hit-rate collapse</td></tr>
+              <tr><td>Resources</td><td>CPU throttling, reduced memory, too few replicas</td></tr>
+            </tbody>
+          </table>
+          <p>Use canaries, blue-green deployment, feature flags, GitOps rollback, and expand/contract database migrations so rollback remains safe. After fixing, redeploy gradually with automated canary analysis on p99 latency and error rate.</p>
+        </article>
+      </section>
+
+      <footer>
+        <p>Generated as a local backend engineering reference artifact.</p>
+      </footer>
+    </main>
+  </div>
+  <script src="assets/guide.js"></script>
+</body>
+</html>
